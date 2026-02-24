@@ -19,6 +19,9 @@ root_router = Router()
 root_router.include_router(subscription_router)
 root_router.include_router(deep_link_auth_router)
 
+from .bot_auth import router as bot_auth_router
+root_router.include_router(bot_auth_router)
+
 # 2. STUDENT
 root_router.include_router(student_documents_router)
 

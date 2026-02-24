@@ -168,7 +168,7 @@ async def cmd_start_deep_link(message: Message, command: CommandObject, session:
             await message.answer("❌ Tizim xatoligi yuz berdi. Keyinroq urinib ko'ring.")
 
 @router.message(CommandStart())
-async def cmd_start_generic(message: Message, session: AsyncSession):
+async def cmd_start_generic(message: Message, state: FSMContext, session: AsyncSession):
     """
     Fallback for non-deep-link start.
     Check if user is Owner/Developer/Admin and show menu.
@@ -208,9 +208,11 @@ async def cmd_start_generic(message: Message, session: AsyncSession):
             return
 
     # 3. Default Fallback
+    from models.states import AuthStates
+    await state.set_state(AuthStates.entering_hemis_login)
     await message.answer(
         "👋 <b>Assalomu alaykum!</b>\n\n"
-        "Bu bot faqat <b>TalabaHamkor</b> ilovasi orqali fayl yuklash va kirish uchun ishlatiladi.\n\n"
-        "📲 Iltimos, mobil ilovadan foydalaning.",
+        "Platformaga kirish uchun <b>Hemis Login (ID)</b>ingizni yozib yuboring:\n"
+        "(Masalan: 395211... yoki 12 ta belgi)",
         parse_mode="HTML"
     )
