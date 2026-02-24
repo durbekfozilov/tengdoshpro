@@ -608,8 +608,7 @@ class _SocialActivityScreenState extends State<SocialActivityScreen> {
       if (!mounted) return;
       setState(() {
         _activities = rawData.map((e) => SocialActivity.fromJson(e)).toList();
-        _isRegisteredBot = profile['is_registered_bot'] ?? false;
-
+        // _isRegisteredBot logic removed
       });
     } catch (e) {
       debugPrint("Load Error: $e");

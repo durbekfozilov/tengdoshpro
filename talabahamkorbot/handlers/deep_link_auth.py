@@ -64,10 +64,14 @@ async def cmd_start_deep_link(message: Message, command: CommandObject, session:
                 tg_account.current_role = "student"
                 await session.commit()
             
+            # Fetch Student to display name
+            student = await session.get(Student, pending.student_id)
+            student_name = student.short_name or student.full_name if student else "Talaba"
+
             # Determine intended state & message
             target_state = DocumentAddStates.WAIT_FOR_APP_FILE
             display_name = pending.title or "Hujjat"
-            msg_prefix = f"📎 <b>{display_name}</b> yuklanmoqda...\nIltimos, faylni shu yerga yuboring:"
+            msg_prefix = f"📎 <b>{display_name}</b> yuklanmoqda...\n\nIltimos, faylni shu yerga yuboring:"
 
             if pending.category == "sertifikat":
                 target_state = CertificateAddStates.WAIT_FOR_APP_FILE
@@ -81,7 +85,10 @@ async def cmd_start_deep_link(message: Message, command: CommandObject, session:
             await state.set_state(target_state)
             
             await message.answer(
-                f"🔗 <b>Hisob Ulandi!</b>\n\n{msg_prefix}",
+                f"👋 Assalomu alaykum, <b>{student_name}</b>!\n\n"
+                f"✅ <b>Sizning Telegramingiz muvaffaqiyatli ulandi.</b> Avtomatik tarzda ilova funksiyalariga ega bo'ldingiz.\n\n"
+                f"👇 <b>Davom etish:</b>\n"
+                f"{msg_prefix}",
                 parse_mode="HTML"
             )
             return
