@@ -90,17 +90,20 @@ class _AllAppealsTabState extends State<_AllAppealsTab> {
       children: [
         // Stats/Filter Header
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: const EdgeInsets.all(16),
           color: Colors.white,
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
+          child: Container(
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              color: Colors.grey[100],
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: Colors.grey[200]!),
+            ),
             child: Row(
               children: [
-                _buildFilterChip("Barchasi", "Barchasi", Icons.all_inbox_rounded),
-                const SizedBox(width: 8),
-                _buildFilterChip("Javob kutilmoqda", "pending", Icons.pending_actions_rounded),
-                const SizedBox(width: 8),
-                _buildFilterChip("Hal qilingan", "resolved", Icons.check_circle_outline_rounded),
+                Expanded(child: _buildSegmentButton("Barchasi", "Barchasi")),
+                Expanded(child: _buildSegmentButton("Kutilmoqda", "pending")),
+                Expanded(child: _buildSegmentButton("Hal qilingan", "resolved")),
               ],
             ),
           ),
@@ -137,33 +140,37 @@ class _AllAppealsTabState extends State<_AllAppealsTab> {
     );
   }
 
-  Widget _buildFilterChip(String label, String value, IconData icon) {
+  Widget _buildSegmentButton(String label, String value) {
     final isSelected = _currentFilter == value;
-    return InkWell(
+    return GestureDetector(
       onTap: () => _onFilterChanged(value),
-      borderRadius: BorderRadius.circular(20),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(vertical: 10),
         decoration: BoxDecoration(
-          color: isSelected ? AppTheme.primaryBlue.withOpacity(0.1) : Colors.grey[100],
+          color: isSelected ? Colors.white : Colors.transparent,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: isSelected ? AppTheme.primaryBlue : Colors.grey[300]!,
-          ),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.04),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  )
+                ]
+              : [],
         ),
-        child: Row(
-          children: [
-            Icon(icon, size: 16, color: isSelected ? AppTheme.primaryBlue : Colors.grey[700]),
-            const SizedBox(width: 6),
-            Text(
-              label,
-              style: TextStyle(
-                color: isSelected ? AppTheme.primaryBlue : Colors.grey[700],
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                fontSize: 13,
-              ),
+        child: Center(
+          child: Text(
+            label,
+            style: TextStyle(
+              color: isSelected ? AppTheme.primaryBlue : Colors.grey[600],
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+              fontSize: 13,
             ),
-          ],
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
       ),
     );
