@@ -220,6 +220,15 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
 
   Future<void> _loadUserPosts() async {
     try {
+      // Attempt to resolve real authorId if "0"
+      String realAuthorId = widget.authorId;
+      if (realAuthorId == "0" || realAuthorId.isEmpty) {
+        final me = await AuthService().getSavedUser();
+        if (me != null) {
+          realAuthorId = me.id.toString();
+        }
+      }
+
       // Fetch from all scopes to ensure we get every post
       final univPosts = await _service.getPosts(scope: "university");
       final facPosts = await _service.getPosts(scope: "faculty");
@@ -230,24 +239,25 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       final uniqueMap = { for (var p in all) p.id : p }; // Dedup by ID
       
       final userPosts = uniqueMap.values.where((p) {
-        // Fallback: If ID is "0" or invalid, try name match. 
-        // But Search passes specific ID, so ID match is primary.
-        if (p.authorId != "0" && p.authorId == widget.authorId) return true;
+        // Use realAuthorId first, fallback to name
+        if (realAuthorId != "0" && p.authorId == realAuthorId) return true;
         return p.authorName == widget.authorName;
       }).toList();
       
       // Sort newest first
       userPosts.sort((a, b) => b.id.compareTo(a.id));
       
-      // NEW: Load Reposts
-      final reposts = await _service.getRepostedPosts(widget.authorId);
+      // Load Reposts with valid author Id
+      final reposts = realAuthorId != "0" && realAuthorId.isNotEmpty 
+          ? await _service.getRepostedPosts(realAuthorId)
+          : <Post>[];
 
       if (mounted) {
         setState(() {
           _posts = userPosts;
-          _reposts = reposts; // NEW
+          _reposts = reposts; 
           _postCount = userPosts.length;
-          _repostCount = reposts.length; // NEW
+          _repostCount = reposts.length; 
           _isLoading = false;
         });
       }
