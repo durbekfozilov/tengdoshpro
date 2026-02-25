@@ -124,7 +124,7 @@ class _YetakchiStudentsScreenState extends State<YetakchiStudentsScreen> {
             ),
             title: Text(student['full_name'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
             subtitle: Padding(
-              padding: const EdgeInsets.top(6),
+              padding: const EdgeInsets.only(top: 6),
               child: Row(
                 children: [
                   Container(

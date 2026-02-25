@@ -32,8 +32,7 @@ class AuthProvider with ChangeNotifier {
     
     final leaderRoles = ['yetakchi', 'yoshlar_prorektori', 'prorektor', 'owner', 'developer'];
     
-    return leaderRoles.contains(role) || leaderRoles.contains(staffRole) || 
-           _currentUser?.hemisRole?.toLowerCase() == 'yetakchi';
+    return leaderRoles.contains(role) || leaderRoles.contains(staffRole);
   }
 
   bool get isModerator {

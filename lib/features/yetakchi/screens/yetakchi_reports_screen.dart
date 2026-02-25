@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/constants/api_constants.dart';
 import '../../../core/theme/app_theme.dart';
-import '../../auth/services/auth_service.dart';
+import '../../../core/services/auth_service.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class YetakchiReportsScreen extends StatelessWidget {
@@ -97,7 +97,7 @@ class YetakchiReportsScreen extends StatelessWidget {
          ),
          title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
          subtitle: Padding(
-           padding: const EdgeInsets.top(4),
+           padding: const EdgeInsets.only(top: 4),
            child: Text(subtitle, style: TextStyle(color: Colors.grey[600], fontSize: 12)),
          ),
          trailing: ElevatedButton.icon(

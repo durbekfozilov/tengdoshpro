@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../../../core/constants/api_constants.dart';
-import '../../auth/services/auth_service.dart';
+import '../../../core/services/auth_service.dart';
 
 class YetakchiService {
   final AuthService _authService = AuthService();
