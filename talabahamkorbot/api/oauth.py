@@ -213,49 +213,78 @@ async def authlog_callback(request: Request, code: Optional[str] = None, error: 
         
     else:
         # Staff
-        from database.models import Staff
+        from database.models import Staff, StaffRole
         pinfl = me.get("pinfl") or me.get("jshshir") or me.get("passport_pin")
         emp_id_num = me.get("employee_id_number")
         
         staff = None
         
         # [FIX] User request: ONLY identify staff via employee_id_number (unique ID).
-        if emp_id_num:
-            result = await db.execute(select(Staff).where(Staff.employee_id_number == emp_id_num))
-            staff = result.scalar_one_or_none()
-
-        if not staff:
-            logger.warning(f"Unauthorized staff login attempt (No Employee ID Match): {me.get('login')} / EmpID: {emp_id_num}")
-            return HTMLResponse(content="<h1>Xatolik</h1><p>Siz tizimda xodim sifatida mavjud emassiz yoki teltizimda xodim ID kiritilmagan. Iltimos adminga murojaat qiling.</p>", status_code=403)
-            
-        # [FIX] Do NOT force Rahbariyat. Keep existing DB role.
-        user_role = staff.role
-        role = "staff" # Generic role flag for JWT payload
-        logger.info(f"DEBUG: Staff matched: {staff.full_name} -> Existing Role: {user_role}")
-        
-        from utils.text_utils import format_uzbek_name
-        full_name = me.get("name")
-        if full_name:
-             full_name = format_uzbek_name(full_name.strip())
-        else:
-             full_name = format_uzbek_name(f"{me.get('surname', '')} {me.get('firstname', '')} {me.get('fathername', '')}".strip())
+        if not emp_id_num:
+             logger.warning(f"OAuth: Missing employee_id_number for {me.get('login')}")
+             return HTMLResponse(content="<h1>Xatolik</h1><p>Siz tizimda xodim sifatida mavjud emassiz yoki teltizimda xodim ID kiritilmagan. Iltimos adminga murojaat qiling.</p>", status_code=403)
              
-        image_url = me.get("picture") or me.get("picture_full") or me.get("image") or me.get("image_url")
+        # Dynamic Role Verification via HEMIS Admin API
+        role_data = await HemisService.verify_staff_role_from_hemis(emp_id_num)
+        if not role_data:
+             logger.warning(f"Unauthorized staff login attempt (Not found in JMCU root): {me.get('login')} / EmpID: {emp_id_num}")
+             return HTMLResponse(content="<h1>Xatolik</h1><p>Kechirasiz, siz JMCU xodimlar bazasida topilmadingiz yoki ruxsat etilgan rolingiz yo'q. Iltimos adminga murojaat qiling.</p>", status_code=403)
+             
+        assigned_role = role_data["role"]
+        dynamic_full_name = role_data["full_name"]
         
-        # Update existing Staff record
-        staff.full_name = full_name
-        if not staff.hemis_id and h_id:
-            staff.hemis_id = int(h_id)
-        if not staff.employee_id_number and emp_id_num:
-            staff.employee_id_number = emp_id_num
-        if not staff.jshshir and pinfl:
-            staff.jshshir = pinfl
-            
-        if image_url and not (staff.image_url and "static/uploads" in staff.image_url):
-            staff.image_url = image_url
-            
-        await db.commit()
-        await db.refresh(staff)
+        # Check Local DB
+        result = await db.execute(select(Staff).where(Staff.employee_id_number == emp_id_num))
+        staff = result.scalar_one_or_none()
+
+        if staff:
+             # Update existing Staff record
+             logger.info(f"DEBUG: Staff matched: {staff.full_name}. Updating Role: {staff.role} -> {assigned_role}")
+             staff.role = assigned_role
+             staff.full_name = dynamic_full_name
+             if not staff.hemis_id and h_id:
+                 staff.hemis_id = int(h_id)
+             if not staff.jshshir and pinfl:
+                 staff.jshshir = pinfl
+             
+             image_url = me.get("picture") or me.get("picture_full") or me.get("image") or me.get("image_url")
+             if image_url and not (staff.image_url and "static/uploads" in staff.image_url):
+                 staff.image_url = image_url
+                 
+             await db.commit()
+             await db.refresh(staff)
+        else:
+             # Look for matching hemis_id just in case
+             if h_id:
+                  res = await db.execute(select(Staff).where(Staff.hemis_id == int(h_id)))
+                  staff = res.scalar_one_or_none()
+                  
+             if staff:
+                  logger.info(f"DEBUG: Staff matched by hemis_id. Updating Role: {staff.role} -> {assigned_role}")
+                  staff.role = assigned_role
+                  staff.employee_id_number = emp_id_num
+                  staff.full_name = dynamic_full_name
+                  await db.commit()
+                  await db.refresh(staff)
+             else:
+                  # [NEW] Auto-create staff if found in dynamic verification
+                  logger.info(f"DEBUG: Auto-creating new staff: {dynamic_full_name} / {assigned_role}")
+                  image_url = me.get("picture") or me.get("picture_full") or me.get("image") or me.get("image_url")
+                  
+                  new_staff = Staff(
+                      full_name=dynamic_full_name,
+                      username=me.get('login', f"staff_{emp_id_num}"),
+                      employee_id_number=emp_id_num,
+                      hemis_id=int(h_id) if h_id else None,
+                      jshshir=pinfl,
+                      role=assigned_role,
+                      is_active=True,
+                      image_url=image_url
+                  )
+                  db.add(new_staff)
+                  await db.commit()
+                  await db.refresh(new_staff)
+                  staff = new_staff
         
         # [STATELESS] Generate JWT with embedded HEMIS token
         user_agent = request.headers.get("user-agent", "unknown")

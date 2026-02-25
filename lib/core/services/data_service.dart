@@ -1393,6 +1393,52 @@ class DataService {
     }
   }
 
+  // 30.3 Get All Tutor Appeals
+  Future<List<dynamic>> getTutorAllAppeals({String? status}) async {
+    try {
+      String url = "${ApiConstants.backendUrl}/tutor/appeals";
+      if (status != null && status.isNotEmpty) {
+        url += "?status=$status";
+      }
+      final response = await _get(url);
+      if (response.statusCode == 200) {
+        final body = json.decode(response.body);
+        if (body['success'] == true) return body['data'] as List;
+      }
+    } catch (e) {
+      debugPrint("Error fetching tutor appeals: $e");
+    }
+    return [];
+  }
+
+  // 30.4 Get Tutor Appeals Stats
+  Future<Map<String, dynamic>> getTutorAppealsStats() async {
+    try {
+      final response = await _get("${ApiConstants.backendUrl}/tutor/appeals/stats");
+      if (response.statusCode == 200) {
+        final body = json.decode(response.body);
+        if (body['success'] == true) return body['stats'];
+      }
+    } catch (e) {
+      debugPrint("Error fetching tutor appeals stats: $e");
+    }
+    return {"pending": 0, "answered": 0, "resolved": 0};
+  }
+
+  // 30.5 Get Tutor Appeal Detail
+  Future<Map<String, dynamic>?> getTutorAppealDetail(int id) async {
+    try {
+      final response = await _get("${ApiConstants.backendUrl}/tutor/appeals/$id");
+      if (response.statusCode == 200) {
+        final body = json.decode(response.body);
+        if (body['success'] == true) return body['detail'];
+      }
+    } catch (e) {
+      debugPrint("Error fetching tutor appeal detail: $e");
+    }
+    return null;
+  }
+
   // 31. Get Tutor Dashboard
   Future<Map<String, dynamic>> getTutorDashboard() async {
     try {

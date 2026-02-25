@@ -6,8 +6,9 @@ import 'package:talabahamkor_mobile/features/tutor/screens/tutor_group_students_
 
 class TutorGroupsScreen extends StatefulWidget {
   final bool isAppealsMode;
+  final bool showAppBar;
 
-  const TutorGroupsScreen({super.key, this.isAppealsMode = true});
+  const TutorGroupsScreen({super.key, this.isAppealsMode = true, this.showAppBar = true});
 
   @override
   State<TutorGroupsScreen> createState() => _TutorGroupsScreenState();
@@ -43,9 +44,9 @@ class _TutorGroupsScreenState extends State<TutorGroupsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppTheme.backgroundWhite,
-      appBar: AppBar(
+      appBar: widget.showAppBar ? AppBar(
         title: Text(widget.isAppealsMode ? "Murojaatlar (Guruhlar)" : "Guruhlarim"),
-      ),
+      ) : null,
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _groups.isEmpty

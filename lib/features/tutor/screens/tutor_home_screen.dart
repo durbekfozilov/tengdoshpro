@@ -9,6 +9,7 @@ import 'package:talabahamkor_mobile/features/tutor/screens/tutor_groups_list_scr
 import 'package:talabahamkor_mobile/features/tutor/screens/tutor_activity_groups_screen.dart';
 import 'package:talabahamkor_mobile/features/tutor/screens/tutor_documents_groups_screen.dart';
 import 'package:talabahamkor_mobile/features/tutor/screens/tutor_certificates_groups_screen.dart';
+import 'package:talabahamkor_mobile/features/tutor/screens/tutor_appeals_main_screen.dart';
 
 class TutorHomeScreen extends StatefulWidget {
   const TutorHomeScreen({super.key});
@@ -169,7 +170,7 @@ class _TutorHomeScreenState extends State<TutorHomeScreen> {
                       () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (_) => const TutorGroupsScreen()),
+                          MaterialPageRoute(builder: (_) => const TutorAppealsMainScreen()),
                         );
                       },
                     ),

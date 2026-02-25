@@ -426,7 +426,176 @@ async def get_group_appeals(
         "data": data
     }
 
-@router.post("/reply")
+
+@router.get("/appeals")
+async def get_all_tutor_appeals(
+    status: Optional[str] = None,
+    db: AsyncSession = Depends(get_session),
+    tutor: Staff = Depends(get_current_staff)
+):
+    groups_result = await db.execute(select(TutorGroup.group_number).where(TutorGroup.tutor_id == tutor.id))
+    group_numbers = groups_result.scalars().all()
+    if not group_numbers:
+        return {"success": True, "data": []}
+
+    stmt = (
+        select(StudentFeedback, Student)
+        .join(Student, StudentFeedback.student_id == Student.id)
+        .where(
+            StudentFeedback.assigned_role == "tyutor",
+            StudentFeedback.parent_id == None,
+            Student.group_number.in_(group_numbers)
+        )
+        .order_by(StudentFeedback.created_at.desc())
+    )
+
+    if status:
+        if status == 'pending':
+            stmt = stmt.where(StudentFeedback.status.not_in(['closed', 'resolved', 'answered', 'replied']))
+        elif status == 'answered':
+            stmt = stmt.where(StudentFeedback.status.in_(['answered', 'replied']))
+        elif status == 'resolved':
+            stmt = stmt.where(StudentFeedback.status.in_(['closed', 'resolved']))
+
+    result = await db.execute(stmt)
+    rows = result.all()
+
+    data = []
+    for feedback, s in rows:
+        data.append({
+            "id": feedback.id,
+            "student_id": s.id,
+            "student_name": s.full_name,
+            "student_image": s.image_url,
+            "student_faculty": s.faculty_name or "",
+            "student_group": s.group_number or "",
+            "text": feedback.text,
+            "status": feedback.status,
+            "created_at": feedback.created_at.isoformat() if feedback.created_at else None,
+            "file_id": feedback.file_id,
+            "file_type": feedback.file_type
+        })
+    return {"success": True, "data": data}
+
+@router.get("/appeals/stats")
+async def get_tutor_appeals_stats(
+    db: AsyncSession = Depends(get_session),
+    tutor: Staff = Depends(get_current_staff)
+):
+    groups_result = await db.execute(select(TutorGroup.group_number).where(TutorGroup.tutor_id == tutor.id))
+    group_numbers = groups_result.scalars().all()
+    if not group_numbers:
+        return {"success": True, "stats": {"pending": 0, "answered": 0, "resolved": 0}}
+
+    stmt = (
+        select(StudentFeedback.status)
+        .join(Student, StudentFeedback.student_id == Student.id)
+        .where(
+            StudentFeedback.assigned_role == "tyutor",
+            StudentFeedback.parent_id == None,
+            Student.group_number.in_(group_numbers)
+        )
+    )
+    result = await db.execute(stmt)
+    statuses = result.scalars().all()
+
+    pending = 0
+    answered = 0
+    resolved = 0
+
+    for s in statuses:
+        if s in ['closed', 'resolved']:
+            resolved += 1
+        elif s in ['answered', 'replied']:
+            answered += 1
+        else:
+            pending += 1
+
+    return {"success": True, "stats": {"pending": pending, "answered": answered, "resolved": resolved}}
+
+@router.get("/appeals/{appeal_id}")
+async def get_tutor_appeal_detail(
+    appeal_id: int,
+    db: AsyncSession = Depends(get_session),
+    tutor: Staff = Depends(get_current_staff)
+):
+    from sqlalchemy.orm import selectinload
+    stmt = (
+        select(StudentFeedback, Student)
+        .join(Student, StudentFeedback.student_id == Student.id)
+        .where(StudentFeedback.id == appeal_id)
+        .options(selectinload(StudentFeedback.replies), selectinload(StudentFeedback.children))
+    )
+    result = await db.execute(stmt)
+    row = result.first()
+    if not row:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail="Murojaat topilmadi")
+
+    appeal, student = row
+    
+    messages = []
+    from datetime import datetime
+    
+    # 1. Root Message
+    messages.append({
+        "id": appeal.id,
+        "sender": "student",
+        "sender_name": student.full_name,
+        "text": appeal.text,
+        "time": appeal.created_at.strftime("%H:%M") if appeal.created_at else "--:--",
+        "timestamp": appeal.created_at,
+        "file_id": appeal.file_id
+    })
+    
+    # 2. Staff Replies
+    try:
+        for r in (appeal.replies or []):
+            messages.append({
+                "id": r.id,
+                "sender": "me" if r.staff_id == tutor.id else "staff",
+                "sender_name": tutor.full_name if r.staff_id == tutor.id else "Xodim",
+                "text": r.text,
+                "time": r.created_at.strftime("%H:%M") if r.created_at else "--:--",
+                "timestamp": r.created_at,
+                "file_id": r.file_id
+            })
+    except Exception: pass
+    
+    # 3. Student Follow-ups
+    try:
+        for child in (appeal.children or []):
+            messages.append({
+                "id": child.id,
+                "sender": "student",
+                "sender_name": student.full_name,
+                "text": child.text,
+                "time": child.created_at.strftime("%H:%M") if child.created_at else "--:--",
+                "timestamp": child.created_at,
+                "file_id": child.file_id
+            })
+    except Exception: pass
+    
+    messages.sort(key=lambda x: x['timestamp'] or datetime.utcnow())
+    for m in messages:
+         m['timestamp'] = m['timestamp'].isoformat() if m['timestamp'] else None
+
+    return {
+        "success": True,
+        "detail": {
+            "id": appeal.id,
+            "title": f"Murojaat #{appeal.id} - {student.full_name}",
+            "status": appeal.status,
+            "date": appeal.created_at.strftime("%d.%m.%Y") if appeal.created_at else "",
+            "is_anonymous": appeal.is_anonymous,
+            "student_name": student.full_name,
+            "student_image": student.image_url,
+            "messages": messages
+        }
+    }
+
+
+@router.post("/appeals/{appeal_id}/reply")
 async def reply_to_appeal(
     appeal_id: int, 
     text: str, 

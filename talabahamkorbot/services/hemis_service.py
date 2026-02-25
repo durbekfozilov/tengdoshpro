@@ -402,6 +402,82 @@ class HemisService:
             
         return None
 
+    @staticmethod
+    async def verify_staff_role_from_hemis(employee_id_number: str) -> Optional[dict]:
+        """
+        Dynamically verifies a staff member's role against the JMCU HEMIS employee database.
+        Maps the external Hemis staff position to our internal `StaffRole`.
+        """
+        if not employee_id_number:
+            return None
+            
+        client = await HemisService.get_client()
+        url = f"https://student.jmcu.uz/rest/v1/data/employee-list"
+        headers = HemisService.get_headers(HEMIS_ADMIN_TOKEN)
+        params = {"type": "employee", "search": employee_id_number, "limit": 1}
+        
+        try:
+            logger.info(f"Verifying staff role for employee ID: {employee_id_number} via Admin API")
+            response = await client.get(url, headers=headers, params=params)
+            
+            if response.status_code == 200:
+                data = response.json()
+                items = data.get("data", {}).get("items", [])
+                
+                if not items:
+                    logger.warning(f"Employee ID {employee_id_number} not found in HEMIS employee-list.")
+                    return None
+                    
+                employee = items[0]
+                # Ensure it's a direct match in case search returned a broad match
+                if employee.get("employee_id_number") != employee_id_number:
+                     logger.warning(f"Employee ID mismatch. Expected {employee_id_number}, got {employee.get('employee_id_number')}")
+                     return None
+                     
+                staff_position = employee.get("staffPosition", {}).get("name", "").lower()
+                department = employee.get("department", {}).get("name", "").lower()
+                full_name = employee.get("full_name", "")
+                hemis_id = employee.get("id")
+                
+                # Dynamic Role Mapping
+                from database.models import StaffRole
+                assigned_role = None
+                
+                if "tyutor" in staff_position:
+                    assigned_role = StaffRole.TYUTOR
+                elif "dekan" in staff_position:
+                     if "o'rinbosar" in staff_position or "o‘rinbosar" in staff_position:
+                          assigned_role = StaffRole.DEKANAT
+                     else:
+                          assigned_role = StaffRole.DEKAN
+                elif "rektor" in staff_position or "prorektor" in staff_position:
+                    assigned_role = StaffRole.REKTOR # Internally handled as rektor or rahbariyat
+                elif "psixolog" in staff_position:
+                    assigned_role = StaffRole.PSIXOLOG
+                elif "kutubxona" in department or "axborot-resurs markazi" in department:
+                    assigned_role = StaffRole.KUTUBXONA
+                elif "inspektor" in staff_position:
+                     assigned_role = StaffRole.INSPEKTOR
+                else:
+                    # Fallback to general rahbariyat/staff
+                    assigned_role = StaffRole.RAHBARIYAT
+                    
+                logger.info(f"Dynamic Role Mapping: {staff_position} -> {assigned_role}")
+                
+                return {
+                    "role": assigned_role,
+                    "full_name": full_name,
+                    "hemis_id": hemis_id,
+                    "staff_position": staff_position,
+                    "department": department
+                }
+            else:
+                 logger.error(f"Failed to fetch employee list. Status: {response.status_code}")
+                 return None
+        except Exception as e:
+            logger.error(f"Exception verifying staff role: {e}")
+            return None
+
 
     @staticmethod
     async def get_student_absence(token: str, semester_code: str = None, student_id: int = None, force_refresh: bool = False, base_url: Optional[str] = None):
