@@ -106,7 +106,9 @@ async def authlog_callback(request: Request, code: Optional[str] = None, error: 
     # 3. Save/Update User in DB (Same logic as auth.py)
     h_id = str(me.get("id", ""))
     h_login = me.get("login")
-    user_type = me.get("type", "student")
+    
+    # [FIX] As per user request: Anyone logging in via OAuth (OneID) is considered staff.
+    user_type = "employee"
     
     internal_token = ""
     role = "student"
@@ -211,175 +213,64 @@ async def authlog_callback(request: Request, code: Optional[str] = None, error: 
         
     else:
         # Staff
-        role = "staff" # Generic
         from database.models import Staff
         pinfl = me.get("pinfl") or me.get("jshshir") or me.get("passport_pin")
+        emp_id_num = me.get("employee_id_number")
         
         staff = None
-        if h_id:
-            result = await db.execute(select(Staff).where(Staff.hemis_id == int(h_id)))
-            staff = result.scalar_one_or_none()
-            
-        if not staff and pinfl:
-            result = await db.execute(select(Staff).where(Staff.jshshir == pinfl))
-            staff = result.scalar_one_or_none()
-            
-        emp_id_num = me.get("employee_id_number")
-        if not staff and emp_id_num:
+        
+        # [FIX] User request: ONLY identify staff via employee_id_number (unique ID).
+        if emp_id_num:
             result = await db.execute(select(Staff).where(Staff.employee_id_number == emp_id_num))
             staff = result.scalar_one_or_none()
+
+        if not staff:
+            logger.warning(f"Unauthorized staff login attempt (No Employee ID Match): {me.get('login')} / EmpID: {emp_id_num}")
+            return HTMLResponse(content="<h1>Xatolik</h1><p>Siz tizimda xodim sifatida mavjud emassiz yoki teltizimda xodim ID kiritilmagan. Iltimos adminga murojaat qiling.</p>", status_code=403)
             
-        # Determine Best Role
-        hemis_roles = me.get("roles", []) or []
-        # [FIX] Force Rahbariyat for ALL OneID users as per user request
-        # "Kim bo'lishidan q'atiy nazar oneid bilan kirsa uni rahbariyat deb qabul qil"
-        user_role = StaffRole.RAHBARIYAT
-        best_priority = 999 
-        
-        # Original logic ignored to force Rahbariyat
-        # for r in hemis_roles: ...
-        
-        logger.info(f"DEBUG: OneID Roles: {hemis_roles} -> Forced Role: {user_role}")
+        # [FIX] Do NOT force Rahbariyat. Keep existing DB role.
+        user_role = staff.role
+        role = "staff" # Generic role flag for JWT payload
+        logger.info(f"DEBUG: Staff matched: {staff.full_name} -> Existing Role: {user_role}")
         
         from utils.text_utils import format_uzbek_name
         full_name = me.get("name")
         if full_name:
-             # Handle UPPERCASE names from OneID
              full_name = format_uzbek_name(full_name.strip())
         else:
-             full_name = format_uzbek_name(f"{me.get('surname', '')} {me.get('firstname', '')} {me.get('patronymic', '')}".strip())
-            
+             full_name = format_uzbek_name(f"{me.get('surname', '')} {me.get('firstname', '')} {me.get('fathername', '')}".strip())
+             
         image_url = me.get("picture") or me.get("picture_full") or me.get("image") or me.get("image_url")
-        logger.info(f"Selected Best Role: {user_role} (Priority: {best_priority}) from {hemis_roles}")
-
-        if staff:
-            # Update existing staff info
-            staff.full_name = full_name
-            if image_url:
-                staff.image_url = image_url
+        
+        # Update existing Staff record
+        staff.full_name = full_name
+        if not staff.hemis_id and h_id:
+            staff.hemis_id = int(h_id)
+        if not staff.employee_id_number and emp_id_num:
+            staff.employee_id_number = emp_id_num
+        if not staff.jshshir and pinfl:
+            staff.jshshir = pinfl
             
-            if not staff.hemis_id and h_id:
-                staff.hemis_id = int(h_id)
+        if image_url and not (staff.image_url and "static/uploads" in staff.image_url):
+            staff.image_url = image_url
             
-            # [NEW] Expanded Profile Data (From OneID)
-            staff.email = me.get("email")
-            staff.phone = me.get("phone")
-            staff.birth_date = me.get("birth_date")
-            staff.employee_id_number = me.get("employee_id_number")
-            
-            # Extract Department and Position
-            # 1. Try 'staffPosition' object
-            staff_position_obj = me.get("staffPosition")
-            if staff_position_obj and isinstance(staff_position_obj, dict):
-                staff.position = staff_position_obj.get("name")
-            
-            # 2. Try 'departments' array (First verified department)
-            departments = me.get("departments", [])
-            if departments and isinstance(departments, list):
-                first_dept = departments[0]
-                if isinstance(first_dept, dict):
-                     dept_info = first_dept.get("department", {})
-                     if isinstance(dept_info, dict):
-                         staff.department = dept_info.get("name")
-                         
-                     # Fallback position if not set
-                     if not staff.position:
-                         sp = first_dept.get("staffPosition", {})
-                         if isinstance(sp, dict):
-                             staff.position = sp.get("name")
-
-            # [FIX] Force Rahbariyat for ALL Staff users as per user request
-            staff.role = StaffRole.RAHBARIYAT
-
-            # Force Rahbariyat for specific employee_id if needed (Safety Net)
-            if staff.employee_id_number == "3952111037": # User's specific ID
-                staff.role = "rahbariyat"
-
-            await db.commit()
-            # [NEW] Save Token
-            # staff.hemis_token = access_token # DISABLED
-            u_id = me.get("university_id")
-            if u_id:
-                try:
-                    u_id_int = int(u_id)
-                    # Map JMCU (395) -> 1
-                    if u_id_int == 395 or "jmcu" in base_url:
-                        staff.university_id = 1
-                    else:
-                        # Only assign if it exists in our DB to avoid IntegrityError
-                        exists = await db.scalar(select(University.id).where(University.id == u_id_int))
-                        if exists:
-                            staff.university_id = u_id_int
-                        else:
-                            logger.warning(f"University ID {u_id_int} not found in local DB for staff. Skipping.")
-                except (ValueError, TypeError):
-                    logger.warning(f"Invalid university_id format for staff: {u_id}")
-                 
-            await db.commit()
-            
-            # [STATELESS] Generate JWT with embedded HEMIS token
-            user_agent = request.headers.get("user-agent", "unknown")
-            encrypted_token = encrypt_data(access_token)
-            
-            internal_token = create_access_token(
-                data={
-                    "sub": str(h_id), 
-                    "type": "staff", 
-                    "id": staff.id,
-                    "hemis_token": encrypted_token # Embed Encrypted
-                },
-                expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
-                user_agent=user_agent
-            )
-        else:
-            # Auto-register Staff
-            logger.info(f"Auto-registering new staff: {h_id} - {me.get('firstname')} {me.get('surname')}")
-            
-            uni_id_final = None
-            u_id_raw = me.get("university_id")
-            if u_id_raw:
-                try:
-                    u_id_int = int(u_id_raw)
-                    if u_id_int == 395 or "jmcu" in base_url:
-                        uni_id_final = 1
-                    else:
-                        # Verify existence
-                        exists = await db.scalar(select(University.id).where(University.id == u_id_int))
-                        if exists: uni_id_final = u_id_int
-                except: pass
-
-
-
-            staff = Staff(
-                hemis_id=int(h_id) if h_id else None,
-                full_name=full_name,
-                image_url=image_url,
-                jshshir=pinfl or "",
-                role=user_role,
-                phone=me.get("phone"),
-                is_active=True,
-                hemis_token=encrypt_data(access_token), # [NEW] Encrypted
-                # hemis_password=None, # [DISABLED] Privacy
-                university_id=uni_id_final
-            )
-            db.add(staff)
-            await db.commit()
-            await db.refresh(staff)
-            
-            # [STATELESS] Generate JWT with embedded HEMIS token
-            user_agent = request.headers.get("user-agent", "unknown")
-            encrypted_token = encrypt_data(access_token)
-            
-            internal_token = create_access_token(
-                data={
-                    "sub": str(h_id), 
-                    "type": "staff", 
-                    "id": staff.id,
-                    "hemis_token": encrypted_token # Embed Encrypted
-                },
-                expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
-                user_agent=user_agent
-            )
+        await db.commit()
+        await db.refresh(staff)
+        
+        # [STATELESS] Generate JWT with embedded HEMIS token
+        user_agent = request.headers.get("user-agent", "unknown")
+        encrypted_token = encrypt_data(access_token)
+        
+        internal_token = create_access_token(
+            data={
+                "sub": str(h_id), 
+                "type": "staff", 
+                "id": staff.id,
+                "hemis_token": encrypted_token
+            },
+            expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
+            user_agent=user_agent
+        )
 
     # 4. Return HTML
     

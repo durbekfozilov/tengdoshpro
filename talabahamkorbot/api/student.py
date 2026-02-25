@@ -701,3 +701,25 @@ async def update_profile(
     # Optionally, we could sync FROM Hemis? But getProfile does that.
     
     return {"success": True, "message": "Ma'lumotlar yangilandi (faqat parol o'zgarishi mumkin)"}
+
+@router.post("/unlink-telegram")
+async def unlink_telegram_account(
+    student: Student = Depends(get_current_student),
+    db: AsyncSession = Depends(get_db)
+):
+    """Unlinks the student's connected Telegram account to allow connecting a new one"""
+    from database.models import TgAccount
+    
+    # 1. Fetch current account
+    stmt = select(TgAccount).where(TgAccount.student_id == student.id)
+    result = await db.execute(stmt)
+    tg_account = result.scalars().first()
+    
+    if not tg_account:
+        return {"success": False, "message": "Telegram hisob ulanmagan"}
+        
+    # 2. Delete the account link
+    await db.delete(tg_account)
+    await db.commit()
+    
+    return {"success": True, "message": "Telegram hisobi muvaffaqiyatli uzildi! Endi yangi hisobni ulashingiz mumkin."}

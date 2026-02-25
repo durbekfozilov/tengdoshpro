@@ -223,11 +223,10 @@ async def cmd_start_generic(message: Message, state: FSMContext, session: AsyncS
         )
 
     # 3. Default Fallback
-    from models.states import AuthStates
-    await state.set_state(AuthStates.entering_hemis_login)
     await message.answer(
         "👋 <b>Assalomu alaykum!</b>\n\n"
-        "Platformaga kirish uchun <b>Hemis Login (ID)</b>ingizni yozib yuboring:\n"
-        "(Masalan: 395211... yoki 12 ta belgi)",
+        "Siz botga ulanmagansiz. Botdan foydalanish va fayllar yuborish uchun, "
+        "iltimos, dastlab <b>Mobil Ilovaga</b> kiring va Profilingizdan "
+        "<i>«Telegramni ulash»</i> tugmasini bosing.",
         parse_mode="HTML"
     )

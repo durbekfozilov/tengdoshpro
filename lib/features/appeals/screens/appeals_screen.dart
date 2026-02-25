@@ -735,7 +735,23 @@ class _CreateAppealSheetState extends State<CreateAppealSheet> {
                                  Navigator.pop(ctx);
                                  setState(() { _isSubmitting = false; _isUploading = false; });
                              }, 
-                             child: const Text("Bekor qilish")
+                             child: const Text("Bekor qilish", style: TextStyle(color: Colors.grey))
+                         ),
+                         TextButton(
+                             onPressed: () async {
+                                 _statusTimer?.cancel();
+                                 Navigator.pop(ctx);
+                                 setState(() { _isSubmitting = false; _isUploading = false; });
+                                 try {
+                                     // Call unlink via data_service/appeal_service
+                                     // But DataService is what we updated
+                                     await DataService().unlinkTelegram();
+                                     if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Eski hisob uzildi. Qayta yuborishni bosing.")));
+                                 } catch(e) {
+                                     if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Xatolik: \$e")));
+                                 }
+                             }, 
+                             child: const Text("Telegramim yangi", style: TextStyle(color: Colors.orange))
                          )
                      ],
                  )

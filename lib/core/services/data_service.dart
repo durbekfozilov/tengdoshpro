@@ -526,6 +526,16 @@ class DataService {
     return {"status": "pending"};
   }
 
+  // NEW: Unlink Telegram Account
+  Future<Map<String, dynamic>> unlinkTelegram() async {
+    final response = await authPost('${ApiConstants.backendUrl}/student/unlink-telegram');
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw Exception('Failed to unlink Telegram: ${response.body}');
+    }
+  }
+
   Future<SocialActivity?> addActivity(String category, String name, String description, String date, {String? sessionId}) async {
     final token = await _authService.getToken();
     var request = http.MultipartRequest('POST', Uri.parse(ApiConstants.activities));

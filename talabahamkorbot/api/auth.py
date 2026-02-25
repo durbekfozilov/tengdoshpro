@@ -795,13 +795,19 @@ async def hemis_callback(
     h_login = me.get("login", "")
     
     # ... logic from login_via_hemis but adapted for OAuth ...
-    # To keep it DRY, I'll extract some logic or just replicate for now as it's complex
-    # Let's simplify: find student by hemis_id/login or create
+    # [FIX] As per user request: Anyone logging in via OAuth is considered staff.
+    from database.models import Staff, StaffRole
     
-    # (Simplified Sync Logic inspired by login_via_hemis)
-    stmt = select(Student).where(Student.hemis_login == h_login)
-    result = await db.execute(stmt)
-    student = result.scalar_one_or_none()
+    # Simple Staff Sync Logic
+    pinfl = me.get("pinfl") or me.get("jshshir") or me.get("passport_pin")
+    emp_id_num = me.get("employee_id_number")
+
+    staff = None
+    
+    # [FIX] User request: ONLY identify staff via employee_id_number (unique ID).
+    if emp_id_num:
+        result = await db.execute(select(Staff).where(Staff.employee_id_number == emp_id_num))
+        staff = result.scalar_one_or_none()
 
     # Name Parsing - Robust Extraction
     first_name = format_uzbek_name((me.get('firstname') or me.get('first_name') or "").strip())
@@ -810,70 +816,56 @@ async def hemis_callback(
     
     full_name_db = f"{last_name} {first_name} {father_name}".strip()
     if not full_name_db:
-        # Final raw fallback
-        full_name_db = me.get('name') or me.get('full_name') or "Talaba"
+        full_name_db = me.get('name') or me.get('full_name') or "Xodim"
     
-    # Uni/Faculty mapping
-    uni_name = me.get("university", {}).get("name") if isinstance(me.get("university"), dict) else me.get("university_name") or "JMCU"
-    fac_name = me.get("faculty", {}).get("name") if isinstance(me.get("faculty"), dict) else me.get("faculty_name") or ""
     image_url = me.get("image") or me.get("picture") or me.get("image_url")
-    
-    uni_id, fac_id = await get_or_create_academic_context(db, uni_name, fac_name)
 
-    if not student:
-        student = Student(
-            full_name=full_name_db,
-            hemis_login=h_login,
-            hemis_id=h_id,
-            hemis_token=token,
-            university_name=uni_name,
-            faculty_name=fac_name,
-            university_id=uni_id,
-            faculty_id=fac_id,
-            short_name=first_name,
-            image_url=image_url
-        )
-        db.add(student)
-    else:
-        student.hemis_token = token
-        student.full_name = full_name_db
-        student.university_name = uni_name
-        student.faculty_name = fac_name
-        student.university_id = uni_id
-        student.faculty_id = fac_id
-        student.short_name = first_name
-        if image_url and not (student.image_url and "static/uploads" in student.image_url):
-            student.image_url = image_url
+    # [FIX] Do NOT auto-register staff. Only allow existing ones with matching employee_id_number.
+    if not staff:
+        logger.warning(f"Unauthorized staff login attempt (No Employee ID Match): {h_login} / EmpID: {emp_id_num}")
+        return HTMLResponse(content=_get_error_html("Siz tizimda xodim sifatida mavjud emassiz yoki teltizimda xodim ID kiritilmagan. Iltimos adminga murojaat qiling."), status_code=403)
     
+    # [FIX] Do NOT force Rahbariyat. Keep existing DB role.
+    user_role = staff.role
+    
+    staff.full_name = full_name_db
+    # Do not overwrite role with a fixed one, preserve existing one!
+    if not staff.hemis_id and h_id:
+        staff.hemis_id = int(h_id)
+    if not staff.employee_id_number and emp_id_num:
+        staff.employee_id_number = emp_id_num
+    if not staff.jshshir and pinfl:
+        staff.jshshir = pinfl
+    if image_url and not (staff.image_url and "static/uploads" in staff.image_url):
+        staff.image_url = image_url
+
     await db.commit()
-    await db.refresh(student)
+    await db.refresh(staff)
 
     # 4. Handle State (Bot vs App)
     if state and state.startswith("bot_"):
         tg_id_str = state.replace("bot_", "")
         try:
             tg_id = int(tg_id_str)
-            # Link TgAccount if not linked
+            # Link TgAccount for Staff
             from database.models import TgAccount
             acc_stmt = select(TgAccount).where(TgAccount.telegram_id == tg_id)
             acc_res = await db.execute(acc_stmt)
             acc = acc_res.scalar_one_or_none()
             if acc:
-                acc.student_id = student.id
-                acc.current_role = "student" # Ensure role is set
+                acc.staff_id = staff.id
+                acc.current_role = "staff" 
                 await db.commit()
             else:
-                # Create new link
                 new_acc = TgAccount(
                     telegram_id=tg_id,
-                    student_id=student.id,
-                    current_role="student"
+                    staff_id=staff.id,
+                    current_role="staff"
                 )
                 db.add(new_acc)
                 await db.commit()
             
-            # Send notification to user via Bot
-            await _notify_bot_user(tg_id, student.full_name)
+            await _notify_bot_user(tg_id, staff.full_name)
             
             return HTMLResponse(content=_get_success_html("Telegram Botga muvaffaqiyatli kirdingiz! Endi brauzerni yopishingiz mumkin."))
         except Exception as e:
@@ -881,20 +873,19 @@ async def hemis_callback(
             return HTMLResponse(content=_get_success_html("Tizimga kirdingiz, lekin botga xabar yuborishda xatolik bo'ldi. Botni qayta ishga tushiring."))
 
     elif state == "app":
-        # [STATELESS] Generate JWT with embedded HEMIS token for OAuth/App Login
         user_agent = request.headers.get("user-agent", "unknown")
         
         # [SECURITY] Encrypt Token
         from utils.encryption import encrypt_data
         encrypted_token = encrypt_data(token)
         
-        # Create Access Token
+        # Create Access Token for Staff
         access_token = create_access_token(
             data={
-                "sub": student.hemis_login,
-                "type": "student",
-                "id": student.id,
-                "hemis_token": encrypted_token # Embed Encrypted Token
+                "sub": h_login,
+                "type": "staff",
+                "id": staff.id,
+                "hemis_token": encrypted_token
             },
             expires_delta=timedelta(minutes=60 * 24 * 7), # 7 days
             user_agent=user_agent

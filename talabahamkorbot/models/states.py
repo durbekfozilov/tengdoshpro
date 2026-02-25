@@ -12,8 +12,6 @@ any_state = State(state="*")
 class AuthStates(StatesGroup):
     choosing_role = State()
     entering_jshshir = State()
-    entering_hemis_login = State()
-    entering_hemis_password = State() # NEW
     confirm_data = State()
     entering_phone = State()
 
@@ -79,8 +77,6 @@ class OwnerGifts(StatesGroup):
 
 class StaffAuthStates(StatesGroup):
     entering_jshshir = State()
-    entering_hemis_login = State()      # NEW
-    entering_hemis_password = State()   # NEW
 
 
 class StaffFeedbackStates(StatesGroup):

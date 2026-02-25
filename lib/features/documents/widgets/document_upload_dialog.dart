@@ -207,6 +207,40 @@ class _DocumentUploadDialogState extends State<DocumentUploadDialog> {
               icon: Icons.telegram_rounded,
               color: AppTheme.primaryBlue,
             ),
+            const SizedBox(height: 12),
+            GestureDetector(
+              onTap: _isLoading ? null : () async {
+                try {
+                  setState(() => _isLoading = true);
+                  await _dataService.unlinkTelegram();
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Eski hisob uzildi. Yangi hisob ulang.")));
+                  await _initiateUpload();
+                } catch (e) {
+                  setState(() => _isLoading = false);
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Xatolik: $e")));
+                }
+              },
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.grey[300]!),
+                ),
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                     Icon(Icons.refresh, color: Colors.grey, size: 18),
+                     SizedBox(width: 8),
+                     Text(
+                       "Telegramim yangi", 
+                       style: TextStyle(color: Colors.black54, fontWeight: FontWeight.w600, fontSize: 13)
+                     ),
+                  ],
+                ),
+              ),
+            ),
           ] else ...[
              _buildProgressView(),
              const SizedBox(height: 24),
