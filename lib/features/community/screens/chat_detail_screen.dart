@@ -299,13 +299,14 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                       ),
                       if (isMe) ...[
                          const SizedBox(width: 4),
-                       Icon(
-                         msg.isRead ? Icons.done_all : Icons.done, 
-                         size: 12, 
-                         color: Colors.white70
-                       )
-                    ]
-                  ],
+                         Icon(
+                           msg.isRead ? Icons.done_all : Icons.done, 
+                           size: 12, 
+                           color: Colors.white70
+                         )
+                      ]
+                    ],
+                  ),
                 )
               ],
             ),
