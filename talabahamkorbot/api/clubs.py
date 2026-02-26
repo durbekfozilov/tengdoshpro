@@ -207,7 +207,6 @@ async def get_club_members(
         # Try to find telegram username from TgAccount
         # Telegram username fallback
         username = getattr(m.student, 'username', None)
-        
         res.append({
             "student_id": m.student_id,
             "full_name": m.student.full_name,
@@ -215,7 +214,8 @@ async def get_club_members(
             "group_number": m.student.group_number,
             "telegram_username": username,
             "joined_at": m.joined_at,
-            "status": getattr(m, 'status', 'active')
+            "status": getattr(m, 'status', 'active'),
+            "image_url": m.student.image_url
         })
     return res
 
@@ -271,6 +271,7 @@ async def get_club_member_profile(
         "faculty_name": faculty_name,
         "group_number": membership.student.group_number,
         "joined_at": membership.joined_at,
+        "image_url": membership.student.image_url,
         "activities": activities
     }
 

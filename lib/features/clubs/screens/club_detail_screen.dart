@@ -406,11 +406,17 @@ class _MembersTabState extends State<_MembersTab> {
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Row(
                   children: [
-                    CircleAvatar(
-                      radius: 22,
-                      backgroundColor: AppTheme.primaryBlue.withOpacity(0.1),
-                      child: const Icon(Icons.person, color: AppTheme.primaryBlue),
-                    ),
+                    m['image_url'] != null
+                      ? CircleAvatar(
+                          radius: 22,
+                          backgroundColor: Colors.grey.shade200,
+                          backgroundImage: NetworkImage(m['image_url']),
+                        )
+                      : CircleAvatar(
+                          radius: 22,
+                          backgroundColor: AppTheme.primaryBlue.withOpacity(0.1),
+                          child: const Icon(Icons.person, color: AppTheme.primaryBlue),
+                        ),
                     const SizedBox(width: 14),
                     Expanded(
                       child: Column(

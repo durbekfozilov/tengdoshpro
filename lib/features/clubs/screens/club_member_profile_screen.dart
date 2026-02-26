@@ -61,11 +61,17 @@ class _ClubMemberProfileScreenState extends State<ClubMemberProfileScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                CircleAvatar(
-                  radius: 50,
-                  backgroundColor: AppTheme.primaryBlue.withOpacity(0.1),
-                  child: const Icon(Icons.person, size: 50, color: AppTheme.primaryBlue),
-                ),
+                data['image_url'] != null
+                  ? CircleAvatar(
+                      radius: 50,
+                      backgroundColor: Colors.grey.shade200,
+                      backgroundImage: NetworkImage(data['image_url']),
+                    )
+                  : CircleAvatar(
+                      radius: 50,
+                      backgroundColor: AppTheme.primaryBlue.withOpacity(0.1),
+                      child: const Icon(Icons.person, size: 50, color: AppTheme.primaryBlue),
+                    ),
                 const SizedBox(height: 16),
                 Text(
                   data['full_name'] ?? 'Noma\'lum', 
