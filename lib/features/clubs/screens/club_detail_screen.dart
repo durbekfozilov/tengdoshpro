@@ -378,64 +378,185 @@ class _MembersTabState extends State<_MembersTab> {
         final int studentId = m['student_id'] ?? 0;
         
         return Container(
+          height: 80,
           margin: const EdgeInsets.only(bottom: 12),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(16),
             boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2))],
           ),
-          child: ListTile(
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            leading: CircleAvatar(
-              backgroundColor: AppTheme.primaryBlue.withOpacity(0.1),
-              child: const Icon(Icons.person, color: AppTheme.primaryBlue),
-            ),
-            title: Text(m['full_name'] ?? 'Noma\'lum', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 4),
-                Text("${m['faculty_name'] ?? ''} - ${m['group_number'] ?? ''}", style: const TextStyle(fontSize: 13, color: Colors.grey)),
-              ],
-            ),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (m['telegram_username'] != null)
-                   IconButton(
-                     icon: const Icon(Icons.telegram, color: Colors.blue),
-                     onPressed: () async {
-                       final url = Uri.parse("https://t.me/${m['telegram_username']}");
-                       if (await canLaunchUrl(url)) await launchUrl(url, mode: LaunchMode.externalApplication);
-                     },
-                   ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: Colors.blue.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Text("🔹 A'zo", style: TextStyle(color: Colors.blue, fontSize: 12, fontWeight: FontWeight.bold)),
-                ),
-                PopupMenuButton<String>(
-                  icon: const Icon(Icons.more_vert, color: Colors.grey),
-                  onSelected: (val) {
-                    if (val == 'remove') {
-                      _confirmRemoveMember(studentId, m['full_name'] ?? '');
-                    }
-                  },
-                  itemBuilder: (context) => [
-                    const PopupMenuItem(
-                      value: 'remove',
-                      child: Text("Soniqdan chiqarish", style: TextStyle(color: Colors.red)),
-                    )
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(16),
+              onTap: () => _showMemberProfileBottomSheet(studentId),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 22,
+                      backgroundColor: AppTheme.primaryBlue.withOpacity(0.1),
+                      child: const Icon(Icons.person, color: AppTheme.primaryBlue),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            m['full_name'] ?? 'Noma\'lum', 
+                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            m['faculty_name'] ?? 'Fakultet yo\'q', 
+                            style: const TextStyle(fontSize: 12, color: Colors.grey),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    if (m['telegram_username'] != null)
+                      IconButton(
+                        icon: const Icon(Icons.telegram, color: Colors.blue, size: 24),
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                        onPressed: () async {
+                          final url = Uri.parse("https://t.me/${m['telegram_username']}");
+                          if (await canLaunchUrl(url)) await launchUrl(url, mode: LaunchMode.externalApplication);
+                        },
+                      ),
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.blue.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Text("🔹 A'zo", style: TextStyle(color: Colors.blue, fontSize: 11, fontWeight: FontWeight.bold)),
+                    ),
+                    PopupMenuButton<String>(
+                      icon: const Icon(Icons.more_vert, color: Colors.grey, size: 20),
+                      padding: EdgeInsets.zero,
+                      onSelected: (val) {
+                        if (val == 'remove') {
+                          _confirmRemoveMember(studentId, m['full_name'] ?? '');
+                        }
+                      },
+                      itemBuilder: (context) => [
+                        const PopupMenuItem(
+                          value: 'remove',
+                          child: Text("Soniqdan chiqarish", style: TextStyle(color: Colors.red)),
+                        )
+                      ],
+                    ),
                   ],
                 ),
-              ],
+              ),
             ),
-          ),
+          )
         );
       },
+    );
+  }
+
+  void _showMemberProfileBottomSheet(int studentId) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      builder: (ctx) => DraggableScrollableSheet(
+        initialChildSize: 0.6,
+        minChildSize: 0.4,
+        maxChildSize: 0.9,
+        expand: false,
+        builder: (_, scrollController) => FutureBuilder<Map<String, dynamic>?>(
+          future: widget.dataService.getClubMemberProfile(widget.clubId, studentId),
+          builder: (context, snapshot) {
+             if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+             }
+             if (!snapshot.hasData || snapshot.data == null) {
+                return const Center(child: Text("Ma'lumot topilmadi"));
+             }
+             final data = snapshot.data!;
+             final List acts = data['activities'] ?? [];
+
+             return SingleChildScrollView(
+                controller: scrollController,
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                     CircleAvatar(
+                        radius: 40,
+                        backgroundColor: AppTheme.primaryBlue.withOpacity(0.1),
+                        child: const Icon(Icons.person, size: 40, color: AppTheme.primaryBlue),
+                     ),
+                     const SizedBox(height: 16),
+                     Text(data['full_name'] ?? 'Noma\'lum', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
+                     const SizedBox(height: 8),
+                     Text(data['faculty_name'] ?? 'Fakultet yo\'q', style: const TextStyle(fontSize: 14, color: Colors.grey), textAlign: TextAlign.center),
+                     if (data['group_number'] != null)
+                        Text(data['group_number'], style: const TextStyle(fontSize: 14, color: Colors.grey), textAlign: TextAlign.center),
+                     const SizedBox(height: 24),
+                     
+                     const Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text("Klubdagi faolliklari (Tadbirlar)", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                     ),
+                     const SizedBox(height: 16),
+                     if (acts.isEmpty)
+                        const Padding(
+                           padding: EdgeInsets.all(20),
+                           child: Text("Hozircha faollik yo'q", style: TextStyle(color: Colors.grey)),
+                        ),
+                     for (var act in acts)
+                        Container(
+                           margin: const EdgeInsets.only(bottom: 12),
+                           padding: const EdgeInsets.all(16),
+                           decoration: BoxDecoration(
+                              color: const Color(0xFFF5F6FA),
+                              borderRadius: BorderRadius.circular(16)
+                           ),
+                           child: Row(
+                              children: [
+                                 Container(
+                                    padding: const EdgeInsets.all(10),
+                                    decoration: BoxDecoration(
+                                      color: Colors.green.withOpacity(0.1),
+                                      shape: BoxShape.circle
+                                    ),
+                                    child: const Icon(Icons.check, color: Colors.green, size: 20),
+                                 ),
+                                 const SizedBox(width: 12),
+                                 Expanded(
+                                    child: Column(
+                                       crossAxisAlignment: CrossAxisAlignment.start,
+                                       children: [
+                                          Text(act['event_title'] ?? '', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14), maxLines: 2, overflow: TextOverflow.ellipsis),
+                                          const SizedBox(height: 4),
+                                          if (act['event_date'] != null)
+                                            Text(act['event_date'].toString().substring(0, 10), style: const TextStyle(color: Colors.grey, fontSize: 12))
+                                       ]
+                                    )
+                                 )
+                              ]
+                           )
+                        )
+                  ]
+                )
+             );
+          },
+        ),
+      ),
     );
   }
 

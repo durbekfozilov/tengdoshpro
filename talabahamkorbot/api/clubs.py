@@ -220,6 +220,61 @@ async def get_club_members(
     return res
 
 
+@router.get("/{club_id}/members/{student_id}")
+async def get_club_member_profile(
+    club_id: int,
+    student_id: int,
+    club: Club = Depends(get_club_leader),
+    db: AsyncSession = Depends(get_db)
+):
+    """(Leader) Get a member's club profile and their activities within this club."""
+    from sqlalchemy.orm import joinedload
+    
+    # 1. Get member basic info
+    membership = await db.scalar(
+        select(ClubMembership)
+        .where(
+            ClubMembership.club_id == club_id,
+            ClubMembership.student_id == student_id
+        )
+        .options(joinedload(ClubMembership.student))
+    )
+    if not membership:
+        raise HTTPException(status_code=404, detail="Membership not found.")
+        
+    faculty_name = membership.student.faculty_name or (membership.student.faculty.name if getattr(membership.student, 'faculty', None) else None)
+    
+    # 2. Get their activities (events attended) in this club
+    # Find all events in this club where this student participated and attended
+    part_query = await db.scalars(
+        select(ClubEventParticipant)
+        .join(ClubEvent, ClubEvent.id == ClubEventParticipant.event_id)
+        .where(
+            ClubEvent.club_id == club_id,
+            ClubEventParticipant.student_id == student_id,
+            ClubEventParticipant.attendance_status == 'attended'
+        )
+        .options(joinedload(ClubEventParticipant.event))
+    )
+    
+    activities = []
+    for part in part_query.all():
+        activities.append({
+            "event_title": part.event.title,
+            "event_date": part.event.event_date.isoformat() if part.event.event_date else None,
+            "status": "attended"
+        })
+        
+    return {
+        "student_id": membership.student_id,
+        "full_name": membership.student.full_name,
+        "faculty_name": faculty_name,
+        "group_number": membership.student.group_number,
+        "joined_at": membership.joined_at,
+        "activities": activities
+    }
+
+
 @router.delete("/{club_id}/members/{student_id}")
 async def remove_club_member(
     club_id: int,
