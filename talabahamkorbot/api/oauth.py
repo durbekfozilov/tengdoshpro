@@ -310,7 +310,7 @@ async def authlog_callback(request: Request, code: Optional[str] = None, error: 
                   
         # [NEW] Sync Tutor Groups
         if staff.role == StaffRole.TYUTOR:
-            tutor_groups = role_data.get("tutor_groups", [])
+            tutor_groups = role_data.get("tutor_groups", []) if role_data else []
             logger.info(f"Syncing {len(tutor_groups)} tutor groups for {staff.full_name}")
             
             # Delete old mappings
