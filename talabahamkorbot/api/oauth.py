@@ -95,8 +95,8 @@ async def authlog_callback(request: Request, code: Optional[str] = None, error: 
     # 2. Get User Profile with this Token (CRITICAL STEP)
     logger.info(f"AuthLog: Fetching profile for token {access_token[:10]} using {base_url}...")
     # Explicitly use OAuth endpoint as per instruction
-    # [FIX] Set to False to allow Fallback: REST -> OAuth (More robust for Staff)
-    me = await HemisService.get_me(access_token, base_url=base_url, use_oauth_endpoint=False)
+    # [FIX] Set to True to ensure we get employee_id_number from OAuth endpoints
+    me = await HemisService.get_me(access_token, base_url=base_url, use_oauth_endpoint=True)
     t2 = time.time()
     logger.info(f"AuthLog: Get Me took {t2 - t1:.2f}s")
     
@@ -219,6 +219,7 @@ async def authlog_callback(request: Request, code: Optional[str] = None, error: 
         
         staff = None
         
+        logger.error(f"DEBUG STAFF LOGIN PAYLOAD: {me}")
         # [FIX] User request: ONLY identify staff via employee_id_number (unique ID).
         if not emp_id_num:
              logger.warning(f"OAuth: Missing employee_id_number for {me.get('login')}")
