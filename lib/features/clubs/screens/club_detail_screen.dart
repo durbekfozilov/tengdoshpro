@@ -726,6 +726,9 @@ class _EventsTabState extends State<_EventsTab> {
     if (!mounted) return;
     Navigator.pop(context);
 
+    // If it's not past, ONLY show those who expressed interest
+    final displayParts = isPast ? parts : parts.where((p) => p['attendance_status'] == 'registered').toList();
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -737,15 +740,15 @@ class _EventsTabState extends State<_EventsTab> {
             padding: const EdgeInsets.all(16),
             child: Column(
               children: [
-                const Text("Tadbir ishtirokchilari", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                Text(isPast ? "Tadbir ishtirokchilari" : "Qatnashmoqchi bo'lganlar", style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 16),
                 Expanded(
-                  child: parts.isEmpty
-                    ? const Center(child: Text("Hozircha ra'yxat bo'sh"))
+                  child: displayParts.isEmpty
+                    ? Center(child: Text(isPast ? "Hozircha ro'yxat bo'sh" : "Hech kim ro'yxatdan o'tmagan"))
                     : ListView.builder(
-                        itemCount: parts.length,
+                        itemCount: displayParts.length,
                         itemBuilder: (ctx, i) {
-                          final p = parts[i];
+                          final p = displayParts[i];
                           final status = p['attendance_status'] ?? 'not_registered';
                           final isAttended = status == 'attended';
                           final isMissed = status == 'missed';
