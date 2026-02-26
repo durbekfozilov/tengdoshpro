@@ -110,6 +110,14 @@ class ClubSchema(BaseModel):
     class Config:
         from_attributes = True
 
+class ClubCreateSchema(BaseModel):
+    name: str
+    description: Optional[str] = None
+    icon: Optional[str] = None
+    color: Optional[str] = None
+    statute_link: Optional[str] = None
+    channel_link: Optional[str] = None
+
 class ClubMembershipSchema(BaseModel):
     club: ClubSchema
     role: str

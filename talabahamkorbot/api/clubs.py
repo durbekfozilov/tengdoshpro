@@ -8,11 +8,12 @@ from pydantic import BaseModel
 from api.dependencies import get_current_student, get_db, get_club_leader
 from api.schemas import (
     ClubSchema, ClubMembershipSchema, ClubMemberSchema, 
-    ClubAnnouncementSchema, ClubEventSchema, ClubEventParticipantSchema
+    ClubAnnouncementSchema, ClubEventSchema, ClubEventParticipantSchema,
+    ClubCreateSchema
 )
 from database.models import (
     Student, Club, ClubMembership, ClubAnnouncement, 
-    ClubEvent, ClubEventParticipant
+    ClubEvent, ClubEventParticipant, University
 )
 
 router = APIRouter()
@@ -39,6 +40,43 @@ async def get_my_clubs(
             data.role = "leader"
         result.append(data)
     return result
+
+@router.post("/", response_model=ClubSchema)
+async def create_club(
+    req: ClubCreateSchema,
+    student: Student = Depends(get_current_student),
+    db: AsyncSession = Depends(get_db)
+):
+    """(Yetakchi) Create a new club for their university."""
+    if student.hemis_role != 'yetakchi':
+        raise HTTPException(status_code=403, detail="Klub yaratish ruxsati faqat yetakchilar uchun berilgan.")
+    
+    # Optional logic: create a default icon or color if not provided
+    club = Club(
+        name=req.name,
+        description=req.description,
+        icon=req.icon or "groups_rounded",
+        color=req.color or "#4A90E2",
+        statute_link=req.statute_link,
+        channel_link=req.channel_link,
+        university_id=student.university_id,
+        leader_student_id=student.id  # Make the creator the leader automatically
+    )
+    db.add(club)
+    await db.commit()
+    await db.refresh(club)
+    
+    # Automatically add the yetakchi to the club and make them a leader?
+    # Actually, setting `leader_student_id` is sufficient for a club leader, 
+    # but let's add them as a member too.
+    membership = ClubMembership(
+        student_id=student.id,
+        club_id=club.id
+    )
+    db.add(membership)
+    await db.commit()
+    
+    return club
 
 @router.get("/all", response_model=List[ClubSchema])
 async def get_all_clubs(

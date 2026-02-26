@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../../core/services/data_service.dart';
+import '../../../../core/providers/auth_provider.dart';
 import 'club_detail_screen.dart';
+import 'club_create_screen.dart';
 
 class ClubsScreen extends StatefulWidget {
   const ClubsScreen({super.key});
@@ -64,6 +67,19 @@ class _ClubsScreenState extends State<ClubsScreen> {
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.black),
       ),
+      floatingActionButton: Provider.of<AuthProvider>(context).isYetakchi
+          ? FloatingActionButton.extended(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const ClubCreateScreen()),
+                ).then((_) => _loadClubs());
+              },
+              backgroundColor: AppTheme.primaryBlue,
+              icon: const Icon(Icons.add, color: Colors.white),
+              label: const Text("Klub qo'shish", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            )
+          : null,
       body: _isLoading 
         ? const Center(child: CircularProgressIndicator())
         : (_clubs.isEmpty 
