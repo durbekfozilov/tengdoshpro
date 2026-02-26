@@ -172,11 +172,12 @@ class _DocumentUploadDialogState extends State<DocumentUploadDialog> {
         color: Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text("Hujjat yuklash", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
@@ -253,6 +254,7 @@ class _DocumentUploadDialogState extends State<DocumentUploadDialog> {
           ],
           const SizedBox(height: 16),
         ],
+      ),
       ),
     );
   }

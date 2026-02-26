@@ -144,9 +144,11 @@ class _EditPostSheetState extends State<EditPostSheet> {
         final shouldPop = await _onWillPop();
         if (shouldPop && context.mounted) Navigator.pop(context);
       },
-      child: Container(
-        height: MediaQuery.of(context).size.height * 0.9, 
-        decoration: const BoxDecoration(
+      child: Padding(
+        padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+        child: Container(
+          constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.9), 
+          decoration: const BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
         ),
@@ -280,6 +282,7 @@ class _EditPostSheetState extends State<EditPostSheet> {
             ),
           ],
         ),
+      ),
       ),
     );
   }

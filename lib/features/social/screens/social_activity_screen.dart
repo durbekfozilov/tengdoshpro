@@ -166,10 +166,11 @@ class _AddActivitySheetState extends State<AddActivitySheet> {
   Widget build(BuildContext context) {
     bool isEdit = widget.activity != null;
 
-    return Container(
-      height: MediaQuery.of(context).size.height * 0.85,
+    return Padding(
       padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-      decoration: const BoxDecoration(
+      child: Container(
+        constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.85),
+        decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -215,6 +216,7 @@ class _AddActivitySheetState extends State<AddActivitySheet> {
             child: _step == 1 ? _buildCategoryStep() : _buildFormStep(isEdit),
           ),
         ],
+      ),
       ),
     );
   }

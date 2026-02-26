@@ -294,6 +294,7 @@ class CommentItem extends StatelessWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
+        scrollable: true,
         title: const Text("Sharhni tahrirlash"),
         content: TextField(
           controller: controller,

@@ -358,6 +358,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
+          scrollable: true,
           title: const Text("Xabarni tahrirlash"),
           content: TextField(
             controller: editController,

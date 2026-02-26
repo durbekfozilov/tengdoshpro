@@ -946,21 +946,24 @@ class _CreateAppealSheetState extends State<CreateAppealSheet> {
           orElse: () => {"icon": Icons.message, "color": Colors.blue}
       );
 
-      return Container(
-        height: MediaQuery.of(context).size.height * 0.85,
-        decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-        ),
-        padding: EdgeInsets.only(
-            left: 24, 
-            right: 24, 
-            top: 20, 
-            bottom: MediaQuery.of(context).viewInsets.bottom + 24
-        ),
-        child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+      return Padding(
+        padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+        child: Container(
+          constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.85),
+          decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          padding: const EdgeInsets.only(
+              left: 24, 
+              right: 24, 
+              top: 20, 
+              bottom: 24
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
                 Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2)))),
                 const SizedBox(height: 20),
                 
@@ -1024,25 +1027,23 @@ class _CreateAppealSheetState extends State<CreateAppealSheet> {
                 const SizedBox(height: 16),
                 
                 // Text Area
-                Expanded(
-                    child: Container(
-                        decoration: BoxDecoration(
-                            color: Colors.grey[50], // Very light grey
-                            borderRadius: BorderRadius.circular(20),
+                Container(
+                    decoration: BoxDecoration(
+                        color: Colors.grey[50],
+                        borderRadius: BorderRadius.circular(20),
+                    ),
+                    padding: const EdgeInsets.all(16),
+                    child: TextField(
+                        controller: _textController,
+                        minLines: 5,
+                        maxLines: 10,
+                        textAlignVertical: TextAlignVertical.top,
+                        decoration: const InputDecoration(
+                            hintText: "Murojaatingizni batafsil yozing...",
+                            border: InputBorder.none,
+                            hintStyle: TextStyle(color: Colors.grey)
                         ),
-                        padding: const EdgeInsets.all(16),
-                        child: TextField(
-                            controller: _textController,
-                            maxLines: null,
-                            expands: true,
-                            textAlignVertical: TextAlignVertical.top,
-                            decoration: const InputDecoration(
-                                hintText: "Murojaatingizni batafsil yozing...",
-                                border: InputBorder.none,
-                                hintStyle: TextStyle(color: Colors.grey)
-                            ),
-                        ),
-                    )
+                    ),
                 ),
                 
                 const SizedBox(height: 16),
@@ -1083,7 +1084,9 @@ class _CreateAppealSheetState extends State<CreateAppealSheet> {
                     ),
                 ),
             ],
+          ),
         ),
+        )
       );
   }
 }
