@@ -105,7 +105,7 @@ class _AddActivitySheetState extends State<AddActivitySheet> {
     try {
       final res = await Provider.of<DataService>(context, listen: false).initUploadSession(
         sessionId,
-        _selectedCategory ?? "Faollik"
+        "Faollik"
       );
       
       // [SMART UPLOAD LOGIC]

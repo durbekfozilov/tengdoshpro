@@ -148,9 +148,9 @@ class _ManagementAppealsScreenState extends State<ManagementAppealsScreen> with 
             children: [
               Expanded(child: _buildStatCard("Jami", _stats!.total.toString(), Colors.blue)),
               const SizedBox(width: 8),
-              Expanded(child: _buildStatCard("Kutilmoqda", _stats!.counts['pending'].toString(), Colors.orange)),
+              Expanded(child: _buildStatCard("Kutilmoqda", (_stats!.counts['pending'] ?? 0).toString(), Colors.orange)),
               const SizedBox(width: 8),
-              Expanded(child: _buildStatCard("Yopilgan", (_stats!.counts['resolved']! + _stats!.counts['replied']!).toString(), Colors.green)),
+              Expanded(child: _buildStatCard("Yopilgan", ((_stats!.counts['resolved'] ?? 0) + (_stats!.counts['replied'] ?? 0)).toString(), Colors.green)),
             ],
           ),
           const SizedBox(height: 24),

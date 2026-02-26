@@ -268,6 +268,8 @@ async def authlog_callback(request: Request, code: Optional[str] = None, error: 
                  staff.hemis_id = int(h_id)
              if not staff.jshshir and pinfl:
                  staff.jshshir = pinfl
+             if not staff.university_id:
+                 staff.university_id = 1
              
              image_url = me.get("picture") or me.get("picture_full") or me.get("image") or me.get("image_url")
              # Only update image if the payload specifically describes an employee, or staff image is totally empty
@@ -291,7 +293,8 @@ async def authlog_callback(request: Request, code: Optional[str] = None, error: 
                  jshshir=pinfl,
                  role=assigned_role,
                  is_active=True,
-                 image_url=image_url
+                 image_url=image_url,
+                 university_id=1
              )
              db.add(new_staff)
              await db.commit()

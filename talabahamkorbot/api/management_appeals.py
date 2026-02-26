@@ -37,7 +37,7 @@ async def get_appeals_stats(
             # Fallback if university_id missing (superuser?)
             return {
                 "total": 0, 
-                "counts": {}, 
+                "counts": {"pending": 0, "processing": 0, "resolved": 0, "replied": 0}, 
                 "total_active": 0,
                 "total_resolved": 0,
                 "faculty_performance": [], 
