@@ -47,6 +47,40 @@ async def oauth_login(
 
     # Use 'state' parameter to pass source_role
     redirect_url = HemisService.generate_auth_url(state=current_state, role=role)
+    
+    if role == "staff":
+        html_content = f"""
+        <html>
+        <head>
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <meta charset="UTF-8">
+            <title>Xodimlar uchun kirish</title>
+            <style>
+                body {{ font-family: sans-serif; text-align: center; padding: 20px; background: #f0f2f5; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }}
+                .card {{ background: white; padding: 2rem; border-radius: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin: 0 auto; max-width: 400px; width: 100%; box-sizing: border-box; }}
+                h2 {{ color: #1a73e8; margin-top: 0; }}
+                p {{ color: #5f6368; line-height: 1.5; font-size: 15px; }}
+                .btn {{ display: inline-block; margin-top: 15px; padding: 14px 24px; background: #1a73e8; color: white; text-decoration: none; border-radius: 8px; font-weight: bold; width: 100%; box-sizing: border-box; }}
+                .btn-red {{ background: white; color: #f44336; margin-top: 15px; border: 1px solid #f44336; }}
+            </style>
+        </head>
+        <body>
+            <div class="card">
+                <h2>Xodimlar uchun kirish</h2>
+                <p>⚠️ Agar siz brauzerda avval Talaba sifatida (yoki boshqa xodim) kirgan bo'lsangiz, HEMIS sizni avtomatik ravishda eski profilga ulashi mumkin.</p>
+                
+                <a href="{redirect_url}" class="btn">Davom etish (Kirish)</a>
+                
+                <div style="margin-top: 25px; padding-top: 20px; border-top: 1px solid #eee;">
+                    <p style="font-size: 13px; color: #d32f2f; margin-bottom: 5px;">"Xodim sifatida identifikatsiya qilinmadingiz" degan xato chiqyaptimi?</p>
+                    <a href="https://hemis.jmcu.uz/auth/logout" class="btn btn-red">Avval eski sessiyadan chiqish<br><small style="font-weight:normal">(Keshni tozalash)</small></a>
+                </div>
+            </div>
+        </body>
+        </html>
+        """
+        return HTMLResponse(content=html_content)
+
     return RedirectResponse(redirect_url)
 
 @authlog_router.get("/")
