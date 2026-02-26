@@ -284,9 +284,6 @@ class HemisService:
 
     @staticmethod
     async def exchange_code(code: str, base_url: Optional[str] = None):
-        # OAuth usually requires fresh client context or we can use shared
-        # Keeping shared is fine
-        client = await HemisService.get_client()
         from config import (
             HEMIS_CLIENT_ID, HEMIS_CLIENT_SECRET, HEMIS_REDIRECT_URL, HEMIS_TOKEN_URL,
             HEMIS_STAFF_CLIENT_ID, HEMIS_STAFF_CLIENT_SECRET, HEMIS_STAFF_REDIRECT_URL
@@ -324,7 +321,8 @@ class HemisService:
             
             logger.info(f"Token Exchange (Basic Auth) on {token_url}: client_id={c_id}, redirect_uri={r_uri}")
             
-            response = await client.post(token_url, data=data, headers=headers, auth=(c_id, c_secret))
+            async with httpx.AsyncClient(verify=False) as client:
+                response = await client.post(token_url, data=data, headers=headers, auth=(c_id, c_secret))
             
             if response.status_code == 200:
                 return response.json(), None
@@ -361,41 +359,41 @@ class HemisService:
         # Updated fields per user suggestion and GitHub Guide
         oauth_profile_url = f"{domain}/oauth/api/user?fields=id,uuid,type,roles,name,login,picture,email,university_id,phone,employee_id_number,firstname,surname,patronymic,birth_date"
 
-        client = await HemisService.get_client()
         headers = HemisService.get_headers(token)
 
         try:
-            # STRATEGY: Try REST API first (Most reliable for data), then OAuth
-            
-            # 1. REST API
-            if not use_oauth_endpoint:
+            async with httpx.AsyncClient(verify=False) as client:
+                # STRATEGY: Try REST API first (Most reliable for data), then OAuth
+                
+                # 1. REST API
+                if not use_oauth_endpoint:
+                    try:
+                        logger.info(f"DEBUG: Fetching REST Profile from {rest_url}")
+                        response = await HemisService.fetch_with_retry(client, "GET", rest_url, headers=headers)
+                    
+                        if response.status_code == 200:
+                            data = response.json()
+                            if "data" in data: return data["data"]
+                            return data
+                        
+                        logger.warning(f"REST Profile failed ({response.status_code}). Trying OAuth fallback...")
+                    except Exception as e:
+                        logger.warning(f"REST Profile Exception: {e}")
+
+                # 2. OAuth Endpoint (Fallback or Primary if requested)
                 try:
-                    logger.info(f"DEBUG: Fetching REST Profile from {rest_url}")
-                    response = await HemisService.fetch_with_retry(client, "GET", rest_url, headers=headers)
+                    logger.info(f"Fetching OAuth Profile from {oauth_profile_url}")
+                    response = await HemisService.fetch_with_retry(client, "GET", oauth_profile_url, headers=headers)
                     
                     if response.status_code == 200:
                         data = response.json()
-                        if "data" in data: return data["data"]
+                        # Map OAuth fields to Standard Profile (id, login, name, etc.)
+                        # OAuth returns flat dict usually
                         return data
                     
-                    logger.warning(f"REST Profile failed ({response.status_code}). Trying OAuth fallback...")
+                    logger.error(f"OAuth Profile Failed: {response.status_code} - {response.text[:100]}")
                 except Exception as e:
-                    logger.warning(f"REST Profile Exception: {e}")
-
-            # 2. OAuth Endpoint (Fallback or Primary if requested)
-            try:
-                logger.info(f"Fetching OAuth Profile from {oauth_profile_url}")
-                response = await HemisService.fetch_with_retry(client, "GET", oauth_profile_url, headers=headers)
-                
-                if response.status_code == 200:
-                    data = response.json()
-                    # Map OAuth fields to Standard Profile (id, login, name, etc.)
-                    # OAuth returns flat dict usually
-                    return data
-                
-                logger.error(f"OAuth Profile Failed: {response.status_code} - {response.text[:100]}")
-            except Exception as e:
-                logger.error(f"OAuth Profile Exception: {e}")
+                    logger.error(f"OAuth Profile Exception: {e}")
 
         except Exception as e:
             logger.error(f"Get Me Critical Error: {e}")
