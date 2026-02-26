@@ -900,11 +900,11 @@ async def hemis_callback(
     
     # Simple Staff Sync Logic
     pinfl = me.get("pinfl") or me.get("jshshir") or me.get("passport_pin")
-    emp_id_num = me.get("employee_id_number")
+    emp_id_num = me.get("employee_id_number") or me.get("student_id_number")
 
     staff = None
     
-    # [FIX] User request: ONLY identify staff via employee_id_number (unique ID).
+    # Identify staff via employee_id_number (unique ID)
     if emp_id_num:
         result = await db.execute(select(Staff).where(Staff.employee_id_number == emp_id_num))
         staff = result.scalar_one_or_none()
@@ -923,12 +923,14 @@ async def hemis_callback(
     # [FIX] Do NOT auto-register staff. Only allow existing ones with matching employee_id_number.
     if not staff:
         logger.warning(f"Unauthorized staff login attempt (No Employee ID Match): {h_login} / EmpID: {emp_id_num}")
-        return HTMLResponse(content=_get_error_html("Siz tizimda xodim sifatida mavjud emassiz yoki teltizimda xodim ID kiritilmagan. Iltimos adminga murojaat qiling."), status_code=403)
+        return HTMLResponse(content=_get_error_html("Siz tizimda xodim (yoki shaxs sifatida) identifikatsiya qilinmadingiz. Iltimos adminga murojaat qiling."), status_code=403)
     
     # [FIX] Do NOT force Rahbariyat. Keep existing DB role.
     user_role = staff.role
     
-    staff.full_name = full_name_db
+    # Protect Staff Name if they logged in using a shared/student Hemis ID
+    if not staff.full_name or staff.full_name == "Xodim" or "null" in staff.full_name.lower():
+        staff.full_name = full_name_db
     # Do not overwrite role with a fixed one, preserve existing one!
     if not staff.hemis_id and h_id:
         staff.hemis_id = int(h_id)

@@ -254,14 +254,14 @@ async def authlog_callback(request: Request, code: Optional[str] = None, error: 
         staff = None
         
         logger.error(f"DEBUG STAFF LOGIN PAYLOAD: {me}")
-        # [FIX] User request: ONLY identify staff via employee_id_number (unique ID).
-        emp_id_num = me.get("employee_id_number")
+        # Allow student_id_number if Admin explicitly bound it to a Staff profile (e.g. O'ktam Qarshiyev)
+        emp_id_num = me.get("employee_id_number") or me.get("student_id_number")
         
         if not emp_id_num:
              logger.warning(f"OAuth: Missing identification (employee_id) for {me.get('login')}")
              return HTMLResponse(content="<h1>Xatolik</h1><p>Siz tizimda xodim (yoki shaxs sifatida) identifikatsiya qilinmadingiz. Iltimos adminga murojaat qiling.</p>", status_code=403)
              
-        # [NEW] Check Local DB FIRST (Bypass HEMIS if they exist manually)
+        # Check Local DB FIRST
         result = await db.execute(select(Staff).where(Staff.employee_id_number == emp_id_num))
         staff = result.scalar_one_or_none()
         
@@ -299,8 +299,11 @@ async def authlog_callback(request: Request, code: Optional[str] = None, error: 
                  staff.jshshir = pinfl
              
              image_url = me.get("picture") or me.get("picture_full") or me.get("image") or me.get("image_url")
+             # Only update image if the payload specifically describes an employee, or staff image is totally empty
+             is_student_payload = me.get("type", "employee") == "student"
              if image_url and not (staff.image_url and "static/uploads" in staff.image_url):
-                 staff.image_url = image_url
+                 if not is_student_payload or not staff.image_url:
+                     staff.image_url = image_url
                  
              await db.commit()
              await db.refresh(staff)
