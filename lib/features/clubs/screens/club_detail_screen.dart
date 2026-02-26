@@ -976,7 +976,7 @@ class _EventsTabState extends State<_EventsTab> {
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
                     onPressed: () async {
-                        final url = Uri.parse("https://t.me/tengdosh_robot?start=clubevent_$eventId");
+                        final url = Uri.parse("https://t.me/talabahamkorbot?start=clubevent_$eventId");
                         if (await canLaunchUrl(url)) {
                           await launchUrl(url, mode: LaunchMode.externalApplication);
                         }
