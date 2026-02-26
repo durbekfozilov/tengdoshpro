@@ -51,6 +51,15 @@ async def create_club(
     if student.hemis_role != 'yetakchi':
         raise HTTPException(status_code=403, detail="Klub yaratish ruxsati faqat yetakchilar uchun berilgan.")
     
+    leader_id = student.id
+    if req.leader_login:
+        leader_student = await db.scalar(
+            select(Student).where(Student.hemis_login == req.leader_login)
+        )
+        if not leader_student:
+            raise HTTPException(status_code=404, detail="Kiritilgan HEMIS login bo'yicha talaba topilmadi.")
+        leader_id = leader_student.id
+
     # Optional logic: create a default icon or color if not provided
     club = Club(
         name=req.name,
@@ -60,17 +69,16 @@ async def create_club(
         statute_link=req.statute_link,
         channel_link=req.channel_link,
         university_id=student.university_id,
-        leader_student_id=student.id  # Make the creator the leader automatically
+        leader_student_id=leader_id
     )
     db.add(club)
     await db.commit()
     await db.refresh(club)
     
-    # Automatically add the yetakchi to the club and make them a leader?
     # Actually, setting `leader_student_id` is sufficient for a club leader, 
-    # but let's add them as a member too.
+    # but let's add them as a member too if they aren't already
     membership = ClubMembership(
-        student_id=student.id,
+        student_id=leader_id,
         club_id=club.id
     )
     db.add(membership)

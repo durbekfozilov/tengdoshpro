@@ -16,6 +16,7 @@ class _ClubCreateScreenState extends State<ClubCreateScreen> {
   String _name = '';
   String _description = '';
   String _channelLink = '';
+  String _leaderLogin = '';
   bool _isLoading = false;
 
   void _submit() async {
@@ -31,6 +32,9 @@ class _ClubCreateScreenState extends State<ClubCreateScreen> {
       'icon': 'groups_rounded',
       'color': '#4A90E2',
     };
+    if (_leaderLogin.isNotEmpty) {
+      data['leader_login'] = _leaderLogin;
+    }
 
     final result = await _dataService.createClub(data);
 
@@ -93,6 +97,15 @@ class _ClubCreateScreenState extends State<ClubCreateScreen> {
                 hint: "https://t.me/kanal_nomi",
                 icon: Icons.telegram,
                 onSaved: (val) => _channelLink = val ?? '',
+              ),
+              
+              const SizedBox(height: 8),
+
+              _buildTextField(
+                label: "Sardor logini (Ixtiyoriy)",
+                hint: "Sardorning HEMIS logini (masalan: 395...)",
+                icon: Icons.person_add_alt_1,
+                onSaved: (val) => _leaderLogin = val ?? '',
               ),
 
               const SizedBox(height: 32),

@@ -117,6 +117,7 @@ class ClubCreateSchema(BaseModel):
     color: Optional[str] = None
     statute_link: Optional[str] = None
     channel_link: Optional[str] = None
+    leader_login: Optional[str] = None
 
 class ClubMembershipSchema(BaseModel):
     club: ClubSchema
