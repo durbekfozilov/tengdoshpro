@@ -644,7 +644,7 @@ class DataService {
     return [];
   }
 
-  Future<bool> joinClub(int clubId) async {
+  Future<Map<String, dynamic>> joinClub(int clubId) async {
     try {
       final response = await http.post(
         Uri.parse('${ApiConstants.backendUrl}/student/clubs/join'),
@@ -653,12 +653,12 @@ class DataService {
       ).timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
-        return true;
+        return json.decode(utf8.decode(response.bodyBytes));
       }
     } catch (e) {
       debugPrint("DataService: Error joining club: $e");
     }
-    return false;
+    return {'status': 'error', 'message': 'Tarmoq xatosi'};
   }
 
   // Club Role-Based Endpoints

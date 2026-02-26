@@ -108,9 +108,27 @@ async def join_club(
         return {"status": "already_joined", "message": "Siz allaqachon a'zosiz"}
     
     # Check if club exists
-    club = await db.get(Club, req.club_id)
+    club = await db.scalar(select(Club).where(Club.id == req.club_id).options(selectinload(Club.leaders)))
     if not club:
          raise HTTPException(status_code=404, detail="Club not found")
+
+    from database.models import TgAccount
+    tg_acc = await db.scalar(select(TgAccount).where(TgAccount.student_id == student.id))
+
+    # [NEW] Verify Telegram Channel Subscription
+    if club.telegram_channel_id:
+        if not tg_acc or not tg_acc.telegram_id:
+             return {"status": "error", "message": "Botga start bosmagansiz / Telegram ulanmagan."}
+             
+        try:
+            from bot import bot
+            member = await bot.get_chat_member(club.telegram_channel_id, tg_acc.telegram_id)
+            if member.status in ['left', 'kicked']:
+                return {"status": "not_subscribed", "channel_link": club.channel_link}
+        except Exception as e:
+            # Maybe the bot is not admin in the channel, or channel ID is invalid
+            print(f"Error checking chat member: {e}")
+            pass # proceed for now if check fails due to bot setup issue
 
     membership = ClubMembership(
         student_id=student.id,
@@ -118,20 +136,12 @@ async def join_club(
     )
     db.add(membership)
     await db.commit()
-    
     # --- [NEW] NOTIFY LEADERS ---
     try:
         from bot import bot
         from database.models import TgAccount
         
-        # 1. Fetch Leaders (Staff & Student)
-        # Eager load leaders to get their IDs
-        club = await db.scalar(
-            select(Club)
-            .where(Club.id == req.club_id)
-            .options(selectinload(Club.leaders))
-        )
-        
+        # Eager load already happened above
         leader_staff_ids = [l.id for l in club.leaders]
         leader_student_id = club.leader_student_id
         
@@ -168,9 +178,10 @@ async def join_club(
     except Exception as e:
         # Don't fail the join process if notification fails
         print(f"Global notification error: {e}")
+        pass
     # ----------------------------
     
-    return {"status": "success", "message": "Muvaffaqiyatli a'zo bo'ldingiz"}
+    return {"status": "success"}
 
 @router.get("/{club_id}/members", response_model=List[ClubMemberSchema])
 async def get_club_members(

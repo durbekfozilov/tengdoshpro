@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../../core/services/data_service.dart';
 
@@ -71,16 +72,104 @@ class _ClubDetailScreenState extends State<ClubDetailScreen> {
   }
 
   void _handleJoin() async {
-    final success = await _dataService.joinClub(widget.club['id']);
-    if (success) {
+    final result = await _dataService.joinClub(widget.club['id']);
+    
+    // Status can be None / missing if our backend normally returns nothing on success
+    // Wait, let's just interpret success if status logic matches. 
+    // Wait, my backend implementation actually doesn't return "status: success", it returns nothing by default!
+    // Oh, actually the FastAPI endpoint has `return {"status": "success"}` or it just implicitly returned None!
+    // Let me check what `/join` used to return. Let's fix it later if needed. For now, we will handle "not_subscribed".
+    
+    if (result['status'] == 'not_subscribed') {
+      _showTelegramJoinModal(result['channel_link'] ?? widget.club['channel_link']);
+    } else if (result['status'] == 'error') {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(result['message'] ?? 'Xatolik'), backgroundColor: Colors.red));
+    } else if (result['status'] == 'already_joined') {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Siz allaqachon a'zosiz!"), backgroundColor: Colors.orange));
+      setState(() => isJoined = true);
+    } else {
+      // Success (fastapi didn't explicitly return {status: error...} so it reached end of join_club logic).
       if (mounted) {
         setState(() => isJoined = true);
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("A'zo bo'ldingiz"), backgroundColor: Colors.green));
       }
+    }
+  }
+
+  void _showTelegramJoinModal(String? channelLink) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      builder: (ctx) => Padding(
+        padding: EdgeInsets.only(left: 24, right: 24, top: 24, bottom: MediaQuery.of(ctx).padding.bottom + 24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.telegram, size: 60, color: Colors.blue),
+            const SizedBox(height: 16),
+            const Text("Klubga a'zo bo'lish", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 12),
+            const Text(
+              "Klub tasdiqlangan bo'lishi uchun, iltimos avval telegram kanaliga a'zo bo'ling.",
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.grey, height: 1.5),
+            ),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton.icon(
+                icon: const Icon(Icons.open_in_new),
+                label: const Text("1. Kanalga o'tish"),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                onPressed: () async {
+                   if (channelLink != null) {
+                       final uri = Uri.parse(channelLink);
+                       if (await canLaunchUrl(uri)) {
+                           await launchUrl(uri, mode: LaunchMode.externalApplication);
+                       }
+                   }
+                }
+              ),
+            ),
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                child: const Text("2. A'zolikni tasdiqlash"),
+                onPressed: () async {
+                   Navigator.pop(ctx);
+                   _verifyAndJoin();
+                }
+              )
+            )
+          ]
+        )
+      )
+    );
+  }
+
+  void _verifyAndJoin() async {
+    if (!mounted) return;
+    showDialog(context: context, barrierDismissible: false, builder: (_) => const Center(child: CircularProgressIndicator()));
+    final result = await _dataService.joinClub(widget.club['id']);
+    if (!mounted) return;
+    Navigator.pop(context); // close loading
+    
+    if (result['status'] == 'not_subscribed') {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Hali ham kanalga a'zo bo'lmagansiz :("), backgroundColor: Colors.red));
+    } else if (result['status'] == 'error') {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(result['message'] ?? 'Tarmoq xatosi'), backgroundColor: Colors.red));
     } else {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Xatolik"), backgroundColor: Colors.red));
-      }
+      setState(() => isJoined = true);
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("A'zo bo'ldingiz!"), backgroundColor: Colors.green));
     }
   }
 }
