@@ -694,7 +694,7 @@ class _EventsTabState extends State<_EventsTab> {
                                  )
                                else if (widget.isLeader)
                                  OutlinedButton(
-                                   onPressed: () => _viewParticipants(a['id']),
+                                   onPressed: () => _viewParticipants(a['id'], a['status'] == "O'tkazildi"),
                                    child: const Text("Ishtirokchilar"),
                                  )
                              ],
@@ -716,7 +716,7 @@ class _EventsTabState extends State<_EventsTab> {
     );
   }
 
-  void _viewParticipants(int eventId) async {
+  void _viewParticipants(int eventId, bool isPast) async {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -754,7 +754,7 @@ class _EventsTabState extends State<_EventsTab> {
                              leading: CircleAvatar(child: Text(p['full_name']?[0] ?? '?')),
                              title: Text(p['full_name'] ?? 'Noma\'lum', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                              subtitle: Text("${p['faculty_name'] ?? ''} - ${p['group_number'] ?? ''}", style: const TextStyle(fontSize: 12)),
-                             trailing: Row(
+                             trailing: isPast ? Row(
                                mainAxisSize: MainAxisSize.min,
                                children: [
                                  IconButton(
@@ -772,31 +772,41 @@ class _EventsTabState extends State<_EventsTab> {
                                    },
                                  ),
                                ],
+                             ) : Text(
+                               status == 'registered' ? "Qatnashadi" : 
+                               status == 'not_registered' ? "" : status,
+                               style: TextStyle(
+                                 color: status == 'registered' ? Colors.green : Colors.grey,
+                                 fontWeight: FontWeight.bold,
+                                 fontSize: 12
+                               )
                              )
                           );
                         },
                       )
                 ),
                 const SizedBox(height: 16),
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppTheme.primaryBlue,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                if (isPast)
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppTheme.primaryBlue,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      onPressed: () async {
+                         final url = Uri.parse("https://t.me/tengdosh_robot?start=clubevent_$eventId");
+                         if (await canLaunchUrl(url)) {
+                            await launchUrl(url, mode: LaunchMode.externalApplication);
+                         }
+                      },
+                      icon: const Icon(Icons.photo_library, color: Colors.white),
+                      label: const Text("Faollik qilib tasdiqlash (Botga)", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                     ),
-                    onPressed: () async {
-                       final url = Uri.parse("https://t.me/tengdosh_robot?start=clubevent_$eventId");
-                       if (await canLaunchUrl(url)) {
-                          await launchUrl(url, mode: LaunchMode.externalApplication);
-                       }
-                    },
-                    icon: const Icon(Icons.photo_library, color: Colors.white),
-                    label: const Text("Faollik qilib tasdiqlash (Botga)", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                   ),
-                ),
-                const SizedBox(height: 16),
+                if (isPast)
+                  const SizedBox(height: 16),
               ],
             ),
           );
