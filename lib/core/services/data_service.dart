@@ -757,6 +757,18 @@ class DataService {
     return [];
   }
 
+  Future<bool> updateClubEventAttendance(int eventId, int studentId, String status) async {
+    try {
+      final response = await http.post(
+        Uri.parse('${ApiConstants.backendUrl}/student/clubs/events/$eventId/attendance'),
+        headers: await _getHeaders(),
+        body: json.encode({"student_id": studentId, "attendance_status": status}),
+      ).timeout(const Duration(seconds: 15));
+      return response.statusCode == 200;
+    } catch (_) {}
+    return false;
+  }
+
   // Announcements
   Future<List<AnnouncementModel>> getAnnouncementModels() async {
     try {

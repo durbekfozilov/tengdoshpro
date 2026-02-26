@@ -221,21 +221,16 @@ async def authlog_callback(request: Request, code: Optional[str] = None, error: 
         
         logger.error(f"DEBUG STAFF LOGIN PAYLOAD: {me}")
         # [FIX] User request: ONLY identify staff via employee_id_number (unique ID).
-        # However, some staff are registered as students (Masters etc) and only have passport_pin.
-        emp_id_num = me.get("employee_id_number") or pinfl or me.get("student_id_number")
+        emp_id_num = me.get("employee_id_number")
         
         if not emp_id_num:
-             logger.warning(f"OAuth: Missing identification (employee_id, pinfl, student_id) for {me.get('login')}")
+             logger.warning(f"OAuth: Missing identification (employee_id) for {me.get('login')}")
              return HTMLResponse(content="<h1>Xatolik</h1><p>Siz tizimda xodim (yoki shaxs sifatida) identifikatsiya qilinmadingiz. Iltimos adminga murojaat qiling.</p>", status_code=403)
              
         # [NEW] Check Local DB FIRST (Bypass HEMIS if they exist manually)
         result = await db.execute(select(Staff).where(Staff.employee_id_number == emp_id_num))
         staff = result.scalar_one_or_none()
         
-        # [NEW] Also check by pinfl/jshshir
-        if not staff and pinfl:
-             result = await db.execute(select(Staff).where(Staff.jshshir == pinfl))
-             staff = result.scalar_one_or_none()
              
         # Dynamic Role Verification via HEMIS Admin API
         role_data = await HemisService.verify_staff_role_from_hemis(emp_id_num)

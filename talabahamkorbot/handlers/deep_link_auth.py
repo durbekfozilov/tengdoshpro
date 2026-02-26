@@ -96,6 +96,34 @@ async def cmd_start_deep_link(message: Message, command: CommandObject, session:
             await message.answer("❌ Yuklash sessiyasi topilmadi yoki eskirgan.")
             return
 
+    # --- 2.5 EVENT PHOTOS FLOW ---
+    elif args.startswith("clubevent_"):
+        event_id_str = args.replace("clubevent_", "")
+        if not event_id_str.isdigit():
+            await message.answer("❌ Xato tadbir IDsi.")
+            return
+            
+        from database.models import ClubEvent
+        from models.states import ClubEventActivityState
+        
+        event_id = int(event_id_str)
+        ev = await session.get(ClubEvent, event_id)
+        if not ev:
+            await message.answer("❌ Bunday tadbir topilmadi.")
+            return
+            
+        await state.update_data(club_event_id=event_id, uploaded_photos=[])
+        await state.set_state(ClubEventActivityState.waiting_for_photo)
+        
+        from keyboards.reply_kb import cancel_kb
+        await message.answer(
+            f"📸 <b>{ev.title}</b> tadbiri uchun rasmlarni (maksimal 5 ta rasm) yuboring.\n"
+            f"Barcha rasmlarni bittadan yuborgach, \"✅ Yakunlash\" tugmasini bosing.",
+            parse_mode="HTML",
+            reply_markup=cancel_kb()
+        )
+        return
+
     # --- 3. OAUTH FLOW (Website -> Bot) ---
     elif args.startswith("login__"): # Double underscore separator
         token = args.replace("login__", "")

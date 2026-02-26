@@ -719,6 +719,7 @@ class _EventsTabState extends State<_EventsTab> {
   void _viewParticipants(int eventId) async {
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (ctx) => const Center(child: CircularProgressIndicator()),
     );
     final parts = await widget.dataService.getClubEventParticipants(eventId);
@@ -729,31 +730,77 @@ class _EventsTabState extends State<_EventsTab> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.white,
-      builder: (context) => Container(
-        height: MediaQuery.of(context).size.height * 0.7,
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            const Text("Tadbir ishtirokchilari", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 16),
-            Expanded(
-              child: parts.isEmpty
-                ? const Center(child: Text("Hech kim ro'yxatdan o'tmagan"))
-                : ListView.builder(
-                    itemCount: parts.length,
-                    itemBuilder: (ctx, i) {
-                      final p = parts[i];
-                      return ListTile(
-                         leading: CircleAvatar(child: Text(p['full_name']?[0] ?? '?')),
-                         title: Text(p['full_name'] ?? 'Nomlum'),
-                         subtitle: Text("${p['faculty_name'] ?? ''} - ${p['group_number'] ?? ''}"),
-                         trailing: Text(p['attendance_status'] ?? '', style: const TextStyle(fontWeight: FontWeight.bold)),
-                      );
+      builder: (context) => StatefulBuilder(
+        builder: (context, setModalState) {
+          return Container(
+            height: MediaQuery.of(context).size.height * 0.85,
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                const Text("Tadbir ishtirokchilari", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 16),
+                Expanded(
+                  child: parts.isEmpty
+                    ? const Center(child: Text("Hozircha ra'yxat bo'sh"))
+                    : ListView.builder(
+                        itemCount: parts.length,
+                        itemBuilder: (ctx, i) {
+                          final p = parts[i];
+                          final status = p['attendance_status'] ?? 'not_registered';
+                          final isAttended = status == 'attended';
+                          final isMissed = status == 'missed';
+                          
+                          return ListTile(
+                             leading: CircleAvatar(child: Text(p['full_name']?[0] ?? '?')),
+                             title: Text(p['full_name'] ?? 'Noma\'lum', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                             subtitle: Text("${p['faculty_name'] ?? ''} - ${p['group_number'] ?? ''}", style: const TextStyle(fontSize: 12)),
+                             trailing: Row(
+                               mainAxisSize: MainAxisSize.min,
+                               children: [
+                                 IconButton(
+                                   icon: Icon(Icons.close, color: isMissed ? Colors.red : Colors.grey.shade400),
+                                   onPressed: () async {
+                                      final ok = await widget.dataService.updateClubEventAttendance(eventId, p['student_id'], 'missed');
+                                      if (ok) setModalState(() => p['attendance_status'] = 'missed');
+                                   },
+                                 ),
+                                 IconButton(
+                                   icon: Icon(Icons.check_circle, color: isAttended ? Colors.green : Colors.grey.shade400),
+                                   onPressed: () async {
+                                      final ok = await widget.dataService.updateClubEventAttendance(eventId, p['student_id'], 'attended');
+                                      if (ok) setModalState(() => p['attendance_status'] = 'attended');
+                                   },
+                                 ),
+                               ],
+                             )
+                          );
+                        },
+                      )
+                ),
+                const SizedBox(height: 16),
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.primaryBlue,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                    onPressed: () async {
+                       final url = Uri.parse("https://t.me/tengdosh_robot?start=clubevent_$eventId");
+                       if (await canLaunchUrl(url)) {
+                          await launchUrl(url, mode: LaunchMode.externalApplication);
+                       }
                     },
-                  )
-            )
-          ],
-        ),
+                    icon: const Icon(Icons.photo_library, color: Colors.white),
+                    label: const Text("Faollik qilib tasdiqlash (Botga)", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  ),
+                ),
+                const SizedBox(height: 16),
+              ],
+            ),
+          );
+        }
       )
     );
   }

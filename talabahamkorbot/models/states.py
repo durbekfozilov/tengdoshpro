@@ -230,3 +230,6 @@ class ClubEditStates(StatesGroup):
     waiting_new_desc = State()
     waiting_new_link = State()
     waiting_new_leader = State()
+
+class ClubEventActivityState(StatesGroup):
+    waiting_for_photo = State()

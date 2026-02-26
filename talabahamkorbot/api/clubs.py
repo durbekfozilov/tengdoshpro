@@ -435,20 +435,70 @@ async def get_event_participants(
         raise HTTPException(status_code=403, detail="Buning uchun siz shu klub sardori bo'lishingiz kerak.")
         
     from sqlalchemy.orm import joinedload
+    memberships = await db.scalars(
+        select(ClubMembership)
+        .where(ClubMembership.club_id == ev.club_id)
+        .options(joinedload(ClubMembership.student))
+    )
+    all_members = memberships.all()
+    
     parts = await db.scalars(
         select(ClubEventParticipant)
         .where(ClubEventParticipant.event_id == event_id)
-        .options(joinedload(ClubEventParticipant.student))
     )
+    part_map = {p.student_id: p for p in parts.all()}
     
     res = []
-    for p in parts.all():
-        faculty_name = p.student.faculty.name if getattr(p.student, 'faculty', None) else None
+    for m in all_members:
+        faculty_name = m.student.faculty_name or (m.student.faculty.name if getattr(m.student, 'faculty', None) else None)
+        p = part_map.get(m.student_id)
+        
+        # registered, attended, missed, not_registered
+        status = p.attendance_status if p else "not_registered"
         res.append({
-            "student_id": p.student_id,
-            "full_name": p.student.full_name,
+            "student_id": m.student_id,
+            "full_name": m.student.full_name,
             "faculty_name": faculty_name,
-            "group_number": p.student.group_number,
-            "attendance_status": p.attendance_status
+            "group_number": m.student.group_number,
+            "attendance_status": status
         })
     return res
+
+class AttendanceUpdateSchema(BaseModel):
+    student_id: int
+    attendance_status: str # "attended" or "missed" or "registered"
+
+@router.post("/events/{event_id}/attendance")
+async def update_event_attendance(
+    event_id: int,
+    req: AttendanceUpdateSchema,
+    student: Student = Depends(get_current_student),
+    db: AsyncSession = Depends(get_db)
+):
+    # Verify leader scope
+    ev = await db.get(ClubEvent, event_id)
+    if not ev:
+         raise HTTPException(status_code=404, detail="Event not found")
+         
+    club = await db.get(Club, ev.club_id)
+    if getattr(club, 'leader_student_id', None) != student.id:
+        raise HTTPException(status_code=403, detail="Buning uchun siz shu klub sardori bo'lishingiz kerak.")
+        
+    part = await db.scalar(
+        select(ClubEventParticipant)
+        .where(ClubEventParticipant.event_id == event_id, ClubEventParticipant.student_id == req.student_id)
+    )
+    
+    if not part:
+        # If not manually registered, auto-register them
+        part = ClubEventParticipant(
+            event_id=event_id,
+            student_id=req.student_id,
+            attendance_status=req.attendance_status
+        )
+        db.add(part)
+    else:
+        part.attendance_status = req.attendance_status
+        
+    await db.commit()
+    return {"status": "success", "attendance_status": part.attendance_status}
