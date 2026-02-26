@@ -123,6 +123,8 @@ class _ClubCreateScreenState extends State<ClubCreateScreen> {
                       : const Text("Yaratish", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
                 ),
               ),
+              // Add padding for keyboard to allow scrolling to the very bottom
+              SizedBox(height: MediaQuery.of(context).viewInsets.bottom),
             ],
           ),
         ),
