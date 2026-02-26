@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../../../core/theme/app_theme.dart';
-import '../../../../core/services/data_service.dart';
+import 'package:provider/provider.dart';
+import 'package:talabahamkor_mobile/core/theme/app_theme.dart';
+import 'package:talabahamkor_mobile/core/services/data_service.dart';
+import 'package:talabahamkor_mobile/core/constants/api_constants.dart';
 import 'club_member_profile_screen.dart';
 
 class ClubDetailScreen extends StatefulWidget {
@@ -908,7 +910,7 @@ class _EventsTabState extends State<_EventsTab> {
                                   ]
                                ),
                                
-                               if (widget.isLeader && a['status'] == "O'tkazildi") ...[
+                               if (widget.isLeader && a['status'] == "O'tkazildi" && a['is_processed'] != true) ...[
                                  const SizedBox(height: 12),
                                  Align(
                                    alignment: Alignment.centerRight,
@@ -1019,30 +1021,32 @@ class _EventsTabState extends State<_EventsTab> {
                             final p = parts[i];
                             final status = p['attendance_status'] ?? 'not_registered';
                             final isAttended = status == 'attended';
-                            final isMissed = status == 'missed';
+                            
+                            String? profileUrl;
+                            if (p['image_url'] != null) {
+                              if (p['image_url'].toString().startsWith('http')) {
+                                profileUrl = p['image_url'];
+                              } else {
+                                profileUrl = '${ApiConstants.backendUrl}/files/${p['image_url']}';
+                              }
+                            }
                             
                             return ListTile(
-                               leading: CircleAvatar(child: Text(p['full_name']?[0] ?? '?')),
-                               title: Text(p['full_name'] ?? 'Noma\'lum', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                               subtitle: Text("${p['faculty_name'] ?? ''} - ${p['group_number'] ?? ''}", style: const TextStyle(fontSize: 12)),
-                               trailing: isPast ? Row(
-                                 mainAxisSize: MainAxisSize.min,
-                                 children: [
-                                   IconButton(
-                                     icon: Icon(Icons.close, color: isMissed ? Colors.red : Colors.grey.shade400),
-                                     onPressed: () async {
-                                        final ok = await widget.dataService.updateClubEventAttendance(eventId, p['student_id'], 'missed');
-                                        if (ok) setModalState(() => p['attendance_status'] = 'missed');
-                                     },
-                                   ),
-                                   IconButton(
-                                     icon: Icon(Icons.check_circle, color: isAttended ? Colors.green : Colors.grey.shade400),
-                                     onPressed: () async {
-                                        final ok = await widget.dataService.updateClubEventAttendance(eventId, p['student_id'], 'attended');
-                                        if (ok) setModalState(() => p['attendance_status'] = 'attended');
-                                     },
-                                   ),
-                                 ],
+                               contentPadding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
+                               leading: CircleAvatar(
+                                 backgroundImage: profileUrl != null ? NetworkImage(profileUrl) : null,
+                                 child: profileUrl == null ? Text(p['full_name']?[0] ?? '?') : null,
+                               ),
+                               title: Text(p['full_name'] ?? 'Noma\'lum', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                               subtitle: Text("${p['faculty_name'] ?? ''} - ${p['group_number'] ?? ''}", style: const TextStyle(fontSize: 11)),
+                               trailing: isPast ? Checkbox(
+                                 value: isAttended,
+                                 activeColor: Colors.green,
+                                 onChanged: (val) async {
+                                    final newStatus = val == true ? 'attended' : 'missed';
+                                    final ok = await widget.dataService.updateClubEventAttendance(eventId, p['student_id'], newStatus);
+                                    if (ok) setModalState(() => p['attendance_status'] = newStatus);
+                                 },
                                ) : Text(
                                  status == 'registered' ? "Qatnashadi" : 
                                  status == 'not_registered' ? "" : status,

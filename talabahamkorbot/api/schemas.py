@@ -171,6 +171,7 @@ class ClubEventSchema(BaseModel):
     event_date: datetime
     created_at: datetime
     participants_count: int = 0
+    is_processed: bool = False
     is_participating: bool = False
     status: str = "upcoming"
     images: list[ClubEventImageSchema] = []
@@ -184,6 +185,7 @@ class ClubEventParticipantSchema(BaseModel):
     faculty_name: Optional[str] = None
     group_number: Optional[str] = None
     attendance_status: str
+    image_url: Optional[str] = None
 
     class Config:
         from_attributes = True

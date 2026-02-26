@@ -1018,6 +1018,7 @@ class ClubEvent(Base):
     event_date: Mapped[datetime] = mapped_column(DateTime(), nullable=False)
     created_by: Mapped[int] = mapped_column(Integer, ForeignKey("students.id", ondelete="SET NULL"), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(), default=datetime.utcnow)
+    is_processed: Mapped[bool] = mapped_column(Boolean, default=False)
 
     club: Mapped["Club"] = relationship("Club")
     author: Mapped["Student"] = relationship("Student")

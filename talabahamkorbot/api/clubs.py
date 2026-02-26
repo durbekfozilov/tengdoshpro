@@ -565,7 +565,8 @@ async def get_event_participants(
             "full_name": m.student.full_name,
             "faculty_name": faculty_name,
             "group_number": m.student.group_number,
-            "attendance_status": status
+            "attendance_status": status,
+            "image_url": m.student.image_url
         })
     return res
 
@@ -670,10 +671,12 @@ async def complete_event_activity(
         created_count += 1
         
     if created_count > 0:
+        ev.is_processed = True
         await db.commit()
         return {"success": True, "created": created_count}
     else:
-        await db.rollback()
+        ev.is_processed = True
+        await db.commit()
         return {"success": False, "message": "All already recorded"}
 
 @router.put("/{club_id}")
