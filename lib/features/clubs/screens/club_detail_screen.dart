@@ -677,24 +677,11 @@ class _EventsTabState extends State<_EventsTab> {
                            ),
                            const SizedBox(height: 16),
                            Row(
-                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                             mainAxisAlignment: MainAxisAlignment.end,
                              children: [
-                               Text("${a['participants_count'] ?? 0} ishtirokchi", style: TextStyle(color: AppTheme.primaryBlue, fontWeight: FontWeight.bold)),
-                               if (widget.isJoined && !widget.isLeader)
-                                 ElevatedButton(
-                                   onPressed: () async {
-                                      final b = await widget.dataService.participateInClubEvent(a['id']);
-                                      if (b) _loadData();
-                                   },
-                                   style: ElevatedButton.styleFrom(
-                                     backgroundColor: isPart ? Colors.red : AppTheme.primaryBlue,
-                                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                                   ),
-                                   child: Text(isPart ? "Bekor qilish" : "Qatnashaman"),
-                                 )
-                               else if (widget.isLeader)
+                               if (widget.isLeader && a['status'] == "O'tkazildi")
                                  OutlinedButton(
-                                   onPressed: () => _viewParticipants(a['id'], a['status'] == "O'tkazildi"),
+                                   onPressed: () => _viewParticipants(a['id'], true),
                                    child: const Text("Ishtirokchilar"),
                                  )
                              ],
@@ -726,9 +713,6 @@ class _EventsTabState extends State<_EventsTab> {
     if (!mounted) return;
     Navigator.pop(context);
 
-    // If it's not past, ONLY show those who expressed interest
-    final displayParts = isPast ? parts : parts.where((p) => p['attendance_status'] == 'registered').toList();
-
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -740,15 +724,15 @@ class _EventsTabState extends State<_EventsTab> {
             padding: const EdgeInsets.all(16),
             child: Column(
               children: [
-                Text(isPast ? "Tadbir ishtirokchilari" : "Qatnashmoqchi bo'lganlar", style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                const Text("Tadbir ishtirokchilari", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 16),
                 Expanded(
-                  child: displayParts.isEmpty
-                    ? Center(child: Text(isPast ? "Hozircha ro'yxat bo'sh" : "Hech kim ro'yxatdan o'tmagan"))
+                  child: parts.isEmpty
+                    ? const Center(child: Text("Hozircha ra'yxat bo'sh"))
                     : ListView.builder(
-                        itemCount: displayParts.length,
+                        itemCount: parts.length,
                         itemBuilder: (ctx, i) {
-                          final p = displayParts[i];
+                          final p = parts[i];
                           final status = p['attendance_status'] ?? 'not_registered';
                           final isAttended = status == 'attended';
                           final isMissed = status == 'missed';
