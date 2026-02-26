@@ -151,6 +151,13 @@ class ClubAnnouncementSchema(BaseModel):
     class Config:
         from_attributes = True
 
+class ClubEventImageSchema(BaseModel):
+    id: int
+    file_id: str
+
+    class Config:
+        from_attributes = True
+
 class ClubEventSchema(BaseModel):
     id: int
     title: str
@@ -161,6 +168,7 @@ class ClubEventSchema(BaseModel):
     participants_count: int = 0
     is_participating: bool = False
     status: str = "upcoming"
+    images: List[ClubEventImageSchema] = []
 
     class Config:
         from_attributes = True

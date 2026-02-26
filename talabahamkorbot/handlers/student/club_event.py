@@ -7,7 +7,7 @@ import logging
 
 from models.states import ClubEventActivityState
 from database.models import (
-    ClubEvent, ClubEventParticipant, UserActivity, UserActivityImage
+    ClubEvent, ClubEventParticipant, ClubEventImage
 )
 
 router = Router()
@@ -31,70 +31,24 @@ async def process_club_event_photo(message: Message, state: FSMContext, session:
             await state.clear()
             return
             
-        # Get all attended participants
-        parts = await session.scalars(
-            select(ClubEventParticipant)
-            .where(
-                ClubEventParticipant.event_id == event_id,
-                ClubEventParticipant.attendance_status == "attended"
-            )
+        # Check if photos already exist and replace or append
+        # Let's delete old photos for this event, or just append. 
+        # Appending is safer, but maybe delete old so user can re-upload? Let's delete old.
+        from sqlalchemy import delete
+        await session.execute(delete(ClubEventImage).where(ClubEventImage.event_id == event_id))
+        
+        for photo_id in uploaded_photos:
+            img = ClubEventImage(event_id=event_id, file_id=photo_id)
+            session.add(img)
+            
+        await session.commit()
+        await message.answer(
+            f"✅ <b>Muvaffaqiyatli!</b>\n\n"
+            f"Jami {len(uploaded_photos)} ta rasm tadbirga saqlandi.\n"
+            f"Endi <b>mobil ilovaga qaytib</b> qatnashchilarni belgilang va 'Saqlash' tugmasini bosing.",
+            parse_mode="HTML",
+            reply_markup=ReplyKeyboardRemove()
         )
-        parts_list = parts.all()
-        
-        if not parts_list:
-            await message.answer("Tadbirda 'Qatnashdi' (attended) deb belgilangan hech qanday ishtirokchi yo'q. Avval mobil ilovadan qatnashganlarni belgilang.", reply_markup=ReplyKeyboardRemove())
-            await state.clear()
-            return
-            
-        # Create UserActivity for each
-        created_count = 0
-        from datetime import datetime
-        
-        for p in parts_list:
-            # Check if this student already has activity for this event to avoid duplicates
-            existing = await session.scalar(
-                select(UserActivity).where(
-                    UserActivity.student_id == p.student_id,
-                    UserActivity.name == ev.title[:255],
-                    UserActivity.category == "Tadbir"
-                )
-            )
-            if existing:
-                continue
-                
-            desc = ev.description or ''
-            activity = UserActivity(
-                student_id=p.student_id,
-                category="Tadbir",
-                name=ev.title[:255],
-                description=f"Klub tadbirida faol ishtirok etildi. {desc[:100]}",
-                date=ev.event_date.strftime("%Y-%m-%d") if ev.event_date else datetime.utcnow().strftime("%Y-%m-%d"),
-                status="approved" # Auto approve!
-            )
-            session.add(activity)
-            await session.commit() # commit to get ID
-            await session.refresh(activity)
-            
-            # Add photos to each activity
-            for photo_id in uploaded_photos:
-                img = UserActivityImage(
-                    activity_id=activity.id,
-                    file_id=photo_id
-                )
-                session.add(img)
-            created_count += 1
-            
-        if created_count > 0:
-            await session.commit()
-            await message.answer(
-                f"✅ <b>Muvaffaqiyatli!</b>\n\n"
-                f"Jami {created_count} ta talabaga \"Ijtimoiy faollik\" (Tadbir) avtomatik tasdiqlandi va rasmlar biriktirildi.",
-                parse_mode="HTML",
-                reply_markup=ReplyKeyboardRemove()
-            )
-        else:
-            await message.answer("✅ Barcha qatnashchilarga avval faollik qo'shib bo'lingan ekan.", reply_markup=ReplyKeyboardRemove())
-            
         await state.clear()
         return
 

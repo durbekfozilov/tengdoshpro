@@ -300,7 +300,7 @@ async def authlog_callback(request: Request, code: Optional[str] = None, error: 
              
              image_url = me.get("picture") or me.get("picture_full") or me.get("image") or me.get("image_url")
              # Only update image if the payload specifically describes an employee, or staff image is totally empty
-             is_student_payload = me.get("type", "employee") == "student"
+             is_student_payload = me.get("type", "employee") == "student" or h_id == str(me.get("id"))
              if image_url and not (staff.image_url and "static/uploads" in staff.image_url):
                  if not is_student_payload or not staff.image_url:
                      staff.image_url = image_url
@@ -328,7 +328,7 @@ async def authlog_callback(request: Request, code: Optional[str] = None, error: 
              staff = new_staff
                   
         # [NEW] Sync Tutor Groups
-        if staff.role == StaffRole.TYUTOR:
+        if staff.role == StaffRole.TYUTOR and role_data:
             tutor_groups = role_data.get("tutor_groups", []) if role_data else []
             logger.info(f"Syncing {len(tutor_groups)} tutor groups for {staff.full_name}")
             

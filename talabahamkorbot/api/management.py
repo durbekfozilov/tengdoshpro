@@ -240,16 +240,16 @@ def build_student_filter(
 
     # --- New Department-Based Scoping ---
     restricted_departments = [
-        "Jurnalistika fakulteti",
-        "PR va menejment fakulteti",
-        "Xalqaro munosabatlar va ijtimoiy-gumanitar fanlar fakulteti"
+        "jurnalistika fakulteti",
+        "pr va menejment fakulteti",
+        "xalqaro munosabatlar va ijtimoiy-gumanitar fanlar fakulteti"
     ]
     
     staff_dept = getattr(staff, 'department', None)
     
     # If the staff belongs to one of the 3 restricted faculties
-    if staff_dept and staff_dept.strip() in restricted_departments:
-        filters.append(Student.faculty_name == staff_dept.strip())
+    if staff_dept and staff_dept.strip().lower() in restricted_departments:
+        filters.append(Student.faculty_name.ilike(f"{staff_dept.strip().lower()}%"))
         # Override incoming faculty_id to prevent viewing others
         # We rely on faculty_name for filtering so no action needed on faculty_id
     elif staff_role == 'tyutor':
@@ -555,9 +555,9 @@ async def get_mgmt_group_students(
     stmt = select(Student).where(Student.group_number == group_number, Student.university_id == uni_id)
     
     restricted_departments = [
-        "Jurnalistika fakulteti",
-        "PR va menejment fakulteti",
-        "Xalqaro munosabatlar va ijtimoiy-gumanitar fanlar fakulteti"
+        "jurnalistika fakulteti",
+        "pr va menejment fakulteti",
+        "xalqaro munosabatlar va ijtimoiy-gumanitar fanlar fakulteti"
     ]
     
     # Role-based restriction
@@ -567,8 +567,8 @@ async def get_mgmt_group_students(
         tg_exists = (await db.execute(tg_stmt)).scalar_one_or_none()
         if not tg_exists:
             raise HTTPException(status_code=403, detail="Bu guruh sizga biriktirilmagan")
-    elif s_dept and s_dept.strip() in restricted_departments:
-        stmt = stmt.where(Student.faculty_name == s_dept.strip())
+    elif s_dept and s_dept.strip().lower() in restricted_departments:
+        stmt = stmt.where(Student.faculty_name.ilike(f"{s_dept.strip().lower()}%"))
 
     result = await db.execute(stmt.order_by(Student.full_name))
     students = result.scalars().all()
@@ -785,12 +785,12 @@ async def search_mgmt_staff(
     s_dept = getattr(staff, 'department', None)
     
     restricted_departments = [
-        "Jurnalistika fakulteti",
-        "PR va menejment fakulteti",
-        "Xalqaro munosabatlar va ijtimoiy-gumanitar fanlar fakulteti"
+        "jurnalistika fakulteti",
+        "pr va menejment fakulteti",
+        "xalqaro munosabatlar va ijtimoiy-gumanitar fanlar fakulteti"
     ]
     
-    is_restricted = s_dept and s_dept.strip() in restricted_departments
+    is_restricted = s_dept and s_dept.strip().lower() in restricted_departments
         
     uni_id = getattr(staff, 'university_id', None)
     

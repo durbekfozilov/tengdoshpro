@@ -445,9 +445,11 @@ async def get_club_events(
     db: AsyncSession = Depends(get_db)
 ):
     from sqlalchemy import desc, func
+    from sqlalchemy.orm import selectinload
     
     evs = await db.scalars(
         select(ClubEvent)
+        .options(selectinload(ClubEvent.images))
         .where(ClubEvent.club_id == club_id)
         .order_by(desc(ClubEvent.event_date))
     )
@@ -485,6 +487,7 @@ async def get_club_events(
             schema.participants_count = counts.get(e.id, 0)
             schema.is_participating = e.id in my_part_ids
             schema.status = "O'tkazildi" if e.event_date < now_dt else "O'tkaziladi"
+            schema.images = e.images if hasattr(e, 'images') else []
             res.append(schema)
             
     return res
@@ -604,3 +607,71 @@ async def update_event_attendance(
         
     await db.commit()
     return {"status": "success", "attendance_status": part.attendance_status}
+
+@router.post("/events/{event_id}/complete_activity")
+async def complete_event_activity(
+    event_id: int,
+    student: Student = Depends(get_current_student),
+    db: AsyncSession = Depends(get_db)
+):
+    from database.models import ClubEventParticipant, UserActivity, UserActivityImage, ClubEventImage, ClubEvent
+    from datetime import datetime
+
+    ev = await db.get(ClubEvent, event_id)
+    if not ev:
+        raise HTTPException(status_code=404, detail="Event not found")
+        
+    parts = await db.scalars(
+        select(ClubEventParticipant)
+        .where(
+            ClubEventParticipant.event_id == event_id,
+            ClubEventParticipant.attendance_status == "attended"
+        )
+    )
+    parts_list = parts.all()
+    
+    if not parts_list:
+        return {"success": False, "message": "No attended participants"}
+        
+    # Get uploaded photos
+    photos = await db.scalars(select(ClubEventImage).where(ClubEventImage.event_id == event_id))
+    photos_list = photos.all()
+    
+    created_count = 0
+    for p in parts_list:
+        existing = await db.scalar(
+            select(UserActivity).where(
+                UserActivity.student_id == p.student_id,
+                UserActivity.name == ev.title[:255],
+                UserActivity.category == "Tadbir"
+            )
+        )
+        if existing:
+            continue
+            
+        desc = ev.description or ''
+        activity = UserActivity(
+            student_id=p.student_id,
+            category="Tadbir",
+            name=ev.title[:255],
+            description=f"Klub tadbirida faol ishtirok etildi. {desc[:100]}",
+            date=ev.event_date.strftime("%Y-%m-%d") if ev.event_date else datetime.utcnow().strftime("%Y-%m-%d"),
+            status="approved"
+        )
+        db.add(activity)
+        await db.flush() # get ID
+        
+        for img in photos_list:
+            u_img = UserActivityImage(
+                activity_id=activity.id,
+                file_id=img.file_id
+            )
+            db.add(u_img)
+        created_count += 1
+        
+    if created_count > 0:
+        await db.commit()
+        return {"success": True, "created": created_count}
+    else:
+        await db.rollback()
+        return {"success": False, "message": "All already recorded"}

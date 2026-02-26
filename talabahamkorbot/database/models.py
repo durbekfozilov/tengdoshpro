@@ -1022,6 +1022,17 @@ class ClubEvent(Base):
     club: Mapped["Club"] = relationship("Club")
     author: Mapped["Student"] = relationship("Student")
     participants: Mapped[list["ClubEventParticipant"]] = relationship("ClubEventParticipant", back_populates="event", cascade="all, delete-orphan")
+    images: Mapped[list["ClubEventImage"]] = relationship("ClubEventImage", back_populates="event", cascade="all, delete-orphan")
+
+class ClubEventImage(Base):
+    __tablename__ = "club_event_images"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    event_id: Mapped[int] = mapped_column(Integer, ForeignKey("club_events.id", ondelete="CASCADE"), nullable=False, index=True)
+    file_id: Mapped[str] = mapped_column(String(255), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(), default=datetime.utcnow)
+
+    event: Mapped["ClubEvent"] = relationship("ClubEvent", back_populates="images")
 
 class ClubEventParticipant(Base):
     __tablename__ = "club_event_participants"
