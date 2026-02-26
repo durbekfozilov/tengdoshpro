@@ -821,9 +821,41 @@ class _EventsTabState extends State<_EventsTab> {
                        borderRadius: BorderRadius.circular(16),
                        boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2))],
                      ),
-                     child: Row(
-                       crossAxisAlignment: CrossAxisAlignment.start,
+                     child: Column(
+                       crossAxisAlignment: CrossAxisAlignment.stretch,
                        children: [
+                         // Media rendering on top
+                         if (a['images'] != null && (a['images'] as List).isNotEmpty)
+                           Container(
+                             height: 120,
+                             margin: const EdgeInsets.only(bottom: 12),
+                             child: ListView.builder(
+                               scrollDirection: Axis.horizontal,
+                               itemCount: (a['images'] as List).length,
+                               itemBuilder: (ctx, idx) {
+                                  final img = a['images'][idx];
+                                  // For telegram file_id, normally we'd need an actual bot URL to load it. 
+                                  // As a fallback/placeholder if we only have file_id:
+                                  return Container(
+                                    width: 100, 
+                                    margin: const EdgeInsets.only(right: 8),
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey[200],
+                                      borderRadius: BorderRadius.circular(8),
+                                      image: DecorationImage(
+                                        image: NetworkImage("https://api.telegram.org/bot/file/..."), // We actually don't have absolute URL without bot token. We'll just show an icon if we only have file_id.
+                                        fit: BoxFit.cover,
+                                        onError: (_, __) {}
+                                      )
+                                    ),
+                                    child: const Center(child: Icon(Icons.image, color: Colors.grey)),
+                                  );
+                               }
+                             )
+                           ),
+                         Row(
+                           crossAxisAlignment: CrossAxisAlignment.start,
+                           children: [
                          // Date Block
                          Container(
                            width: 60,
@@ -881,7 +913,7 @@ class _EventsTabState extends State<_EventsTab> {
                                      style: OutlinedButton.styleFrom(
                                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                      ),
-                                     child: const Text("Ishtirokchilar"),
+                                     child: const Text("Qo'shimcha yoki Tahrirlash"),
                                    ),
                                  )
                                ]
@@ -890,8 +922,10 @@ class _EventsTabState extends State<_EventsTab> {
                          )
                        ]
                      )
-                   );
-                 },
+                   ]
+                 )
+               );
+             },
                ),
       floatingActionButton: widget.isLeader
           ? FloatingActionButton.extended(
@@ -915,6 +949,9 @@ class _EventsTabState extends State<_EventsTab> {
     if (!mounted) return;
     Navigator.pop(context);
 
+    bool showList = false;
+    bool isSaving = false;
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -926,76 +963,125 @@ class _EventsTabState extends State<_EventsTab> {
             padding: const EdgeInsets.all(16),
             child: Column(
               children: [
-                const Text("Tadbir ishtirokchilari", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                const Text("Tadbir qo'shimcha amallari", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 16),
-                Expanded(
-                  child: parts.isEmpty
-                    ? const Center(child: Text("Hozircha ra'yxat bo'sh"))
-                    : ListView.builder(
-                        itemCount: parts.length,
-                        itemBuilder: (ctx, i) {
-                          final p = parts[i];
-                          final status = p['attendance_status'] ?? 'not_registered';
-                          final isAttended = status == 'attended';
-                          final isMissed = status == 'missed';
-                          
-                          return ListTile(
-                             leading: CircleAvatar(child: Text(p['full_name']?[0] ?? '?')),
-                             title: Text(p['full_name'] ?? 'Noma\'lum', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                             subtitle: Text("${p['faculty_name'] ?? ''} - ${p['group_number'] ?? ''}", style: const TextStyle(fontSize: 12)),
-                             trailing: isPast ? Row(
-                               mainAxisSize: MainAxisSize.min,
-                               children: [
-                                 IconButton(
-                                   icon: Icon(Icons.close, color: isMissed ? Colors.red : Colors.grey.shade400),
-                                   onPressed: () async {
-                                      final ok = await widget.dataService.updateClubEventAttendance(eventId, p['student_id'], 'missed');
-                                      if (ok) setModalState(() => p['attendance_status'] = 'missed');
-                                   },
-                                 ),
-                                 IconButton(
-                                   icon: Icon(Icons.check_circle, color: isAttended ? Colors.green : Colors.grey.shade400),
-                                   onPressed: () async {
-                                      final ok = await widget.dataService.updateClubEventAttendance(eventId, p['student_id'], 'attended');
-                                      if (ok) setModalState(() => p['attendance_status'] = 'attended');
-                                   },
-                                 ),
-                               ],
-                             ) : Text(
-                               status == 'registered' ? "Qatnashadi" : 
-                               status == 'not_registered' ? "" : status,
-                               style: TextStyle(
-                                 color: status == 'registered' ? Colors.green : Colors.grey,
-                                 fontWeight: FontWeight.bold,
-                                 fontSize: 12
-                               )
-                             )
-                          );
-                        },
-                      )
+                
+                // Button 1: Deep Link
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blueAccent,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                    onPressed: () async {
+                        final url = Uri.parse("https://t.me/tengdosh_robot?start=clubevent_$eventId");
+                        if (await canLaunchUrl(url)) {
+                          await launchUrl(url, mode: LaunchMode.externalApplication);
+                        }
+                    },
+                    icon: const Icon(Icons.telegram, color: Colors.white),
+                    label: const Text("1. Rasm yuklash (Telegram orqali)", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  ),
                 ),
-                const SizedBox(height: 16),
-                if (isPast)
+                const SizedBox(height: 12),
+
+                // Button 2: Show List
+                if (!showList)
                   SizedBox(
                     width: double.infinity,
                     height: 50,
-                    child: ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppTheme.primaryBlue,
+                    child: OutlinedButton.icon(
+                      style: OutlinedButton.styleFrom(
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
-                      onPressed: () async {
-                         final url = Uri.parse("https://t.me/tengdosh_robot?start=clubevent_$eventId");
-                         if (await canLaunchUrl(url)) {
-                            await launchUrl(url, mode: LaunchMode.externalApplication);
-                         }
-                      },
-                      icon: const Icon(Icons.photo_library, color: Colors.white),
-                      label: const Text("Faollik qilib tasdiqlash (Botga)", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                      onPressed: () => setModalState(() => showList = true),
+                      icon: const Icon(Icons.group),
+                      label: const Text("2. Ishtirokchilarni belgilash ro'yxati"),
                     ),
                   ),
-                if (isPast)
-                  const SizedBox(height: 16),
+
+                if (showList) ...[
+                  const Divider(height: 32),
+                  const Text("Ishtirokchilar ro'yxati:", style: TextStyle(fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 8),
+                  Expanded(
+                    child: parts.isEmpty
+                      ? const Center(child: Text("Hozircha ra'yxat bo'sh"))
+                      : ListView.builder(
+                          itemCount: parts.length,
+                          itemBuilder: (ctx, i) {
+                            final p = parts[i];
+                            final status = p['attendance_status'] ?? 'not_registered';
+                            final isAttended = status == 'attended';
+                            final isMissed = status == 'missed';
+                            
+                            return ListTile(
+                               leading: CircleAvatar(child: Text(p['full_name']?[0] ?? '?')),
+                               title: Text(p['full_name'] ?? 'Noma\'lum', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                               subtitle: Text("${p['faculty_name'] ?? ''} - ${p['group_number'] ?? ''}", style: const TextStyle(fontSize: 12)),
+                               trailing: isPast ? Row(
+                                 mainAxisSize: MainAxisSize.min,
+                                 children: [
+                                   IconButton(
+                                     icon: Icon(Icons.close, color: isMissed ? Colors.red : Colors.grey.shade400),
+                                     onPressed: () async {
+                                        final ok = await widget.dataService.updateClubEventAttendance(eventId, p['student_id'], 'missed');
+                                        if (ok) setModalState(() => p['attendance_status'] = 'missed');
+                                     },
+                                   ),
+                                   IconButton(
+                                     icon: Icon(Icons.check_circle, color: isAttended ? Colors.green : Colors.grey.shade400),
+                                     onPressed: () async {
+                                        final ok = await widget.dataService.updateClubEventAttendance(eventId, p['student_id'], 'attended');
+                                        if (ok) setModalState(() => p['attendance_status'] = 'attended');
+                                     },
+                                   ),
+                                 ],
+                               ) : Text(
+                                 status == 'registered' ? "Qatnashadi" : 
+                                 status == 'not_registered' ? "" : status,
+                                 style: TextStyle(
+                                   color: status == 'registered' ? Colors.green : Colors.grey,
+                                   fontWeight: FontWeight.bold,
+                                   fontSize: 12
+                                 )
+                               )
+                            );
+                          },
+                        )
+                  ),
+                ] else ...[
+                  const Spacer(),
+                ],
+                
+                const SizedBox(height: 16),
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.primaryBlue,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                    onPressed: isSaving ? null : () async {
+                      setModalState(() => isSaving = true);
+                      final ok = await widget.dataService.completeEventActivity(eventId);
+                      setModalState(() => isSaving = false);
+                      
+                      if (!context.mounted) return;
+                      if (ok) {
+                        Navigator.pop(context);
+                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Faollik qilib tasdiqlandi!")));
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Bajarilmadi. Barcha ma'lumotlar to'g'riligini tekshiring.")));
+                      }
+                    },
+                    child: isSaving ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)) : const Text("3. Saqlash", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  ),
+                ),
+                const SizedBox(height: 16),
               ],
             ),
           );

@@ -753,6 +753,17 @@ class DataService {
     return false;
   }
 
+  Future<bool> completeEventActivity(int eventId) async {
+    try {
+      final response = await http.post(
+        Uri.parse('${ApiConstants.backendUrl}/student/clubs/events/$eventId/complete_activity'),
+        headers: await _getHeaders(),
+      ).timeout(const Duration(seconds: 15));
+      return response.statusCode == 200;
+    } catch (_) {}
+    return false;
+  }
+
   Future<bool> participateInClubEvent(int eventId) async {
     try {
       final response = await http.post(

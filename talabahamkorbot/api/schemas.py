@@ -168,7 +168,7 @@ class ClubEventSchema(BaseModel):
     participants_count: int = 0
     is_participating: bool = False
     status: str = "upcoming"
-    images: List[ClubEventImageSchema] = []
+    images: list[ClubEventImageSchema] = []
 
     class Config:
         from_attributes = True
