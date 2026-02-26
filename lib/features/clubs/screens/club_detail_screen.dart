@@ -128,7 +128,7 @@ class _ClubDetailScreenState extends State<ClubDetailScreen> {
                   children: [
                     _InfoTab(club: widget.club, dataService: _dataService, onJoin: _handleJoin),
                     if (isLeader) _MembersTab(clubId: widget.club['id'], dataService: _dataService),
-                    _AnnouncementsTab(clubId: widget.club['id'], isLeader: isLeader, dataService: _dataService),
+                    _AnnouncementsTab(club: widget.club, isLeader: isLeader, dataService: _dataService),
                     _EventsTab(clubId: widget.club['id'], isLeader: isLeader, isJoined: isJoined, dataService: _dataService),
                   ],
                 ),
@@ -521,11 +521,11 @@ class _MembersTabState extends State<_MembersTab> {
 // 3. ANNOUNCEMENTS TAB
 // ==========================================
 class _AnnouncementsTab extends StatefulWidget {
-  final int clubId;
+  final Map<String, dynamic> club;
   final bool isLeader;
   final DataService dataService;
 
-  const _AnnouncementsTab({required this.clubId, required this.isLeader, required this.dataService});
+  const _AnnouncementsTab({required this.club, required this.isLeader, required this.dataService});
 
   @override
   State<_AnnouncementsTab> createState() => _AnnouncementsTabState();
@@ -542,7 +542,7 @@ class _AnnouncementsTabState extends State<_AnnouncementsTab> {
   }
 
   Future<void> _loadData() async {
-    final data = await widget.dataService.getClubAnnouncements(widget.clubId);
+    final data = await widget.dataService.getClubAnnouncements(widget.club['id']);
     if (mounted) {
       setState(() {
         items = data;
@@ -594,7 +594,7 @@ class _AnnouncementsTabState extends State<_AnnouncementsTab> {
                     onPressed: () async {
                       if (textCtrl.text.isEmpty) return;
                       Navigator.pop(ctx);
-                      final ok = await widget.dataService.createClubAnnouncement(widget.clubId, textCtrl.text, sendToTelegram);
+                      final ok = await widget.dataService.createClubAnnouncement(widget.club['id'], textCtrl.text, sendToTelegram);
                       if (ok) _loadData();
                     },
                     child: const Text("Joylsh", style: TextStyle(fontWeight: FontWeight.bold)),
