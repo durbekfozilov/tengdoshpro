@@ -430,8 +430,12 @@ class HemisService:
                     
                 employee = items[0]
                 # Ensure it's a direct match in case search returned a broad match
-                if employee.get("employee_id_number") != employee_id_number:
-                     logger.warning(f"Employee ID mismatch. Expected {employee_id_number}, got {employee.get('employee_id_number')}")
+                emp_id = employee.get("employee_id_number")
+                emp_pinfl = employee.get("pinfl") or employee.get("jshshir") or employee.get("passport_pin")
+                
+                # Check if search term matches the internal employee ID OR their PINFL
+                if str(emp_id) != str(employee_id_number) and str(emp_pinfl) != str(employee_id_number):
+                     logger.warning(f"Employee ID mismatch. Expected {employee_id_number}, got ID:{emp_id}, PINFL:{emp_pinfl}")
                      return None
                      
                 staff_position = employee.get("staffPosition", {}).get("name", "").lower()
@@ -458,9 +462,13 @@ class HemisService:
                     assigned_role = StaffRole.KUTUBXONA
                 elif "inspektor" in staff_position:
                      assigned_role = StaffRole.INSPEKTOR
+                elif "kafedra mudiri" in staff_position:
+                     assigned_role = StaffRole.KAFEDRA_MUDIRI
+                elif "o'qituvchi" in staff_position or "o‘qituvchi" in staff_position or "professor" in staff_position or "dotsent" in staff_position:
+                     assigned_role = StaffRole.TEACHER
                 else:
-                    # Fallback to general rahbariyat/staff
-                    assigned_role = StaffRole.RAHBARIYAT
+                    # Default if no specific mapping matches
+                    assigned_role = StaffRole.TEACHER
                     
                 logger.info(f"Dynamic Role Mapping: {staff_position} -> {assigned_role}")
                 
@@ -470,9 +478,9 @@ class HemisService:
                     "role": assigned_role,
                     "full_name": full_name,
                     "hemis_id": hemis_id,
-                    "staff_position": staff_position,
+                    "tutor_groups": [], # Handled separately via subject tasks or manual assignment
                     "department": department,
-                    "tutor_groups": tutor_groups_data
+                    "position": staff_position
                 }
             else:
                  logger.error(f"Failed to fetch employee list. Status: {response.status_code}")

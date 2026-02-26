@@ -221,9 +221,12 @@ async def authlog_callback(request: Request, code: Optional[str] = None, error: 
         
         logger.error(f"DEBUG STAFF LOGIN PAYLOAD: {me}")
         # [FIX] User request: ONLY identify staff via employee_id_number (unique ID).
+        # However, some staff are registered as students (Masters etc) and only have passport_pin.
+        emp_id_num = me.get("employee_id_number") or pinfl or me.get("student_id_number")
+        
         if not emp_id_num:
-             logger.warning(f"OAuth: Missing employee_id_number for {me.get('login')}")
-             return HTMLResponse(content="<h1>Xatolik</h1><p>Siz tizimda xodim sifatida mavjud emassiz yoki teltizimda xodim ID kiritilmagan. Iltimos adminga murojaat qiling.</p>", status_code=403)
+             logger.warning(f"OAuth: Missing identification (employee_id, pinfl, student_id) for {me.get('login')}")
+             return HTMLResponse(content="<h1>Xatolik</h1><p>Siz tizimda xodim (yoki shaxs sifatida) identifikatsiya qilinmadingiz. Iltimos adminga murojaat qiling.</p>", status_code=403)
              
         # Dynamic Role Verification via HEMIS Admin API
         role_data = await HemisService.verify_staff_role_from_hemis(emp_id_num)
@@ -243,6 +246,8 @@ async def authlog_callback(request: Request, code: Optional[str] = None, error: 
              logger.info(f"DEBUG: Staff matched: {staff.full_name}. Updating Role: {staff.role} -> {assigned_role}")
              staff.role = assigned_role
              staff.full_name = dynamic_full_name
+             staff.department = role_data.get("department")
+             staff.position = role_data.get("position")
              if not staff.hemis_id and h_id:
                  staff.hemis_id = int(h_id)
              if not staff.jshshir and pinfl:
