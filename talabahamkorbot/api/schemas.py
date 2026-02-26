@@ -119,6 +119,11 @@ class ClubCreateSchema(BaseModel):
     channel_link: Optional[str] = None
     leader_login: Optional[str] = None
 
+class ClubUpdateSchema(BaseModel):
+    name: Optional[str] = None
+    channel_link: Optional[str] = None
+    leader_login: Optional[str] = None
+
 class ClubMembershipSchema(BaseModel):
     club: ClubSchema
     role: str

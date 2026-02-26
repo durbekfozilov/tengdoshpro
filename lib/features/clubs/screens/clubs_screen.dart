@@ -215,7 +215,31 @@ class _ClubsScreenState extends State<ClubsScreen> {
                     ),
                   )
                 else
-                  const Icon(Icons.arrow_forward_ios_rounded, color: Colors.grey, size: 16)
+                  const Icon(Icons.arrow_forward_ios_rounded, color: Colors.grey, size: 16),
+                  
+                if (Provider.of<AuthProvider>(context, listen: false).isYetakchi) ...[
+                   const SizedBox(width: 8),
+                   PopupMenuButton<String>(
+                     icon: const Icon(Icons.more_vert, color: Colors.grey),
+                     onSelected: (val) {
+                       if (val == 'edit') {
+                         _showEditClubSheet(club);
+                       }
+                     },
+                     itemBuilder: (ctx) => [
+                       const PopupMenuItem(
+                         value: 'edit',
+                         child: Row(
+                           children: [
+                             Icon(Icons.edit, size: 20, color: Colors.blue),
+                             SizedBox(width: 8),
+                             Text("Tahrirlash"),
+                           ],
+                         ),
+                       ),
+                     ],
+                   ),
+                ]
               ],
             ),
           ),
@@ -225,4 +249,110 @@ class _ClubsScreenState extends State<ClubsScreen> {
   }
 
   // Replaced bottom sheet logic completely.
+  void _showEditClubSheet(Map<String, dynamic> club) {
+    final TextEditingController nameCtl = TextEditingController(text: club['name']);
+    final TextEditingController leaderCtl = TextEditingController(text: club['leader_login'] ?? ''); // Not all clubs return leader_login but they might
+    final TextEditingController channelCtl = TextEditingController(text: club['channel_link'] ?? '');
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        bool isSaving = false;
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Container(
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+              ),
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom,
+                left: 20, right: 20, top: 20
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 40, height: 4,
+                        decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2)),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    const Text("Klubni tahrirlash", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: nameCtl,
+                      decoration: InputDecoration(
+                        labelText: "Klub nomi", 
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                        filled: true,
+                        fillColor: Colors.grey[50],
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: leaderCtl,
+                      decoration: InputDecoration(
+                        labelText: "Sardorning HEMIS logini (O'zgartirish uchun)", 
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                        filled: true,
+                        fillColor: Colors.grey[50],
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      controller: channelCtl,
+                      decoration: InputDecoration(
+                        labelText: "Telegram kanal linki (ixtiyoriy)", 
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                        filled: true,
+                        fillColor: Colors.grey[50],
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppTheme.primaryBlue,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                        onPressed: isSaving ? null : () async {
+                          setModalState(() => isSaving = true);
+                          final data = <String, dynamic>{};
+                          if (nameCtl.text.isNotEmpty) data['name'] = nameCtl.text;
+                          if (leaderCtl.text.isNotEmpty) data['leader_login'] = leaderCtl.text;
+                          if (channelCtl.text.isNotEmpty) data['channel_link'] = channelCtl.text;
+
+                          final success = await _dataService.updateClub(club['id'], data);
+                          setModalState(() => isSaving = false);
+                          if (!context.mounted) return;
+                          
+                          if (success) {
+                            Navigator.pop(context);
+                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("O'zgarishlar saqlandi"), backgroundColor: Colors.green));
+                            _loadClubs();
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Xatolik yuz berdi. Sardor topilmagan bo'lishi mumkin."), backgroundColor: Colors.red));
+                          }
+                        },
+                        child: isSaving ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)) : const Text("Saqlash", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                  ],
+                ),
+              ),
+            );
+          }
+        );
+      }
+    );
+  }
 }

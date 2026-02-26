@@ -9,7 +9,7 @@ from api.dependencies import get_current_student, get_db, get_club_leader
 from api.schemas import (
     ClubSchema, ClubMembershipSchema, ClubMemberSchema, 
     ClubAnnouncementSchema, ClubEventSchema, ClubEventParticipantSchema,
-    ClubCreateSchema
+    ClubCreateSchema, ClubUpdateSchema
 )
 from database.models import (
     Student, Club, ClubMembership, ClubAnnouncement, 
@@ -675,3 +675,50 @@ async def complete_event_activity(
     else:
         await db.rollback()
         return {"success": False, "message": "All already recorded"}
+
+@router.put("/{club_id}")
+async def update_club(
+    club_id: int,
+    req: ClubUpdateSchema,
+    student: Student = Depends(get_current_student),
+    db: AsyncSession = Depends(get_db)
+):
+    if student.hemis_role != 'yetakchi':
+        raise HTTPException(status_code=403, detail="Sizga ruxsat yo'q")
+        
+    club = await db.get(Club, club_id)
+    if not club:
+        raise HTTPException(status_code=404, detail="Klub topilmadi")
+        
+    if req.name is not None:
+        club.name = req.name
+    if req.channel_link is not None:
+        club.channel_link = req.channel_link
+        
+    if req.leader_login is not None:
+        leader_student = await db.scalar(
+            select(Student).where(Student.hemis_login == req.leader_login)
+        )
+        if not leader_student:
+             raise HTTPException(status_code=404, detail="Sardor (HEMIS login) topilmadi")
+             
+        club.leader_student_id = leader_student.id
+        
+        # Optionally add leader to membership if they aren't there
+        existing = await db.scalar(
+            select(ClubMembership).where(
+                ClubMembership.student_id == leader_student.id,
+                ClubMembership.club_id == club.id
+            )
+        )
+        if not existing:
+             m = ClubMembership(
+                 club_id=club.id,
+                 student_id=leader_student.id,
+                 status="active"
+             )
+             db.add(m)
+             
+    await db.commit()
+    await db.refresh(club)
+    return {"message": "Muvaffaqiyatli saqlandi"}

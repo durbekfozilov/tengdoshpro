@@ -614,6 +614,19 @@ class DataService {
 
   // 4. Get Clubs
 
+  Future<bool> updateClub(int clubId, Map<String, dynamic> data) async {
+    try {
+      final response = await http.put(
+        Uri.parse('${ApiConstants.backendUrl}/student/clubs/$clubId'),
+        headers: await _getHeaders(),
+        body: json.encode(data),
+      ).timeout(const Duration(seconds: 15));
+      return response.statusCode == 200;
+    } catch (_) {
+      return false;
+    }
+  }
+
   Future<List<dynamic>> getClubs() async {
     try {
       final response = await http.get(
