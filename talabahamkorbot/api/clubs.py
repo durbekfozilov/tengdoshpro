@@ -221,6 +221,29 @@ async def get_club_members(
         })
     return res
 
+
+@router.delete("/{club_id}/members/{student_id}")
+async def remove_club_member(
+    club_id: int,
+    student_id: int,
+    club: Club = Depends(get_club_leader),
+    db: AsyncSession = Depends(get_db)
+):
+    """(Leader) Remove a student from the club."""
+    membership = await db.scalar(
+        select(ClubMembership)
+        .where(
+            ClubMembership.club_id == club_id,
+            ClubMembership.student_id == student_id
+        )
+    )
+    if not membership:
+        raise HTTPException(status_code=404, detail="Membership not found.")
+        
+    await db.delete(membership)
+    await db.commit()
+    return {"status": "success", "message": "Talaba klub a'zolari safidan chiqarildi"}
+
 class AnnouncementCreateSchema(BaseModel):
     content: str
     media_url: Optional[str] = None

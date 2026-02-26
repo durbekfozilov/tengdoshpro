@@ -266,6 +266,8 @@ class _MembersTabState extends State<_MembersTab> {
       itemBuilder: (context, index) {
         final m = members[index];
         final isActive = m['status'] == 'active';
+        final int studentId = m['student_id'] ?? 0;
+        
         return Card(
           elevation: 0,
           margin: const EdgeInsets.only(bottom: 12),
@@ -281,18 +283,69 @@ class _MembersTabState extends State<_MembersTab> {
                    Text("@${m['telegram_username']}", style: const TextStyle(fontSize: 12, color: AppTheme.primaryBlue)),
               ],
             ),
-            trailing: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: isActive ? Colors.green.withValues(alpha: 0.1) : Colors.red.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(isActive ? "Active" : "Kanalda emas", style: TextStyle(color: isActive ? Colors.green : Colors.red, fontSize: 10, fontWeight: FontWeight.bold)),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: isActive ? Colors.green.withValues(alpha: 0.1) : Colors.red.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(isActive ? "Active" : "Kanalda emas", style: TextStyle(color: isActive ? Colors.green : Colors.red, fontSize: 10, fontWeight: FontWeight.bold)),
+                ),
+                PopupMenuButton<String>(
+                  icon: const Icon(Icons.more_vert, color: Colors.grey),
+                  onSelected: (val) {
+                    if (val == 'remove') {
+                      _confirmRemoveMember(studentId, m['full_name'] ?? '');
+                    }
+                  },
+                  itemBuilder: (context) => [
+                    const PopupMenuItem(
+                      value: 'remove',
+                      child: Text("Soniqdan chiqarish", style: TextStyle(color: Colors.red)),
+                    )
+                  ],
+                ),
+              ],
             ),
           ),
         );
       },
     );
+  }
+
+  Future<void> _confirmRemoveMember(int studentId, String name) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text("Chiqarish"),
+        content: Text("Rostdan ham $name ismli talabani klubdan o'chirmoqchimisiz?"),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text("Bekor qilish")),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: const Text("O'chirish", style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      if (!mounted) return;
+      showDialog(context: context, barrierDismissible: false, builder: (_) => const Center(child: CircularProgressIndicator()));
+      final ok = await widget.dataService.removeClubMember(widget.clubId, studentId);
+      if (!mounted) return;
+      Navigator.pop(context); // loading
+
+      if (ok) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Talaba chiqarib yuborildi"), backgroundColor: Colors.green));
+        _loadMembers();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Xatolik yuz berdi"), backgroundColor: Colors.red));
+      }
+    }
   }
 }
 
