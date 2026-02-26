@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../../core/services/data_service.dart';
+import 'club_member_profile_screen.dart';
 
 class ClubDetailScreen extends StatefulWidget {
   final Map<String, dynamic> club;
@@ -389,7 +390,18 @@ class _MembersTabState extends State<_MembersTab> {
             color: Colors.transparent,
             child: InkWell(
               borderRadius: BorderRadius.circular(16),
-              onTap: () => _showMemberProfileBottomSheet(studentId),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ClubMemberProfileScreen(
+                      clubId: widget.clubId,
+                      studentId: studentId,
+                      dataService: widget.dataService,
+                    ),
+                  ),
+                );
+              },
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Row(
@@ -463,100 +475,6 @@ class _MembersTabState extends State<_MembersTab> {
           )
         );
       },
-    );
-  }
-
-  void _showMemberProfileBottomSheet(int studentId) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
-      builder: (ctx) => DraggableScrollableSheet(
-        initialChildSize: 0.6,
-        minChildSize: 0.4,
-        maxChildSize: 0.9,
-        expand: false,
-        builder: (_, scrollController) => FutureBuilder<Map<String, dynamic>?>(
-          future: widget.dataService.getClubMemberProfile(widget.clubId, studentId),
-          builder: (context, snapshot) {
-             if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-             }
-             if (!snapshot.hasData || snapshot.data == null) {
-                return const Center(child: Text("Ma'lumot topilmadi"));
-             }
-             final data = snapshot.data!;
-             final List acts = data['activities'] ?? [];
-
-             return SingleChildScrollView(
-                controller: scrollController,
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                     CircleAvatar(
-                        radius: 40,
-                        backgroundColor: AppTheme.primaryBlue.withOpacity(0.1),
-                        child: const Icon(Icons.person, size: 40, color: AppTheme.primaryBlue),
-                     ),
-                     const SizedBox(height: 16),
-                     Text(data['full_name'] ?? 'Noma\'lum', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold), textAlign: TextAlign.center),
-                     const SizedBox(height: 8),
-                     Text(data['faculty_name'] ?? 'Fakultet yo\'q', style: const TextStyle(fontSize: 14, color: Colors.grey), textAlign: TextAlign.center),
-                     if (data['group_number'] != null)
-                        Text(data['group_number'], style: const TextStyle(fontSize: 14, color: Colors.grey), textAlign: TextAlign.center),
-                     const SizedBox(height: 24),
-                     
-                     const Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text("Klubdagi faolliklari (Tadbirlar)", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                     ),
-                     const SizedBox(height: 16),
-                     if (acts.isEmpty)
-                        const Padding(
-                           padding: EdgeInsets.all(20),
-                           child: Text("Hozircha faollik yo'q", style: TextStyle(color: Colors.grey)),
-                        ),
-                     for (var act in acts)
-                        Container(
-                           margin: const EdgeInsets.only(bottom: 12),
-                           padding: const EdgeInsets.all(16),
-                           decoration: BoxDecoration(
-                              color: const Color(0xFFF5F6FA),
-                              borderRadius: BorderRadius.circular(16)
-                           ),
-                           child: Row(
-                              children: [
-                                 Container(
-                                    padding: const EdgeInsets.all(10),
-                                    decoration: BoxDecoration(
-                                      color: Colors.green.withOpacity(0.1),
-                                      shape: BoxShape.circle
-                                    ),
-                                    child: const Icon(Icons.check, color: Colors.green, size: 20),
-                                 ),
-                                 const SizedBox(width: 12),
-                                 Expanded(
-                                    child: Column(
-                                       crossAxisAlignment: CrossAxisAlignment.start,
-                                       children: [
-                                          Text(act['event_title'] ?? '', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14), maxLines: 2, overflow: TextOverflow.ellipsis),
-                                          const SizedBox(height: 4),
-                                          if (act['event_date'] != null)
-                                            Text(act['event_date'].toString().substring(0, 10), style: const TextStyle(color: Colors.grey, fontSize: 12))
-                                       ]
-                                    )
-                                 )
-                              ]
-                           )
-                        )
-                  ]
-                )
-             );
-          },
-        ),
-      ),
     );
   }
 
