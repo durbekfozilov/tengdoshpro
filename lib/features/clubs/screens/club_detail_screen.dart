@@ -466,7 +466,15 @@ class _AnnouncementsTabState extends State<_AnnouncementsTab> {
                            Row(
                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                              children: [
-                               Text(a['author_name'] ?? 'Sardor', style: const TextStyle(fontWeight: FontWeight.bold)),
+                               Expanded(
+                                 child: Text(
+                                   a['author_name'] ?? 'Sardor',
+                                   style: const TextStyle(fontWeight: FontWeight.bold),
+                                   maxLines: 1,
+                                   overflow: TextOverflow.ellipsis,
+                                 ),
+                               ),
+                               const SizedBox(width: 8),
                                Text(a['created_at']?.toString().substring(0, 10) ?? '', style: const TextStyle(color: Colors.grey, fontSize: 12)),
                              ],
                            ),
