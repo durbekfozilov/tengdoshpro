@@ -40,66 +40,100 @@ class _ClubDetailScreenState extends State<ClubDetailScreen> {
       length: tabCount,
       child: Scaffold(
         backgroundColor: const Color(0xFFF5F6FA),
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.black),
-            onPressed: () => Navigator.pop(context),
-          ),
-        ),
-        body: Column(
-          children: [
-            Text(
-              widget.club['name'] ?? 'Klub', 
-              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black)
-            ),
-            const SizedBox(height: 4),
-            Text(
-              "${widget.club['members_count'] ?? 0} ta a'zo • 2024 yilda tashkil topgan", 
-              style: const TextStyle(color: Color(0xFF8E8E93), fontSize: 13)
-            ),
-            const SizedBox(height: 24),
-            Container(
-              height: 44,
-              margin: const EdgeInsets.symmetric(horizontal: 16),
-              decoration: BoxDecoration(
-                color: Colors.grey[200],
-                borderRadius: BorderRadius.circular(22),
-              ),
-              child: TabBar(
-                isScrollable: true,
-                dividerColor: Colors.transparent,
-                indicatorSize: TabBarIndicatorSize.tab,
-                indicatorPadding: const EdgeInsets.all(4),
-                indicator: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(18),
-                  boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2))],
+        body: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // 1. BACK BUTTON
+              Padding(
+                padding: const EdgeInsets.only(left: 8.0, top: 4.0),
+                child: IconButton(
+                  icon: const Icon(Icons.arrow_back, color: Colors.black, size: 28),
+                  onPressed: () => Navigator.pop(context),
                 ),
-                labelColor: Colors.black,
-                labelStyle: const TextStyle(fontWeight: FontWeight.bold),
-                unselectedLabelColor: Colors.grey[600],
-                tabs: [
-                  const Tab(text: "Ma'lumot"),
-                  if (isLeader) const Tab(text: "A'zolar"),
-                  const Tab(text: "E'lonlar"),
-                  const Tab(text: "Tadbirlar"),
-                ],
               ),
-            ),
-            const SizedBox(height: 16),
-            Expanded(
-              child: TabBarView(
-                children: [
-                  _InfoTab(club: widget.club, dataService: _dataService, onJoin: _handleJoin),
-                  if (isLeader) _MembersTab(clubId: widget.club['id'], dataService: _dataService),
-                  _AnnouncementsTab(clubId: widget.club['id'], isLeader: isLeader, dataService: _dataService),
-                  _EventsTab(clubId: widget.club['id'], isLeader: isLeader, isJoined: isJoined, dataService: _dataService),
-                ],
+              
+              // 2. LARGE TITLE & SUBTITLE
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      widget.club['name'] ?? 'Klub', 
+                      style: const TextStyle(
+                        fontSize: 28, 
+                        fontWeight: FontWeight.w800, 
+                        color: Colors.black,
+                        height: 1.2
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      "${widget.club['members_count'] ?? 0} ta a'zo • 2024 yilda tashkil topgan", 
+                      style: const TextStyle(
+                        color: Color(0xFF8E8E93), 
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+              const SizedBox(height: 16),
+
+              // 3. SEGMENTED TABS (Full Width)
+              Container(
+                height: 48,
+                margin: const EdgeInsets.symmetric(horizontal: 20),
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade200,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: TabBar(
+                  isScrollable: false, // Make it explicitly distribute space
+                  dividerColor: Colors.transparent,
+                  indicatorSize: TabBarIndicatorSize.tab,
+                  indicator: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.04),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      )
+                    ],
+                  ),
+                  labelColor: Colors.black,
+                  labelStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                  unselectedLabelColor: Colors.grey.shade600,
+                  unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500, fontSize: 13),
+                  labelPadding: EdgeInsets.zero,
+                  tabs: [
+                    const Tab(text: "Ma'lumot"),
+                    if (isLeader) const Tab(text: "A'zolar"),
+                    const Tab(text: "E'lonlar"),
+                    const Tab(text: "Tadbirlar"),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              // 4. TAB CONTENTS
+              Expanded(
+                child: TabBarView(
+                  children: [
+                    _InfoTab(club: widget.club, dataService: _dataService, onJoin: _handleJoin),
+                    if (isLeader) _MembersTab(clubId: widget.club['id'], dataService: _dataService),
+                    _AnnouncementsTab(clubId: widget.club['id'], isLeader: isLeader, dataService: _dataService),
+                    _EventsTab(clubId: widget.club['id'], isLeader: isLeader, isJoined: isJoined, dataService: _dataService),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
