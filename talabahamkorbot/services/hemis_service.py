@@ -276,7 +276,7 @@ class HemisService:
             if "hemis.jmcu.uz" in domain:
                 domain = domain.replace("hemis.jmcu.uz", "student.jmcu.uz")
             
-        return f"{domain}?client_id={client_id}&redirect_uri={redirect_uri}&response_type=code&state={state}"
+        return f"{domain}?client_id={client_id}&redirect_uri={redirect_uri}&response_type=code&state={state}&prompt=login&max_age=0"
 
     @staticmethod
     def generate_oauth_url(state: str = "mobile"):
