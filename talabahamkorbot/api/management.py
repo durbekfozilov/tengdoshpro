@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, BackgroundTasks
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import or_, select, func, and_, or_, desc, distinct, case
 from sqlalchemy.orm import selectinload
@@ -1474,8 +1474,94 @@ async def get_mgmt_documents_archive(
     }
 
 
+async def _process_and_send_zip_bg(export_items: list, tg_id: int, title: str):
+    from bot import bot
+    from config import BOT_TOKEN
+    from aiogram.types import BufferedInputFile
+    import aiohttp
+    import zipfile
+    import io
+    import logging
+    
+    logger = logging.getLogger(__name__)
+
+    zip_buffer = io.BytesIO()
+    count = 0
+    size_limit_reached = False
+    MAX_BYTES = 40 * 1024 * 1024  # 40 MB safe limit
+    
+    with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zip_file:
+        async with aiohttp.ClientSession() as session:
+            for item in export_items:
+                try:
+                    tg_file = await bot.get_file(item["telegram_file_id"])
+                    file_path = tg_file.file_path
+                    download_url = f"https://api.telegram.org/file/bot{BOT_TOKEN}/{file_path}"
+                    
+                    async with session.get(download_url) as resp:
+                        if resp.status == 200:
+                            file_bytes = await resp.read()
+                            
+                            ext = "pdf"
+                            if item["file_name"] and "." in item["file_name"]:
+                                ext = item["file_name"].split(".")[-1]
+                            elif file_path and "." in file_path:
+                                ext = file_path.split(".")[-1]
+                            elif item["mime_type"]:
+                                if "pdf" in item["mime_type"]: ext = "pdf"
+                                elif "jpeg" in item["mime_type"] or "jpg" in item["mime_type"]: ext = "jpg"
+                                elif "png" in item["mime_type"]: ext = "png"
+                                elif "word" in item["mime_type"] or "doc" in item["mime_type"]: ext = "docx"
+                                
+                            clean_name = item["student_full_name"].replace(" ", "_").replace("'", "").replace("\"", "")
+                            f_name_raw = item["file_name"] or "Hujjat"
+                            clean_title = f_name_raw.replace(" ", "_").replace("'", "").replace("\"", "")
+                            filename = f"{clean_name}_{clean_title}_{item['id']}.{ext}"
+                            
+                            if zip_buffer.tell() + len(file_bytes) > MAX_BYTES:
+                                size_limit_reached = True
+                                break
+                            
+                            zip_file.writestr(filename, file_bytes)
+                            count += 1
+                            if count % 10 == 0:
+                                logger.info(f"Yig'ilayotgan ZIP jarayoni: {count} ta hujjat tirkaldi. Joriy hajm: {zip_buffer.tell() / (1024*1024):.2f} MB")
+                except Exception as e:
+                    logger.error(f"Error zipping doc {item['id']}: {e}")
+                    
+                if size_limit_reached:
+                    warning_msg = "Telegram bot orqali maksimal fayl hajmi chegaralanganligi (50MB) sababli arxiv to'ldi.\nIltimos, qolgan hujjatlarni olish uchun Guruh kurs yoki ro'yxat filtrlaridan foydalaning."
+                    zip_file.writestr("DIQQAT_XABARNOMA.txt", warning_msg.encode("utf-8"))
+                    break
+
+    if count == 0:
+        try:
+            await bot.send_message(tg_id, "Hech qanday fayl yuklab olinmadi")
+        except:
+            pass
+        return
+
+    zip_buffer.seek(0)
+    
+    try:
+        input_file = BufferedInputFile(zip_buffer.read(), filename="hujjatlar_arxivi.zip")
+        sz_msg = " ⚠️ Qisman (Hajm cheklovi)" if size_limit_reached else ""
+        caption = (
+            f"📦 <b>Hujjatlar Arxivi (ZIP)</b>{sz_msg}\n\n"
+            f"Soni: <b>{count} ta</b>\n"
+            f"Filtr: <b>{title or 'Barchasi'}</b>"
+        )
+        await bot.send_document(tg_id, input_file, caption=caption, parse_mode="HTML")
+    except Exception as e:
+        logger.error(f"Error sending ZIP: {e}")
+        try:
+            await bot.send_message(tg_id, f"ZIP yuborish xatosi (Hajm yoki tarmoq): {str(e)}")
+        except:
+            pass
+
 @router.post("/documents/export-zip")
 async def export_mgmt_documents_zip(
+    background_tasks: BackgroundTasks,
     query: str = None,
     faculty_id: int = None,
     title: str = None,
@@ -1537,77 +1623,22 @@ async def export_mgmt_documents_zip(
     res = await db.execute(stmt.options(selectinload(StudentDocument.student)))
     all_docs_to_export = res.scalars().all()
 
-    # 5. Process and ZIP
-    if not all_docs_to_export:
+    # Serialize objects to dictionaries for safe background task transport (detached db context)
+    export_items = []
+    for doc in all_docs_to_export:
+        if doc.student:
+            export_items.append({
+                "id": doc.id,
+                "file_name": doc.file_name,
+                "mime_type": doc.mime_type,
+                "telegram_file_id": doc.telegram_file_id,
+                "student_full_name": doc.student.full_name
+            })
+            
+    if not export_items:
         return {"success": False, "message": "Hech qanday hujjat topilmadi"}
-
-    # Create ZIP in memory
-    zip_buffer = io.BytesIO()
-    count = 0
-    size_limit_reached = False
-    MAX_BYTES = 40 * 1024 * 1024  # 40 MB safe limit for Telegram Bot (50MB is max)
-    
-    with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zip_file:
-        async with aiohttp.ClientSession() as session:
-            for doc in all_docs_to_export:
-                student = doc.student
-                if not student: continue
-                
-                try:
-                    # Get File Info from Telegram
-                    tg_file = await bot.get_file(doc.telegram_file_id)
-                    file_path = tg_file.file_path
-                    download_url = f"https://api.telegram.org/file/bot{BOT_TOKEN}/{file_path}"
-                    
-                    # Download File
-                    async with session.get(download_url) as resp:
-                        if resp.status == 200:
-                            file_bytes = await resp.read()
-                            
-                            # Determine Extension intelligently
-                            ext = "pdf" # Default fallback
-                            if doc.file_name and "." in doc.file_name:
-                                ext = doc.file_name.split(".")[-1]
-                            elif file_path and "." in file_path:
-                                ext = file_path.split(".")[-1]
-                            elif doc.mime_type:
-                                if "pdf" in doc.mime_type: ext = "pdf"
-                                elif "jpeg" in doc.mime_type or "jpg" in doc.mime_type: ext = "jpg"
-                                elif "png" in doc.mime_type: ext = "png"
-                                elif "word" in doc.mime_type or "doc" in doc.mime_type: ext = "docx"
-                            
-                            # Filename: StudentName_DocTitle_ID.ext
-                            clean_name = student.full_name.replace(" ", "_").replace("'", "").replace("\"", "")
-                            clean_title = doc.file_name.replace(" ", "_").replace("'", "").replace("\"", "")
-                            filename = f"{clean_name}_{clean_title}_{doc.id}.{ext}"
-                            
-                            # Check size threshold before appending
-                            if zip_buffer.tell() + len(file_bytes) > MAX_BYTES:
-                                size_limit_reached = True
-                                break
-                            
-                            zip_file.writestr(filename, file_bytes)
-                            count += 1
-                            if count % 10 == 0:
-                                logger = logging.getLogger(__name__)
-                                logger.info(f"Yig'ilayotgan ZIP jarayoni: {count} ta hujjat tirkaldi. Joriy hajm: {zip_buffer.tell() / (1024*1024):.2f} MB")
-                except Exception as e:
-                    import logging
-                    logger = logging.getLogger(__name__)
-                    logger.error(f"Error zipping doc {doc.id}: {e}")
-                    
-                if size_limit_reached:
-                    warning_msg = "Telegram bot orqali maksimal fayl hajmi chegaralanganligi (50MB) sababli arxiv to'ldi.\nIltimos, qolgan hujjatlarni olish uchun Guruh kurs yoki ro'yxat filtrlaridan foydalaning."
-                    zip_file.writestr("DIQQAT_XABARNOMA.txt", warning_msg.encode("utf-8"))
-                    break
-
-    if count == 0:
-        return {"success": False, "message": "Hech qanday fayl yuklab olinmadi"}
-
-    zip_buffer.seek(0)
-    
-    # Send ZIP via Bot
-    # Dynamic Lookup for current Staff User TG Account
+        
+    # Verify Telegram Account mapping immediately
     tg_acc = await db.scalar(select(TgAccount).where(
         (TgAccount.student_id == staff.id) | (TgAccount.staff_id == staff.id)
     ))
@@ -1615,21 +1646,17 @@ async def export_mgmt_documents_zip(
     if not tg_acc:
         return {"success": False, "message": "Sizning Telegram hisobingiz ulanmagan. Iltimos, Avval botga kiring."}
         
-    try:
-        input_file = BufferedInputFile(zip_buffer.read(), filename="hujjatlar_arxivi.zip")
-        sz_msg = " ⚠️ Qisman (Hajm cheklovi)" if size_limit_reached else ""
-        caption = (
-            f"📦 <b>Hujjatlar Arxivi (ZIP)</b>{sz_msg}\n\n"
-            f"Soni: <b>{count} ta</b>\n"
-            f"Filtr: <b>{title or 'Barchasi'}</b>"
-        )
-        await bot.send_document(tg_acc.telegram_id, input_file, caption=caption, parse_mode="HTML")
-        return {"success": True, "message": f"ZIP fayl yuborildi ({count} ta hujjat)."}
-    except Exception as e:
-        import logging
-        logger = logging.getLogger(__name__)
-        logger.error(f"Error sending ZIP: {e}")
-        return {"success": False, "message": f"ZIP yuborish xatosi (Hajm yoki tarmoq): {str(e)}"}
+    tg_id = tg_acc.telegram_id
+    
+    # Offload the blocking >60s ZIP loop to FastAPI BackgroundTasks to fix NGINX 504 Timeouts
+    background_tasks.add_task(
+        _process_and_send_zip_bg,
+        export_items=export_items,
+        tg_id=tg_id,
+        title=title
+    )
+
+    return {"success": True, "message": "ZIP arxiv tayyorlanmoqda. Tugashi bilan bot orqali yuboriladi."}
 
 
 # ============================================================
