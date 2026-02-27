@@ -112,8 +112,9 @@ async def authlog_callback(request: Request, code: Optional[str] = None, error: 
     h_id = str(me.get("id", ""))
     h_login = me.get("login")
     
-    # [FIX] As per user request: Anyone logging in via OAuth (OneID) is considered staff.
-    user_type = "employee"
+    user_type = str(me.get("type", "student")).lower()
+    if "_staff" in state:
+        user_type = "employee"
     
     internal_token = ""
     role = "student"

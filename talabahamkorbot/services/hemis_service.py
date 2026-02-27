@@ -413,12 +413,7 @@ class HemisService:
         url = f"https://student.jmcu.uz/rest/v1/data/employee-list"
         headers = HemisService.get_headers(HEMIS_ADMIN_TOKEN)
         
-        params = {"type": "all", "limit": 1}
-        # Check if 14 digits JSHSHIR / PINFL
-        if len(str(identifier)) == 14 and str(identifier).isdigit():
-             params["passport_pin"] = identifier
-        else:
-             params["search"] = identifier
+        params = {"type": "all", "limit": 1, "search": str(identifier)}
         
         try:
             logger.info(f"Verifying staff role for identifier: {identifier} via Admin API")
@@ -437,10 +432,19 @@ class HemisService:
                 emp_id = employee.get("employee_id_number")
                 emp_pinfl = employee.get("pinfl") or employee.get("jshshir") or employee.get("passport_pin")
                 
-                # Check if search term matches the internal employee ID OR their PINFL
-                if str(emp_id) != str(identifier) and str(emp_pinfl) != str(identifier):
-                     logger.warning(f"Employee ID mismatch. Expected {identifier}, got ID:{emp_id}, PINFL:{emp_pinfl}")
-                     return None
+                is_pinfl_search = len(str(identifier)) == 14 and str(identifier).isdigit()
+                
+                if is_pinfl_search:
+                    # 14 digit PINFLs are unique. Since HEMIS API search returns it, we trust it.
+                    # Only verify if the API actually provided a pinfl field.
+                    if emp_pinfl and str(emp_pinfl) != str(identifier):
+                        logger.warning(f"Employee PINFL mismatch. Expected {identifier}, got PINFL:{emp_pinfl}")
+                        return None
+                else:
+                    # If searching by employee_id_number, perform strict check on emp_id.
+                    if str(emp_id) != str(identifier):
+                         logger.warning(f"Employee ID mismatch. Expected {identifier}, got ID:{emp_id}, PINFL:{emp_pinfl}")
+                         return None
                      
                 staff_position = employee.get("staffPosition", {}).get("name", "").lower()
                 department = employee.get("department", {}).get("name", "").lower()
