@@ -600,16 +600,20 @@ async def search_mgmt_students(
     staff: Any = Depends(get_current_staff),
     db: AsyncSession = Depends(get_db)
 ):
+    current_role = getattr(staff, 'role', None)
     uni_id = getattr(staff, 'university_id', None)
-    if uni_id is None:
-        return {"success": True, "total_count": 0, "app_users_count": 0, "data": []}
+    if not uni_id:
+        from database.models import StaffRole
+        if current_role not in [StaffRole.OWNER, StaffRole.DEVELOPER]:
+            return {"success": True, "total_count": 0, "app_users_count": 0, "data": []}
     
     # [FIX] Normalize empty strings from frontend
-    if education_type in ["", "All", "-1", "none"]: education_type = None
-    if education_form in ["", "All", "-1", "none"]: education_form = None
-    if level_name in ["", "All", "-1", "none"]: level_name = None
-    if specialty_name in ["", "All", "-1", "none"]: specialty_name = None
-    if group_number in ["", "All", "-1", "none"]: group_number = None
+    empty_vals = ["", "All", "-1", "none", "null", "undefined"]
+    if education_type in empty_vals: education_type = None
+    if education_form in empty_vals: education_form = None
+    if level_name in empty_vals: level_name = None
+    if specialty_name in empty_vals: specialty_name = None
+    if group_number in empty_vals: group_number = None
 
     # [FIX] Smart Filter Mapping (Frontend sends Form as Type sometimes)
     known_forms = ["Kunduzgi", "Kechki", "Sirtqi", "Masofaviy"]
@@ -674,7 +678,7 @@ async def search_mgmt_students(
     
     # App Users Count
     app_users_stmt = select(func.count(Student.id)).join(User, Student.hemis_login == User.hemis_login).where(
-        and_(*search_filters)
+        and_(*search_filters, User.hemis_token != None)
     )
     app_users_count = (await db.execute(app_users_stmt)).scalar() or 0
 
@@ -942,8 +946,11 @@ async def get_mgmt_student_details(
 
         # Security: Ensure student belongs to staff's university
         uni_id = getattr(staff, 'university_id', None)
-        if student.university_id != uni_id:
-            raise HTTPException(status_code=403, detail="Boshqa universitet talabasi ma'lumotlarini ko'rish imkonsiz")
+        current_role = getattr(staff, 'role', None)
+        from database.models import StaffRole
+        if current_role not in [StaffRole.OWNER, StaffRole.DEVELOPER]:
+            if student.university_id != uni_id:
+                raise HTTPException(status_code=403, detail="Boshqa universitet talabasi ma'lumotlarini ko'rish imkonsiz")
 
         # 1. Appeals (Feedbacks) - parent_id=None are top-level threads
         appeals_result = await db.execute(
@@ -981,6 +988,27 @@ async def get_mgmt_student_details(
             except:
                 return str(dt)
 
+        # [NEW] Fetch Live Academic Data if token available
+        from database.models import User
+        user = await db.scalar(select(User).where(User.hemis_login == student.hemis_login))
+        user_token = user.hemis_token if user else None
+        
+        attendance_str = "Noma'lum"
+        if user_token:
+            try:
+                from services.hemis_service import HemisService
+                t, e, u, _ = await HemisService.get_student_absence(user_token, student_id=student.id)
+                attendance_str = f"Jami: {t} soat (Sababli: {e}, Sababsiz: {u})"
+                
+                # Update GPA if 0
+                if student.gpa == 0.0:
+                    live_gpa = await HemisService.get_student_performance(user_token, student_id=student.id)
+                    if live_gpa:
+                        student.gpa = live_gpa
+                        await db.commit()
+            except:
+                pass
+
         return {
             "success": True,
             "data": {
@@ -994,12 +1022,13 @@ async def get_mgmt_student_details(
                     "image_url": getattr(student, 'image_url', None),
                     "phone": getattr(student, 'phone', None),
                     "gpa": getattr(student, 'gpa', 0.0),
+                    "attendance": attendance_str,
                     # [NEW] Enhanced Fields
                     "education_type": getattr(student, 'education_type', None),
                     "specialty_name": getattr(student, 'specialty_name', None),
                     "level_name": getattr(student, 'level_name', None),
                     "education_form": getattr(student, 'education_form', None),
-                    "is_app_user": bool(getattr(student, 'hemis_token', None)),
+                    "is_app_user": bool(user_token),
                     "last_active": student.last_login.isoformat() if getattr(student, 'last_login', None) else None
                 },
                 "appeals": [
