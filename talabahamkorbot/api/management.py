@@ -1588,6 +1588,9 @@ async def export_mgmt_documents_zip(
                             
                             zip_file.writestr(filename, file_bytes)
                             count += 1
+                            if count % 10 == 0:
+                                logger = logging.getLogger(__name__)
+                                logger.info(f"Yig'ilayotgan ZIP jarayoni: {count} ta hujjat tirkaldi. Joriy hajm: {zip_buffer.tell() / (1024*1024):.2f} MB")
                 except Exception as e:
                     import logging
                     logger = logging.getLogger(__name__)
