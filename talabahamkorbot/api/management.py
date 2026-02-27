@@ -1159,9 +1159,13 @@ async def send_student_cert_to_management(
     cert, student = row
     
     # 2. Verify Management Access (University Check)
-    uni_id = getattr(staff, 'university_id', None)
-    if student.university_id != uni_id:
-        raise HTTPException(status_code=403, detail="Boshqa universitet talabasi ma'lumotlarini yuklash imkonsiz")
+    global_mgmt_roles = ["rahbariyat", "Rektor", "Prorektor", "Yoshlar bilan ishlash bo'yicha prorektor", "Owner", "Developer"]
+    staff_role = getattr(staff, 'role', None) or getattr(staff, 'hemis_role', None)
+    
+    if staff_role not in global_mgmt_roles:
+        uni_id = getattr(staff, 'university_id', None)
+        if uni_id and student.university_id != uni_id:
+            raise HTTPException(status_code=403, detail="Boshqa universitet talabasi ma'lumotlarini yuklash imkonsiz")
 
     # 3. Get Management User's TG Account
     tg_acc = await db.scalar(select(TgAccount).where(
@@ -1218,9 +1222,13 @@ async def send_student_doc_to_management(
     doc, student = row
     
     # 2. Verify Management Access (University Check)
-    uni_id = getattr(staff, 'university_id', None)
-    if student.university_id != uni_id:
-        raise HTTPException(status_code=403, detail="Boshqa universitet talabasi ma'lumotlarini yuklash imkonsiz")
+    global_mgmt_roles = ["rahbariyat", "Rektor", "Prorektor", "Yoshlar bilan ishlash bo'yicha prorektor", "Owner", "Developer"]
+    staff_role = getattr(staff, 'role', None) or getattr(staff, 'hemis_role', None)
+    
+    if staff_role not in global_mgmt_roles:
+        uni_id = getattr(staff, 'university_id', None)
+        if uni_id and student.university_id != uni_id:
+            raise HTTPException(status_code=403, detail="Boshqa universitet talabasi ma'lumotlarini yuklash imkonsiz")
 
     # 3. Get Management User's TG Account
     tg_acc = await db.scalar(select(TgAccount).where(

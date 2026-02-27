@@ -317,7 +317,7 @@ class _ManagementArchiveScreenState extends State<ManagementArchiveScreen> {
           controller: _searchController,
           onSubmitted: (val) => _loadDocuments(refresh: true),
           decoration: InputDecoration(
-            hintText: "Ism yoki Hemis ID...",
+            hintText: AppDictionary.tr(context, 'hint_name_or_hemis'),
             hintStyle: TextStyle(color: Colors.grey[500], fontSize: 14),
             prefixIcon: const Icon(Icons.search_rounded, color: Colors.grey),
             border: InputBorder.none,
@@ -552,16 +552,16 @@ class _ManagementArchiveScreenState extends State<ManagementArchiveScreen> {
             const SizedBox(height: 24),
             ListTile(
               leading: const CircleAvatar(backgroundColor: Colors.blue, child: Icon(Icons.telegram, color: Colors.white, size: 20)),
-              title: const Text("Bot orqali yuborish"),
+              title: const Text(AppDictionary.tr(context, 'btn_send_via_bot')),
               onTap: () { Navigator.pop(context); _downloadDoc(doc); },
             ),
             ListTile(
               leading: CircleAvatar(backgroundColor: Colors.grey[100], child: Icon(Icons.copy_rounded, color: Colors.grey[700], size: 20)),
-              title: const Text("HEMIS ID nusxalash"),
+              title: const Text(AppDictionary.tr(context, 'btn_copy_hemis_id')),
               onTap: () {
                 Clipboard.setData(ClipboardData(text: doc['student']['hemis_id'] ?? ''));
                 Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("HEMIS ID nusxalandi")));
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(AppDictionary.tr(context, 'msg_hemis_copied'))));
               },
             ),
           ],
@@ -587,7 +587,7 @@ class _ManagementArchiveScreenState extends State<ManagementArchiveScreen> {
     if (confirmed != true) return;
 
     setState(() => _isLoading = true);
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("ZIP arxiv tayyorlanmoqda...")));
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(AppDictionary.tr(context, 'msg_preparing_zip'))));
 
     final result = await _dataService.exportManagementDocumentsZip(
       query: _searchController.text,
@@ -615,7 +615,15 @@ class _ManagementArchiveScreenState extends State<ManagementArchiveScreen> {
 
   Future<void> _downloadDoc(dynamic doc) async {
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Telegramga yuborilmoqda...")));
-    final result = await _dataService.downloadStudentDocumentForManagement(doc['id'], type: doc['file_type']);
+    final bool isCert = doc['is_certificate'] == true;
+    
+    String? result;
+    if (isCert) {
+      result = await _dataService.downloadStudentCertificateForManagement(doc['id']);
+    } else {
+      result = await _dataService.downloadStudentDocumentForManagement(doc['id'], type: doc['file_type']);
+    }
+    
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
