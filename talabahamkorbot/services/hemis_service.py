@@ -401,21 +401,27 @@ class HemisService:
         return None
 
     @staticmethod
-    async def verify_staff_role_from_hemis(employee_id_number: str) -> Optional[dict]:
+    async def verify_staff_role_from_hemis(identifier: str) -> Optional[dict]:
         """
         Dynamically verifies a staff member's role against the JMCU HEMIS employee database.
         Maps the external Hemis staff position to our internal `StaffRole`.
         """
-        if not employee_id_number:
+        if not identifier:
             return None
             
         client = await HemisService.get_client()
         url = f"https://student.jmcu.uz/rest/v1/data/employee-list"
         headers = HemisService.get_headers(HEMIS_ADMIN_TOKEN)
-        params = {"type": "employee", "search": employee_id_number, "limit": 1}
+        
+        params = {"type": "all", "limit": 1}
+        # Check if 14 digits JSHSHIR / PINFL
+        if len(str(identifier)) == 14 and str(identifier).isdigit():
+             params["passport_pin"] = identifier
+        else:
+             params["search"] = identifier
         
         try:
-            logger.info(f"Verifying staff role for employee ID: {employee_id_number} via Admin API")
+            logger.info(f"Verifying staff role for identifier: {identifier} via Admin API")
             response = await client.get(url, headers=headers, params=params)
             
             if response.status_code == 200:
@@ -423,7 +429,7 @@ class HemisService:
                 items = data.get("data", {}).get("items", [])
                 
                 if not items:
-                    logger.warning(f"Employee ID {employee_id_number} not found in HEMIS employee-list.")
+                    logger.warning(f"Identifier {identifier} not found in HEMIS employee-list.")
                     return None
                     
                 employee = items[0]
@@ -432,8 +438,8 @@ class HemisService:
                 emp_pinfl = employee.get("pinfl") or employee.get("jshshir") or employee.get("passport_pin")
                 
                 # Check if search term matches the internal employee ID OR their PINFL
-                if str(emp_id) != str(employee_id_number) and str(emp_pinfl) != str(employee_id_number):
-                     logger.warning(f"Employee ID mismatch. Expected {employee_id_number}, got ID:{emp_id}, PINFL:{emp_pinfl}")
+                if str(emp_id) != str(identifier) and str(emp_pinfl) != str(identifier):
+                     logger.warning(f"Employee ID mismatch. Expected {identifier}, got ID:{emp_id}, PINFL:{emp_pinfl}")
                      return None
                      
                 staff_position = employee.get("staffPosition", {}).get("name", "").lower()

@@ -109,7 +109,10 @@ async def get_group_document_details(
                     "id": d.id,
                     "title": d.file_name,
                     "type": d.file_type,
-                    "created_at": d.uploaded_at.isoformat()
+                    "created_at": d.uploaded_at.isoformat(),
+                    "file_id": d.telegram_file_id,
+                    "file_url": f"/api/v1/management/documents/{d.id}/download",
+                    "status": "approved"
                 } for d in s.all_documents if d.file_type == "document"
             ]
         })

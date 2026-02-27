@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Body, Request
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
@@ -39,10 +40,56 @@ async def get_my_documents(
                 "id": d.id,
                 "title": d.file_name,
                 "type": d.file_type,
-                "created_at": d.uploaded_at.strftime("%d.%m.%Y")
+                "created_at": d.uploaded_at.strftime("%d.%m.%Y"),
+                "file_id": d.telegram_file_id,
+                "file_url": f"/api/v1/student/documents/{d.id}/download",
+                "status": "approved"
             } for d in docs
         ]
     }
+
+import httpx
+from config import BOT_TOKEN
+
+@router.get("/{doc_id}/download")
+async def download_document(
+    doc_id: int,
+    student: Student = Depends(get_current_student),
+    db: AsyncSession = Depends(get_session)
+):
+    """Download a student's document by streaming it from Telegram Cloud."""
+    stmt = select(StudentDocument).where(StudentDocument.id == doc_id, StudentDocument.student_id == student.id)
+    result = await db.execute(stmt)
+    doc = result.scalars().first()
+    
+    if not doc:
+        raise HTTPException(status_code=404, detail="Hujjat topilmadi")
+
+    try:
+        file = await bot.get_file(doc.telegram_file_id)
+        file_path = file.file_path
+        url = f"https://api.telegram.org/file/bot{BOT_TOKEN}/{file_path}"
+        
+        async def iterate_file():
+            async with httpx.AsyncClient() as client:
+                async with client.stream("GET", url) as response:
+                    async for chunk in response.aiter_bytes():
+                        yield chunk
+
+        safe_filename = doc.file_name.replace(" ", "_").replace("/", "_")
+        if "." not in safe_filename:
+            ext = file_path.split(".")[-1] if "." in file_path else "bin"
+            safe_filename += f".{ext}"
+
+        return StreamingResponse(
+            iterate_file(),
+            media_type=doc.mime_type or "application/octet-stream",
+            headers={"Content-Disposition": f"attachment; filename={safe_filename}"}
+        )
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Telegramdan faylni yuklab olishda xatolik: {str(e)}")
 
 # ... (Previous code omitted for brevity) ...
 

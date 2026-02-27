@@ -107,7 +107,7 @@ class _ActivityMonitoringScreenState extends State<ActivityMonitoringScreen> {
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       crossAxisCount: 2,
-      childAspectRatio: 1.5,
+      childAspectRatio: 1.35,
       crossAxisSpacing: 16,
       mainAxisSpacing: 16,
       children: [

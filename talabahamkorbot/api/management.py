@@ -635,7 +635,6 @@ async def search_mgmt_students(
     # [NEW] Tutor Scoping
     if getattr(staff, 'role', None) == 'tyutor':
         from database.models import TutorGroup
-        from sqlalchemy import select, or_
         tg_stmt = select(TutorGroup.group_number).where(TutorGroup.tutor_id == staff.id)
         group_numbers = (await db.execute(tg_stmt)).scalars().all()
         
@@ -1054,14 +1053,22 @@ async def get_mgmt_student_details(
                     {
                         "id": d.id, 
                         "title": d.file_name, 
-                        "created_at": safe_isoformat(d.uploaded_at)
+                        "created_at": safe_isoformat(d.uploaded_at),
+                        "file_id": d.telegram_file_id,
+                        "file_url": f"/api/v1/management/documents/{d.id}/download",
+                        "file_type": d.file_type or "document",
+                        "status": "approved"
                     } for d in docs
                 ],
                 "certificates": [
                     {
                         "id": c.id, 
                         "title": c.file_name, 
-                        "created_at": safe_isoformat(c.uploaded_at)
+                        "created_at": safe_isoformat(c.uploaded_at),
+                        "file_id": c.telegram_file_id,
+                        "file_url": f"/api/v1/management/documents/{c.id}/download",
+                        "file_type": c.file_type or "certificate",
+                        "status": "approved"
                     } for c in certs
                 ]
             }
@@ -1393,8 +1400,10 @@ async def get_mgmt_documents_archive(
             "created_at": d.uploaded_at.isoformat() if d.uploaded_at else None,
             "short_date": d.uploaded_at.strftime("%d.%m.%Y") if d.uploaded_at else "",
             "file_id": d.telegram_file_id,
+            "file_url": f"/api/v1/management/documents/{d.id}/download",
             "file_type": d.file_type or "document",
             "is_certificate": d.file_type == "certificate",
+            "status": "approved",
             "student": {
                 "id": str(d.student.id) if d.student else None,
                 "full_name": d.student.full_name if d.student else "Noma'lum",
@@ -1685,7 +1694,7 @@ async def get_management_activities(
                 "status": a.status,
                 "moderator_comment": a.moderator_comment,
                 "created_at": a.created_at,
-                "images": [f"https://tengdosh.uzjoku.uz/api/v1/files?file_id={img.file_id}" for img in a.images]
+                "images": [f"https://tengdosh.uzjoku.uz/api/v1/files/{img.file_id}" for img in a.images]
             } for a in activities
         ]
     }

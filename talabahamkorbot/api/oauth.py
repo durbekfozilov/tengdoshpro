@@ -228,34 +228,39 @@ async def authlog_callback(request: Request, code: Optional[str] = None, error: 
         # Allow student_id_number if Admin explicitly bound it to a Staff profile (e.g. O'ktam Qarshiyev)
         emp_id_num = me.get("employee_id_number") or me.get("student_id_number")
         
-        if not emp_id_num:
-             logger.warning(f"OAuth: Missing identification (employee_id) for {me.get('login')}")
+        if not emp_id_num and not pinfl:
+             logger.warning(f"OAuth: Missing identification (employee_id and pinfl) for {me.get('login')}")
              return HTMLResponse(content="<h1>Xatolik</h1><p>Siz tizimda xodim (yoki shaxs sifatida) identifikatsiya qilinmadingiz. Iltimos adminga murojaat qiling.</p>", status_code=403)
              
-        # Check Local DB FIRST
-        result = await db.execute(select(Staff).where(Staff.employee_id_number == emp_id_num))
-        staff = result.scalar_one_or_none()
+        # Dynamic Role Verification via HEMIS Admin API FIRST
+        role_data = None
+        if emp_id_num:
+             role_data = await HemisService.verify_staff_role_from_hemis(emp_id_num)
+        if not role_data and pinfl:
+             role_data = await HemisService.verify_staff_role_from_hemis(pinfl)
         
+        if not role_data:
+             logger.warning(f"Unauthorized staff login attempt (Not found in JMCU HEMIS employee-list): {me.get('login')} / EmpID: {emp_id_num} / PINFL: {pinfl}")
+             return HTMLResponse(content="<h1>Xatolik</h1><p>Kechirasiz, siz JMCU xodimlar ro'yxatida topilmadingiz. Iltimos kadrlar bo'limiga murojaat qiling.</p>", status_code=403)
              
-        # Dynamic Role Verification via HEMIS Admin API
-        role_data = await HemisService.verify_staff_role_from_hemis(emp_id_num)
-        
-        if not role_data and not staff:
-             logger.warning(f"Unauthorized staff login attempt (Not found in JMCU root or local DB): {me.get('login')} / EmpID: {emp_id_num}")
-             return HTMLResponse(content="<h1>Xatolik</h1><p>Kechirasiz, siz JMCU xodimlar bazasida topilmadingiz yoki ruxsat etilgan rolingiz yo'q. Iltimos adminga murojaat qiling.</p>", status_code=403)
+        # Process Identity from HEMIS
+        assigned_role = role_data["role"]
+        dynamic_full_name = role_data["full_name"]
+        department = role_data.get("department")
+        position = role_data.get("position")
+
+        # Now load or create in Local DB for syncing
+        from sqlalchemy import or_
+        conditions = []
+        if emp_id_num:
+             conditions.append(Staff.employee_id_number == emp_id_num)
+        if pinfl:
+             conditions.append(Staff.jshshir == pinfl)
              
-        # Process Identity
-        if role_data:
-            assigned_role = role_data["role"]
-            dynamic_full_name = role_data["full_name"]
-            department = role_data.get("department")
-            position = role_data.get("position")
-        elif staff:
-            # Fallback to Local DB properties
-            assigned_role = staff.role
-            dynamic_full_name = staff.full_name
-            department = staff.department
-            position = staff.position
+        staff = None
+        if conditions:
+             result = await db.execute(select(Staff).where(or_(*conditions)))
+             staff = result.scalar_one_or_none()
 
         if staff:
              # Update existing Staff record
