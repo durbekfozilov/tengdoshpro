@@ -44,7 +44,8 @@ async def get_current_user_token_data(
              return {
                  "type": payload["type"], 
                  "id": payload["id"],
-                 "hemis_token": payload.get("hemis_token") # [NEW] Extract embedded token
+                 "hemis_token": payload.get("hemis_token"), # [NEW] Extract embedded token
+                 "avatar": payload.get("avatar") # [NEW] Extract stateless avatar
              }
              
     # 2. Legacy Formats (Backward Compatibility - Limited)
@@ -52,21 +53,21 @@ async def get_current_user_token_data(
     if token.startswith("jwt_token_for_"):
         try:
             tid = int(token.replace("jwt_token_for_", ""))
-            return {"type": "telegram", "id": tid, "hemis_token": None}
+            return {"type": "telegram", "id": tid, "hemis_token": None, "avatar": None}
         except:
              pass
 
     if token.startswith("student_id_"):
         try:
             sid = int(token.replace("student_id_", ""))
-            return {"type": "student", "id": sid, "hemis_token": None}
+            return {"type": "student", "id": sid, "hemis_token": None, "avatar": None}
         except:
             pass
 
     if token.startswith("staff_id_"):
         try:
             sid = int(token.replace("staff_id_", ""))
-            return {"type": "staff", "id": sid, "hemis_token": None}
+            return {"type": "staff", "id": sid, "hemis_token": None, "avatar": None}
         except:
             pass
             
@@ -108,6 +109,10 @@ async def get_current_staff(
             headers={"WWW-Authenticate": "Bearer"},
         )
         
+    # Inject stateless avatar
+    if token_data.get("avatar"):
+        staff.transient_avatar = token_data["avatar"]
+        
     return staff
 
 async def get_current_student(
@@ -135,6 +140,9 @@ async def get_current_student(
         # [SECURITY] Token in JWT is encrypted (Stateless Storage)
         student.hemis_token = decrypt_data(token_data["hemis_token"])
     
+    if token_data.get("avatar"):
+        student.transient_avatar = token_data["avatar"]
+        
     return student
 
 
@@ -150,6 +158,8 @@ async def get_student_or_staff(
             raise HTTPException(status_code=404, detail="Xodim topilmadi")
         if token_data.get("hemis_token"):
             staff.hemis_token = decrypt_data(token_data["hemis_token"])
+        if token_data.get("avatar"):
+            staff.transient_avatar = token_data["avatar"]
         return staff
     elif user_type == "student" or user_type == "telegram":
         if user_type == "telegram":
@@ -166,6 +176,8 @@ async def get_student_or_staff(
             raise HTTPException(status_code=404, detail="Talaba topilmadi")
         if token_data.get("hemis_token"):
             student.hemis_token = decrypt_data(token_data["hemis_token"])
+        if token_data.get("avatar"):
+            student.transient_avatar = token_data["avatar"]
         return student
     else:
         raise HTTPException(status_code=403, detail="Ruxsat etilmagan foydalanuvchi turi")

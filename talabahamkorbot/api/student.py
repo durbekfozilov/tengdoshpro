@@ -111,6 +111,17 @@ async def get_my_profile(
             s_first_name = p_name
             s_last_name = p_surname
             
+        # Retrieve ephemeral image from embedded token if stored or from profile
+        effective_image = getattr(student, 'image_url', None)
+        transient = getattr(student, 'transient_avatar', None)
+        
+        # Priority: Local Upload > JWT Transmitted Avatar > UI-Avatars Fallback
+        if not effective_image or "ui-avatars.com" in effective_image:
+             if transient:
+                  effective_image = transient
+             else:
+                  effective_image = "https://ui-avatars.com/api/?name=" + student.full_name.replace(" ", "+")
+        
         return {
              "id": student.id,
              "full_name": display_name,
@@ -119,8 +130,8 @@ async def get_my_profile(
              "short_name": display_name, # Fallback
              "role": role_label, # Dynamic Label (Rektor)
              "role_code": frontend_role_code, # Internal code (Rahbariyat -> triggers dashboard)
-             "image": getattr(student, 'image_url', None) or "https://ui-avatars.com/api/?name=" + student.full_name.replace(" ", "+"),
-             "image_url": getattr(student, 'image_url', None) or "https://ui-avatars.com/api/?name=" + student.full_name.replace(" ", "+"),
+             "image": effective_image,
+             "image_url": effective_image,
              "university_name": "O‘zbekiston jurnalistika va ommaviy kommunikatsiyalar universiteti", # [FIX] Full Name
              # [FIX] Map Expanded Staff Data to existing Frontend Keys
              "faculty_name": getattr(student, 'department', '') or "",          # Mapped to 'Fakultet' slot -> Department

@@ -548,16 +548,33 @@ async def login_via_hemis(
         encrypted_token = encrypt_data(token)
         user_agent = request.headers.get("user-agent", "unknown")
         
+        # Determine effective image: if "static/uploads" exists in db, use it, else transient HEMIS picture
+        staff_db_img = getattr(staff, "image_url", None)
+        effective_image = staff_db_img if staff_db_img and "static/uploads" in staff_db_img else (me.get("image") or me.get("picture"))
+        
         access_token = create_access_token(
             data={
                 "sub": staff.full_name,
                 "type": "staff",
                 "id": staff.id,
-                "hemis_token": encrypted_token
+                "hemis_token": encrypted_token,
+                "avatar": effective_image
             },
             expires_delta=timedelta(minutes=60 * 24 * 7), # 7 days
             user_agent=user_agent
         )
+        
+        # Extract phone and birth date
+        phone = me.get("phone") or me.get("phone_number")
+        birth_date = me.get("birth_date") or me.get("birthDate")
+        
+        if phone and not staff.phone:
+            staff.phone = phone
+        if birth_date and not staff.birth_date:
+            staff.birth_date = birth_date
+            
+        await db.commit()
+        await db.refresh(staff)
         
         return {
             "success": True,
@@ -568,7 +585,9 @@ async def login_via_hemis(
                     "id": staff.id,
                     "full_name": staff.full_name,
                     "role": staff.role,
-                    "image": getattr(staff, "image_url", None) or me.get("image") or me.get("picture"),
+                    "image": effective_image,
+                    "phone": staff.phone,
+                    "birth_date": staff.birth_date
                     # Add other staff fields if needed
                 }
             }

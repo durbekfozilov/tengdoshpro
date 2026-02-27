@@ -271,11 +271,17 @@ async def authlog_callback(request: Request, code: Optional[str] = None, error: 
              if not staff.university_id:
                  staff.university_id = 1
              
-             image_url = me.get("picture") or me.get("picture_full") or me.get("image") or me.get("image_url")
-             if image_url and not (staff.image_url and "static/uploads" in staff.image_url):
-                 import time
-                 sep = "&" if "?" in image_url else "?"
-                 staff.image_url = f"{image_url}{sep}t={int(time.time())}"
+             # Extract extra profile details that might be missing
+             phone = me.get("phone") or (role_data.get("phone") if role_data else None)
+             birth_date = me.get("birth_date") or (role_data.get("birth_date") if role_data else None)
+             
+             if phone and not staff.phone:
+                 staff.phone = phone
+             if birth_date and not staff.birth_date:
+                 staff.birth_date = birth_date
+                 
+             # [FIX] Do NOT overwrite staff image permanently if it already exists unless explicitly uploading
+             # Image will be passed temporarily in the response token payload instead of saving to DB
                  
              await db.commit()
              await db.refresh(staff)
@@ -325,12 +331,17 @@ async def authlog_callback(request: Request, code: Optional[str] = None, error: 
         user_agent = request.headers.get("user-agent", "unknown")
         encrypted_token = encrypt_data(access_token)
         
+        # Determine effective image: if "static/uploads" exists in db, use it, else transient HEMIS picture
+        staff_db_img = getattr(staff, "image_url", None)
+        effective_image = staff_db_img if staff_db_img and "static/uploads" in staff_db_img else (me.get("image") or me.get("picture") or me.get("picture_full"))
+        
         internal_token = create_access_token(
             data={
                 "sub": str(h_id), 
                 "type": "staff", 
                 "id": staff.id,
-                "hemis_token": encrypted_token
+                "hemis_token": encrypted_token,
+                "avatar": effective_image # Dynamically embed image
             },
             expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
             user_agent=user_agent

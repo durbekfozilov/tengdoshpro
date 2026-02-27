@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import or_, select, func, and_, or_, desc, distinct
+from sqlalchemy import or_, select, func, and_, or_, desc, distinct, case
 from sqlalchemy.orm import selectinload
 from typing import Dict, Any, List, Optional
 import zipfile
@@ -74,116 +74,55 @@ async def get_management_dashboard(
         if HEMIS_ADMIN_TOKEN:
             token = HEMIS_ADMIN_TOKEN
 
-        total_students = 0
-        platform_users = 0
-        total_staff = 0
-
-        # 2. Filter by Faculty (Dean) or Group (Tutor) if restricted
-        s_role = getattr(staff, 'role', None)
+        # 2. Base Filters for exact scope match
+        base_filters = build_student_filter(staff)
         
-        # Priority: API -> DB (Fallback)
+        # 3. Tutor-specific group filter
+        s_role = getattr(staff, 'role', None)
         if s_role == 'tyutor':
-            groups = await db.scalars(
-                select(TutorGroup).where(TutorGroup.staff_id == staff.id)
-            )
+            groups = await db.scalars(select(TutorGroup).where(TutorGroup.staff_id == staff.id))
             group_numbers = [g.group_number for g in groups.all() if g.group_number]
             
             logger.info(f"Tutor {staff.id} dashboard for groups: {group_numbers}")
-            total_students_db = await db.scalar(
-                select(func.count(Student.id))
-                .where(Student.university_id == uni_id, or_(*[Student.group_number.ilike(f"{g.strip()}%") for g in group_numbers]) if group_numbers else False)
-            ) or 0
-            total_students = total_students_db
-            
-            platform_users = await db.scalar(
-                select(func.count(Student.id))
-                .join(User, Student.hemis_login == User.hemis_login)
-                .where(
-                    Student.university_id == uni_id, 
-                    or_(*[Student.group_number.ilike(f"{g.strip()}%") for g in group_numbers]) if group_numbers else False
-                )
-            ) or 0
+            if group_numbers:
+                base_filters.append(or_(*[Student.group_number.ilike(f"{g.strip()}%") for g in group_numbers]))
+            else:
+                base_filters.append(Student.id == -1) # No groups = No students
+
+        # 4. Calculate Total Students (Exact Scope)
+        total_students = await db.scalar(
+            select(func.count(Student.id)).where(and_(*base_filters))
+        ) or 0
+
+        # 5. Calculate Active Platform Users (Exact Scope)
+        # Active means they have a hemis_token (logged into the app)
+        platform_users = await db.scalar(
+            select(func.count(Student.id)).where(and_(*base_filters, Student.hemis_token != None))
+        ) or 0
+
+        # 6. Calculate Total Staff (Fallback logic)
+        total_staff = 0
+        if s_role == 'tyutor':
             total_staff = 1
-            
         elif (is_dean or f_id):
-            # Scoped Management (Dean level or any management with faculty_id)
-            effective_f_id = f_id
-            if HEMIS_ADMIN_TOKEN:
-                h_fac_id = effective_f_id
-                if effective_f_id == 36: h_fac_id = 4 # Jurnalistika
-                elif effective_f_id == 34: h_fac_id = 2 # PR
-                elif effective_f_id == 42: h_fac_id = 35 # SIRTQI
-                elif effective_f_id == 37: h_fac_id = 16 # MAGISTRATURA
-                
-                admin_filters = {"_department": h_fac_id}
-                try:
-                    _, total_students = await HemisService.get_admin_student_list(admin_filters, limit=1)
-                    logger.info(f"HEMIS API Result: FacId={h_fac_id}, Count={total_students}")
-                except Exception as e:
-                    logger.error(f"HEMIS API Failed: {e}")
-                    total_students = 0
-            
-            # Fallback to DB if API returned 0 or no token
-            if total_students == 0:
-                logger.info(f"Using DB Fallback for Faculty {effective_f_id}")
-                total_students = await db.scalar(
-                    select(func.count(Student.id)).where(Student.university_id == uni_id, Student.faculty_id == effective_f_id)
-                ) or 0
-                logger.info(f"DB Fallback Count: {total_students}")
-                
-            platform_users = await db.scalar(
-                select(func.count(Student.id))
-                .join(User, Student.hemis_login == User.hemis_login)
-                .where(
-                    Student.university_id == uni_id, 
-                    Student.faculty_id == effective_f_id
-                )
-            ) or 0
             total_staff = await db.scalar(
-                select(func.count(Staff.id)).where(Staff.university_id == uni_id, Staff.faculty_id == effective_f_id)
+                select(func.count(Staff.id)).where(Staff.university_id == uni_id, Staff.faculty_id == f_id)
             ) or 0
         else:
-            # Global Management (No faculty restriction)
-            total_students_api = 0
-            # ONLY use public API for JMCU (uni_id=1), otherwise it leaks JMCU stats
             if uni_id == 1:
                 try:
-                    # Force public request to NOT use token to prevent token mixups
-                    total_students_api = await HemisService.get_total_student_count(token=token)
-                    logger.info(f"HEMIS Global Count: {total_students_api}")
-                except Exception as e:
-                    logger.warning(f"HEMIS Global Count Failed: {e}")
-                    
-            if total_students_api > 0:
-                total_students = total_students_api
-            else:
-                logger.info("Using DB Fallback for Global")
-                total_students = await db.scalar(
-                    select(func.count(Student.id)).where(Student.university_id == uni_id)
-                ) or 0
-
-            platform_users = await db.scalar(
-                select(func.count(Student.id))
-                .join(User, Student.hemis_login == User.hemis_login)
-                .where(
-                    Student.university_id == uni_id
-                )
-            ) or 0
-
-            public_employees = 0
-            if uni_id == 1:
-                public_employees = await HemisService.get_public_employee_count()
+                    total_staff = await HemisService.get_public_employee_count()
+                except Exception:
+                    pass
             
-            if public_employees > 0:
-                total_staff = public_employees
-            else:
+            if total_staff == 0:
                 total_staff = await db.scalar(
                     select(func.count(Staff.id)).where(Staff.university_id == uni_id)
                 ) or 0
 
-        logger.info(f"MGMT_STATS: Staff={staff.id}, Role={current_role}, Fac={f_id}, Global={is_global}, Total={total_students}, Users={platform_users}")
+        logger.info(f"MGMT_STATS: Staff={staff.id}, Role={current_role}, Total={total_students}, Users={platform_users}")
         
-        # 6. Calc Usage Percentage
+        # 7. Calc Usage Percentage
         usage_percentage = 0
         if total_students > 0:
             usage_percentage = round((platform_users / total_students) * 100)
@@ -247,13 +186,18 @@ def build_student_filter(
     
     staff_dept = getattr(staff, 'department', None)
     
-    # If the staff belongs to one of the 3 restricted faculties
+    # 1. Scoped by Department Text (Legacy string map fallback)
     if staff_dept and staff_dept.strip().lower() in restricted_departments:
         filters.append(Student.faculty_name.ilike(f"{staff_dept.strip().lower()}%"))
         # Override incoming faculty_id to prevent viewing others
-        # We rely on faculty_name for filtering so no action needed on faculty_id
+    # 2. Scoped by Faculty ID (Proper Relational Mapping)
+    elif staff_fac_id and not is_global:
+        # If staff has a specific faculty_id assigned and they are not global, lock them to it
+        filters.append(Student.faculty_id == staff_fac_id)
+        # Override requested faculty_id to prevent snooping
+        faculty_id = staff_fac_id 
+    # 3. Scoped by Tyutor (Dynamically handled in endpoints but we ensure they don't leak here)
     elif staff_role == 'tyutor':
-        # Tutors are restricted to their assigned groups (handled dynamically in endpoints)
         pass
     else:
         # Global access for Rektorat, 1-bo'lim, Kutubxona, etc.

@@ -472,13 +472,19 @@ class HemisService:
                 
                 tutor_groups_data = employee.get("tutorGroups", [])
                 
+                # Extract extra fields
+                phone = employee.get("phone") or employee.get("phone_number")
+                birth_date = employee.get("birth_date") or employee.get("birthDate")
+                
                 return {
                     "role": assigned_role,
                     "full_name": full_name,
                     "hemis_id": hemis_id,
                     "tutor_groups": [], # Handled separately via subject tasks or manual assignment
                     "department": department,
-                    "position": staff_position
+                    "position": staff_position,
+                    "phone": phone,
+                    "birth_date": birth_date
                 }
             else:
                  logger.error(f"Failed to fetch employee list. Status: {response.status_code}")

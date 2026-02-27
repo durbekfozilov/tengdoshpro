@@ -1,21 +1,17 @@
-
 import asyncio
 from sqlalchemy import text
-from database.db_connect import AsyncSessionLocal
+from sqlalchemy.ext.asyncio import create_async_engine
+from config import DATABASE_URL
 
-async def add_column():
-    async with AsyncSessionLocal() as session:
+async_engine = create_async_engine(DATABASE_URL, echo=False)
+
+async def main():
+    async with async_engine.begin() as conn:
         try:
-            print("Attempting to add column hemis_token to staff table...")
-            await session.execute(text("ALTER TABLE staff ADD COLUMN hemis_token VARCHAR(1024);"))
-            await session.commit()
+            await conn.execute(text("ALTER TABLE club_events ADD COLUMN is_processed BOOLEAN DEFAULT false;"))
             print("Column added successfully.")
         except Exception as e:
-            print(f"Error (possibly column exists): {e}")
+            print(f"Error: {e}")
 
-if __name__ == "__main__":
-    import sys
-    import os
-    # Ensure current directory is in path for imports
-    sys.path.append(os.getcwd())
-    asyncio.run(add_column())
+if __name__ == '__main__':
+    asyncio.run(main())
