@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/services/data_service.dart';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class SubjectDetailScreen extends StatefulWidget {
   final String subjectId;
@@ -63,7 +64,7 @@ class _SubjectDetailScreenState extends State<SubjectDetailScreen> {
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _details == null
-              ? const Center(child: Text(AppDictionary.tr(context, 'msg_info_not_found')))
+              ? Center(child: Text(AppDictionary.tr(context, 'msg_info_not_found')))
               : SingleChildScrollView(
                   padding: const EdgeInsets.all(20),
                   child: Column(

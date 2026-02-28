@@ -13,6 +13,7 @@ import '../../../../core/providers/auth_provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'edit_post_sheet.dart';
 import 'comment_sheet.dart';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class PostCard extends StatefulWidget {
   final Post post;
@@ -201,9 +202,9 @@ class _PostCardState extends State<PostCard> {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text("O'chirish"),
-        content: const Text(AppDictionary.tr(context, 'msg_confirm_delete_post')),
+        content: Text(AppDictionary.tr(context, 'msg_confirm_delete_post')),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text(AppDictionary.tr(context, 'btn_no'))),
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(AppDictionary.tr(context, 'btn_no'))),
           TextButton(
             child: const Text("Ha, o'chirish", style: TextStyle(color: Colors.red)),
             onPressed: () async {
@@ -247,7 +248,7 @@ class _PostCardState extends State<PostCard> {
                   decoration: BoxDecoration(color: Colors.grey[100], shape: BoxShape.circle),
                   child: const Icon(Icons.copy, color: Colors.blueAccent),
                 ),
-                title: const Text(AppDictionary.tr(context, 'btn_copy_link'), style: TextStyle(fontWeight: FontWeight.w500)),
+                title: Text(AppDictionary.tr(context, 'btn_copy_link'), style: TextStyle(fontWeight: FontWeight.w500)),
                 onTap: () async {
                   await Clipboard.setData(ClipboardData(text: link));
                   if (mounted) {
@@ -270,7 +271,7 @@ class _PostCardState extends State<PostCard> {
                   child: const Icon(Icons.share, color: Colors.green),
                 ),
                 title: const Text("Boshqa ilovalar orqali...", style: TextStyle(fontWeight: FontWeight.w500)),
-                subtitle: const Text(AppDictionary.tr(context, 'hint_share_options')),
+                subtitle: Text(AppDictionary.tr(context, 'hint_share_options')),
                 onTap: () {
                    Navigator.pop(context);
                    Share.share("Talaba Hamkor ilovasidagi qiziqarli postni ko'ring:\n\n$link");
@@ -412,7 +413,7 @@ class _PostCardState extends State<PostCard> {
                     if (val == 'delete') _showDeleteDialog();
                   },
                   itemBuilder: (context) => [
-                    const PopupMenuItem(value: 'edit', child: Row(children: [Icon(Icons.edit, size: 20), SizedBox(width: 8), Text(AppDictionary.tr(context, 'btn_edit'))])),
+                    PopupMenuItem(value: 'edit', child: Row(children: [Icon(Icons.edit, size: 20), SizedBox(width: 8), Text(AppDictionary.tr(context, 'btn_edit'))])),
                     const PopupMenuItem(value: 'delete', child: Row(children: [Icon(Icons.delete, color: Colors.red, size: 20), SizedBox(width: 8), Text("O'chirish", style: TextStyle(color: Colors.red))])),
                   ],
                 )

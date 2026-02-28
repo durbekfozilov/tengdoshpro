@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:talabahamkor_mobile/core/services/data_service.dart';
 import 'package:talabahamkor_mobile/core/theme/app_theme.dart';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class TutorStudentCertificatesScreen extends StatefulWidget {
   final int studentId;
@@ -39,7 +40,7 @@ class _TutorStudentCertificatesScreenState extends State<TutorStudentCertificate
 
   Future<void> _downloadViaTelegram(int certId) async {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text(AppDictionary.tr(context, 'msg_sending_to_tg_bot'))),
+      SnackBar(content: Text(AppDictionary.tr(context, 'msg_sending_to_tg_bot'))),
     );
     
     final msg = await _dataService.downloadStudentCertificateForTutor(certId);

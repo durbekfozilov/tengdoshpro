@@ -1,0 +1,54 @@
+ID=15 Name=Muhammadali Akramjonov EmpID=None JSHSHIR=TEMP395251000000 Role=dekanat
+ID=9 Name=Muhammadali Akramjonov EmpID=None JSHSHIR=52609006110006 Role=yoshlar_yetakchisi
+ID=27 Name=Rahimxonov Javohirxon Rustamxon O‘g‘li EmpID=None JSHSHIR=DEV_7476703866 Role=developer
+ID=52 Name=Tugalov Suhrobbek Xudoyor O‘g‘li EmpID=3952611002 JSHSHIR=None Role=tyutor
+ID=3 Name=Bot Owner EmpID=None JSHSHIR=52609005170054 Role=owner
+ID=26 Name=Akramjonov Muhammadali EmpID=None JSHSHIR=000000001_OWNER Role=owner
+ID=85 Name=Jurnalistika Dekanati EmpID=dean1 JSHSHIR=None Role=dekan
+ID=53 Name=Jurayev To‘lqinjon O‘tkirjon O‘g‘li EmpID=3952611001 JSHSHIR=None Role=tyutor
+ID=54 Name=Ergashova Guljahon Abdullayevna EmpID=3952512075 JSHSHIR=None Role=tyutor
+ID=56 Name=Mamatov Ulug‘bek Abdusattor O‘g‘li EmpID=3952511025 JSHSHIR=None Role=tyutor
+ID=57 Name=Ergashev Jamshidbek Elmurod O‘g‘li EmpID=3952511024 JSHSHIR=None Role=tyutor
+ID=58 Name=Saidov Shokir Abduqodir O‘g‘li EmpID=3952511023 JSHSHIR=None Role=tyutor
+ID=61 Name=Safarov Nurbek Ibragim O‘g‘li EmpID=3952411073 JSHSHIR=None Role=tyutor
+ID=69 Name=Sherzodxon Tojiddinxon O'g'li Qudratxo'ja EmpID=3951811006 JSHSHIR=None Role=rektor
+ID=86 Name=Demo Dekanat EmpID=demo.dekanat JSHSHIR=None Role=dekanat
+ID=36 Name=Saidova Rushana Ravshanovna EmpID=3951812009 JSHSHIR=None Role=rahbariyat
+ID=38 Name=Ergashev Xurshidjon Shukurjonovich EmpID=3142011075 JSHSHIR=None Role=rahbariyat
+ID=39 Name=Abduxalilov Abdusamat Abdumalik  O‘g‘li EmpID=3272211054 JSHSHIR=None Role=rahbariyat
+ID=40 Name=Raximjonov Lazizjon Voxidjon O‘g‘li EmpID=3952311047 JSHSHIR=None Role=rahbariyat
+ID=55 Name=Farrux Narziyev EmpID=3372111032 JSHSHIR=None Role=rahbariyat
+ID=41 Name=Zakirova Oisha Voxid Qizi EmpID=3952112002 JSHSHIR=None Role=rahbariyat
+ID=42 Name=Taylakova Shaxnoza Norbekovna EmpID=3951912009 JSHSHIR=None Role=rahbariyat
+ID=43 Name=Yuldashev Otabek Abdugaffarovich EmpID=3110211004 JSHSHIR=None Role=rahbariyat
+ID=44 Name=Axmedov Axror Abrarovich EmpID=3951811010 JSHSHIR=None Role=rahbariyat
+ID=45 Name=Xudaybergenova Dilnavoz Gulomboyevna EmpID=3952112083 JSHSHIR=None Role=rahbariyat
+ID=46 Name=Mira’zamov Alisher Mirakbar O‘g‘li EmpID=3951911010 JSHSHIR=None Role=rahbariyat
+ID=47 Name=Elmuradov Akbar Muxammadiyevich EmpID=3951811002 JSHSHIR=None Role=rahbariyat
+ID=49 Name=Jabiyev Nuriddin Nurmatovich EmpID=3951811009 JSHSHIR=None Role=rahbariyat
+ID=60 Name=Hamdambek Shomurotov EmpID=3952511022 JSHSHIR=None Role=rahbariyat
+ID=87 Name=O'ktam Qarshiyev EmpID=395191100477 JSHSHIR=30808985740077 Role=dekanat
+ID=33 Name=Rashidov Sanjarbek Botirjon O‘g‘li EmpID=3952111037 JSHSHIR= Role=rahbariyat
+ID=37 Name=Shohruh Begmatov EmpID=3372011116 JSHSHIR=None Role=rahbariyat
+ID=70 Name=Qulliyeva Oygul Sattorovna EmpID=3952212015 JSHSHIR=41703801080035 Role=rahbariyat
+ID=88 Name=Jurnalistika Yetakchisi (Demo) EmpID=yetakchi1 JSHSHIR=None Role=yetakchi
+ID=63 Name=Xaitova Laylo Bolikulovna EmpID=3952412048 JSHSHIR=None Role=rahbariyat
+ID=62 Name=Yusupova Zulayxo Abdiraimovna EmpID=3572012008 JSHSHIR=None Role=tyutor
+ID=64 Name=Nazokat Saatova EmpID=3952212053 JSHSHIR=None Role=rahbariyat
+ID=84 Name=Sanjar Botirovich (Test) EmpID=demo.jurnalistika JSHSHIR=None Role=rahbariyat
+ID=65 Name=Toshpo‘latova Luiza Bahodir Qizi EmpID=3952312066 JSHSHIR=None Role=tyutor
+ID=82 Name=Vaydullayeva Shahina Xayrulla Qizi EmpID=None JSHSHIR=DEV_6429853070 Role=developer
+ID=75 Name=Qulliyeva Oygul Sattorovna EmpID=None JSHSHIR=None Role=tyutor
+ID=66 Name=Muslimbek Maxmanazarov EmpID=3952311041 JSHSHIR=None Role=rahbariyat
+ID=59 Name=Zilola Usmonova EmpID=3952512019 JSHSHIR=None Role=rahbariyat
+ID=83 Name=Shoxrux Matayev EmpID=3952411017 JSHSHIR=31204884040057 Role=rahbariyat
+ID=67 Name=Nazarbekova Sayyora Asilbekovna EmpID=3952312013 JSHSHIR=None Role=tyutor
+ID=68 Name=Shodiyeva Viloyat Jumaboyevna EmpID=3952312006 JSHSHIR=None Role=tyutor
+ID=50 Name=O‘ktam Qarshiyev EmpID=3952211051 JSHSHIR=None Role=rahbariyat
+ID=48 Name=Nurmatov Akbar Normatovich EmpID=3951811001 JSHSHIR=None Role=rahbariyat
+ID=74 Name=Maxmanazarov Muslimbek Odiljon O‘g‘li EmpID=None JSHSHIR=None Role=tyutor
+ID=76 Name=Saatova Nazokat Allambergenovna EmpID=None JSHSHIR=None Role=tyutor
+ID=77 Name=Shomurotov Hamdambek Qo‘shnazar O‘g‘li EmpID=None JSHSHIR=None Role=tyutor
+ID=78 Name=Usmonova Zilola Sherzot-Qizi EmpID=None JSHSHIR=None Role=tyutor
+ID=79 Name=Xaitova Laylo Bolikulovna EmpID=None JSHSHIR=None Role=tyutor
+ID=81 Name=Narziyev Farrux Muzaffar O‘g‘li EmpID=None JSHSHIR=None Role=tyutor

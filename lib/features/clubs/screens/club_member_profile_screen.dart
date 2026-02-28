@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/services/data_service.dart';
 import '../../../../core/theme/app_theme.dart';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class ClubMemberProfileScreen extends StatefulWidget {
   final int clubId;
@@ -51,7 +52,7 @@ class _ClubMemberProfileScreenState extends State<ClubMemberProfileScreen> {
             return const Center(child: CircularProgressIndicator());
           }
           if (!snapshot.hasData || snapshot.data == null) {
-            return const Center(child: Text(AppDictionary.tr(context, 'msg_info_not_found')));
+            return Center(child: Text(AppDictionary.tr(context, 'msg_info_not_found')));
           }
           final data = snapshot.data!;
           final List acts = data['activities'] ?? [];

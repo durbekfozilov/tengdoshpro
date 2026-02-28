@@ -10,6 +10,7 @@ import 'package:talabahamkor_mobile/features/tutor/screens/tutor_activity_groups
 import 'package:talabahamkor_mobile/features/tutor/screens/tutor_documents_groups_screen.dart';
 import 'package:talabahamkor_mobile/features/tutor/screens/tutor_certificates_groups_screen.dart';
 import 'package:talabahamkor_mobile/features/tutor/screens/tutor_appeals_main_screen.dart';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class TutorHomeScreen extends StatefulWidget {
   const TutorHomeScreen({super.key});
@@ -51,7 +52,7 @@ class _TutorHomeScreenState extends State<TutorHomeScreen> {
     return Scaffold(
       backgroundColor: AppTheme.backgroundWhite,
       appBar: AppBar(
-        title: const Text(AppDictionary.tr(context, 'lbl_tutor_cabinet')),
+        title: Text(AppDictionary.tr(context, 'lbl_tutor_cabinet')),
         centerTitle: false,
         actions: [
           IconButton(
@@ -193,7 +194,7 @@ class _TutorHomeScreenState extends State<TutorHomeScreen> {
                       Colors.redAccent,
                       () {
                          ScaffoldMessenger.of(context).showSnackBar(
-                           const SnackBar(content: Text(AppDictionary.tr(context, 'msg_coming_soon')))
+                           SnackBar(content: Text(AppDictionary.tr(context, 'msg_coming_soon')))
                          );
                       },
                     ),

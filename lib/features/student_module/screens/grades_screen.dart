@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/services/data_service.dart';
 import 'subject_detail_screen.dart';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class GradesScreen extends StatefulWidget {
   const GradesScreen({super.key});
@@ -172,7 +173,7 @@ class _GradesScreenState extends State<GradesScreen> {
                 ),
               );
             } else {
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(AppDictionary.tr(context, 'msg_subject_id_not_found'))));
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppDictionary.tr(context, 'msg_subject_id_not_found'))));
             }
           },
           child: Padding(

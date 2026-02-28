@@ -28,7 +28,7 @@ import '../../appeals/screens/appeals_screen.dart';
 import '../../library/screens/library_screen.dart';
 import 'package:talabahamkor_mobile/features/notifications/screens/notifications_screen.dart';
 import 'package:talabahamkor_mobile/core/providers/notification_provider.dart';
-import '../../core/localization/app_dictionary.dart';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:async';
 
@@ -217,7 +217,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     BottomNavigationBarItem(icon: const Icon(Icons.grid_view_rounded), label: AppDictionary.tr(context, 'home_tab_main')),
                     const BottomNavigationBarItem(icon: Icon(Icons.shopping_bag_rounded), label: "Bozor"),
                     const BottomNavigationBarItem(icon: Icon(Icons.smart_toy_rounded), label: "AI"),
-                    const BottomNavigationBarItem(icon: Icon(Icons.forum_rounded), label: AppDictionary.tr(context, 'lbl_teahouse')),
+                    BottomNavigationBarItem(icon: Icon(Icons.forum_rounded), label: AppDictionary.tr(context, 'lbl_teahouse')),
                     BottomNavigationBarItem(icon: const Icon(Icons.person_rounded), label: AppDictionary.tr(context, 'home_tab_profile')),
                   ],
                 ),
@@ -418,7 +418,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(AppDictionary.tr(context, 'lbl_active_election'),
+                          Text(AppDictionary.tr(context, 'lbl_active_election'),
                             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                           ),
                           Text(
@@ -445,7 +445,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 12),
                       elevation: 0,
                     ),
-                    child: const Text(AppDictionary.tr(context, 'btn_vote')),
+                    child: Text(AppDictionary.tr(context, 'btn_vote')),
                   )
                 ],
               ),

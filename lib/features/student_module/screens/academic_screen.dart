@@ -8,6 +8,7 @@ import 'subjects_screen.dart';
 import '../../academic/screens/survey_list_screen.dart';
 import 'finance/subsidy_screen.dart';
 import 'contract_screen.dart';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class AcademicScreen extends StatefulWidget {
   const AcademicScreen({super.key});
@@ -376,13 +377,13 @@ class _AcademicScreenState extends State<AcademicScreen> {
                       if (passCtrl.text.isNotEmpty) {
                         if (passCtrl.text != confirmPassCtrl.text) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text(AppDictionary.tr(context, 'msg_passwords_mismatch')), backgroundColor: Colors.red),
+                            SnackBar(content: Text(AppDictionary.tr(context, 'msg_passwords_mismatch')), backgroundColor: Colors.red),
                           );
                           return;
                         }
                         if (passCtrl.text.length < 6) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text(AppDictionary.tr(context, 'msg_pwd_length_err')), backgroundColor: Colors.red),
+                            SnackBar(content: Text(AppDictionary.tr(context, 'msg_pwd_length_err')), backgroundColor: Colors.red),
                           );
                           return;
                         }
@@ -415,7 +416,7 @@ class _AcademicScreenState extends State<AcademicScreen> {
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     ),
-                    child: const Text(AppDictionary.tr(context, 'btn_save')),
+                    child: Text(AppDictionary.tr(context, 'btn_save')),
                   ),
                 ],
               );

@@ -5,6 +5,7 @@ import '../../models/reservation_model.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../book_details_screen.dart';
 import '../secure_reader_screen.dart';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class MyBooksScreen extends StatefulWidget {
   const MyBooksScreen({super.key});
@@ -61,10 +62,10 @@ class _MyBooksScreenState extends State<MyBooksScreen> with SingleTickerProvider
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text(AppDictionary.tr(context, 'btn_cancel')),
+        title: Text(AppDictionary.tr(context, 'btn_cancel')),
         content: Text("${item.bookTitle} ni bekor qilishni xohlaysizmi?"),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text(AppDictionary.tr(context, 'btn_no'))),
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(AppDictionary.tr(context, 'btn_no'))),
           TextButton(onPressed: () => Navigator.pop(context, true), child: const Text("Ha", style: TextStyle(color: Colors.red))),
         ],
       ),
@@ -82,7 +83,7 @@ class _MyBooksScreenState extends State<MyBooksScreen> with SingleTickerProvider
         _isLoading = false;
       });
        if (mounted) {
-         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(AppDictionary.tr(context, 'msg_cancelled'))));
+         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppDictionary.tr(context, 'msg_cancelled'))));
       }
     }
   }
@@ -100,7 +101,7 @@ class _MyBooksScreenState extends State<MyBooksScreen> with SingleTickerProvider
           MaterialPageRoute(builder: (_) => BookDetailsScreen(book: book)),
         );
       } else if (mounted) {
-         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(AppDictionary.tr(context, 'msg_book_not_found'))));
+         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppDictionary.tr(context, 'msg_book_not_found'))));
       }
   }
 
@@ -117,7 +118,7 @@ class _MyBooksScreenState extends State<MyBooksScreen> with SingleTickerProvider
           MaterialPageRoute(builder: (_) => SecureReaderScreen(book: book)),
         );
       } else if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(AppDictionary.tr(context, 'msg_book_info_not_found'))));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppDictionary.tr(context, 'msg_book_info_not_found'))));
       }
     } catch (e) {
       if (mounted) setState(() => _isLoading = false);
@@ -444,7 +445,7 @@ class _MyBooksScreenState extends State<MyBooksScreen> with SingleTickerProvider
                     shape: const StadiumBorder(),
                     padding: const EdgeInsets.symmetric(vertical: 12),
                   ),
-                  child: const Text(AppDictionary.tr(context, 'btn_cancel')),
+                  child: Text(AppDictionary.tr(context, 'btn_cancel')),
                 )
               ),
               const SizedBox(width: 12),
@@ -462,7 +463,7 @@ class _MyBooksScreenState extends State<MyBooksScreen> with SingleTickerProvider
                     shape: const StadiumBorder(),
                     padding: const EdgeInsets.symmetric(vertical: 12),
                   ),
-                  child: const Text(AppDictionary.tr(context, 'btn_details')),
+                  child: Text(AppDictionary.tr(context, 'btn_details')),
                 )
               ),
             ],

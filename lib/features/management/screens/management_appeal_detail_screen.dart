@@ -4,6 +4,7 @@ import 'package:talabahamkor_mobile/core/constants/api_constants.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../services/appeal_service.dart';
 import '../../appeals/models/appeal_model.dart' as student_models;
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class ManagementAppealDetailScreen extends StatefulWidget {
   final int appealId;
@@ -83,7 +84,7 @@ class _ManagementAppealDetailScreenState extends State<ManagementAppealDetailScr
 
     if (_error != null || _detail == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text(AppDictionary.tr(context, 'msg_error'))),
+        appBar: AppBar(title: Text(AppDictionary.tr(context, 'msg_error'))),
         body: Center(child: Text(_error ?? "Murojaat topilmadi")),
       );
     }

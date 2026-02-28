@@ -4,6 +4,7 @@ import 'package:talabahamkor_mobile/features/auth/auth_provider.dart';
 import 'package:talabahamkor_mobile/core/theme/app_theme.dart';
 import 'package:talabahamkor_mobile/features/appeals/screens/appeals_screen.dart';
 import 'package:talabahamkor_mobile/features/documents/screens/documents_screen.dart';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
@@ -24,11 +25,11 @@ class AppDrawer extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.settings),
-            title: const Text(AppDictionary.tr(context, 'menu_settings')),
+            title: Text(AppDictionary.tr(context, 'menu_settings')),
           ),
           ListTile(
             leading: const Icon(Icons.message_outlined),
-            title: const Text(AppDictionary.tr(context, 'menu_appeals')),
+            title: Text(AppDictionary.tr(context, 'menu_appeals')),
             onTap: () {
                Navigator.pop(context);
                Navigator.push(context, MaterialPageRoute(builder: (_) => const AppealsScreen()));
@@ -36,7 +37,7 @@ class AppDrawer extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.file_copy_outlined),
-            title: const Text(AppDictionary.tr(context, 'menu_documents')),
+            title: Text(AppDictionary.tr(context, 'menu_documents')),
             onTap: () {
                Navigator.pop(context);
                Navigator.push(context, MaterialPageRoute(builder: (_) => const DocumentsScreen()));
@@ -44,7 +45,7 @@ class AppDrawer extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.help_outline),
-            title: const Text(AppDictionary.tr(context, 'menu_help')),
+            title: Text(AppDictionary.tr(context, 'menu_help')),
             onTap: () {},
           ),
           const Spacer(),

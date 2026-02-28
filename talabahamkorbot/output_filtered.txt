@@ -1,0 +1,107 @@
+# Tizim Foydalanuvchilari Hisoboti (Faol kirganlar)
+
+**Umumiy talabalar soni (login qilganlar):** 1789
+
+**Umumiy xodimlar soni (login/bot orqali ulanganlar):** 6
+
+## 🏛 Universitetlar va Fakultetlar bo'yicha (Talabalar)
+
+### O‘zbekiston jurnalistika va ommaviy kommunikatsiyalar universiteti (Jami: 1758)
+- Xalqaro munosabatlar va ijtimoiy-gumanitar fanlar fakulteti: 913
+- Jurnalistika fakulteti: 501
+- PR va menejment fakulteti: 335
+- SIRTQI FAKULTET: 4
+- Magistratura bo'limi: 3
+- Nomalum Fakultet: 2
+
+### Termiz davlat universiteti (Jami: 3)
+- Iqtisodiyot  fakulteti: 2
+- Xorijiy filologiya fakulteti: 1
+
+### Jizzax politexnika instituti (Jami: 2)
+- Transport muhandisligi: 2
+
+### Farg‘ona davlat universiteti (Jami: 2)
+- Pedagogika-psixologiya va san'atshunoslik  fakulteti: 1
+- Tarix fakulteti: 1
+
+### Toshkent davlat sharqshunoslik universiteti (Jami: 2)
+- Sharq sivilizatsiyasi va falsafa fakulteti: 1
+- Sharq xalqlari tillari va adabiyoti instituti: 1
+
+### Abu Rayhon Beruniy nomidagi Urganch davlat universiteti (Jami: 1)
+- Xorijiy filologiya fakulteti: 1
+
+### Aniq va ijtimoiy fanlar universiteti (Jami: 1)
+- Fakultet 3: 1
+
+### Buxoro davlat universiteti (Jami: 1)
+- Iqtisodiyot va turizm fakulteti: 1
+
+### "INTERNATIONAL SCHOOL OF FINANCE TECHNOLOGY AND SCIENCE'' instituti (Jami: 1)
+- Akademik faoliyat va registrator departamenti Samarqand filiali: 1
+
+### Nizomiy nomidagi  O‘zbekiston milliy  pedagogika universiteti (Jami: 1)
+- Maktabgacha va boshlang'ich ta'lim  : 1
+
+### Oʻzbekiston davlat jismoniy tarbiya va sport universiteti (Jami: 1)
+- Ofis registratori: 1
+
+### Olmaliq davlat texnika instituti (Jami: 1)
+- Energetika va mashinasozlik fakulteti: 1
+
+### Osiyo texnologiyalar universiteti (Jami: 1)
+- Akademik ishlar departamenti: 1
+
+### O‘zbekiston Respublikasi Bank-moliya akademiyasi (Jami: 1)
+- Biznes va menejment fakulteti: 1
+
+### Qo'qon universiteti Andijon filiali (Jami: 1)
+- Iqtisodiyot va pedagogika fakulteti: 1
+
+### Samarqand davlat veterinariya meditsinasi, chorvachilik va biotexnologiyalar universiteti (Jami: 1)
+- Veterinariya proflaktikasi va davolash fakulteti: 1
+
+### Sharof Rashidov nomidagi Samarqand davlat universiteti (Jami: 1)
+- Markaziy Osiyo xalqlari tillari va madaniyati instituti : 1
+
+### Toshkent davlat agrar universiteti (Jami: 1)
+- Zooinjeneriya fakulteti: 1
+
+### Toshkent davlat iqtisodiyot universiteti (Jami: 1)
+- Iqtisodiyot fakulteti: 1
+
+### Toshkent davlat transport universiteti (Jami: 1)
+- Elektrotexnika va kompyuter muhandisligi: 1
+
+### Toshkent Kimyo xalqaro universiteti (Jami: 1)
+- Tillar va tarjimashunoslik: 1
+
+### Toshkent toʻqimachilik va yengil sanoat instituti (Jami: 1)
+- Iqtisodiyot fakulteti: 1
+
+### University of Business and Science (Jami: 1)
+- UBS Toshkent filiali: 1
+
+### University of management and future technologies (Jami: 1)
+- Raqamli texnologiyalar fakulteti: 1
+
+### UNIVERSITY OF SCIENCE AND TECHNOLOGIES (Jami: 1)
+- Kunduzgi bo‘lim: 1
+
+### Zahiriddin Muhammad Bobur nomidagi Andijon davlat universiteti (Jami: 1)
+- Fizika-matematika-IT fakulteti: 1
+
+### Nomalum Universitet (Jami: 1)
+- Nomalum Fakultet: 1
+
+## 👨‍💼 Xodimlar roliklari bo'yicha
+
+- **Developer**: 2
+- **Rahbariyat**: 2
+- **Dekanat**: 1
+- **Owner**: 1
+
+---
+
+**Qamrab olingan universitetlar soni (faqat talabalar kesimida): 27 ta**

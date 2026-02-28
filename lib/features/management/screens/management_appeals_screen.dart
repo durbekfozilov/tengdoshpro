@@ -5,6 +5,7 @@ import '../services/appeal_service.dart';
 import 'management_appeal_detail_screen.dart';
 import 'faculty_appeals_screen.dart';
 import 'package:intl/intl.dart';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class ManagementAppealsScreen extends StatefulWidget {
   const ManagementAppealsScreen({super.key});
@@ -426,7 +427,7 @@ class _ManagementAppealsScreenState extends State<ManagementAppealsScreen> with 
               if (appeal.status == 'pending' || appeal.status == 'processing')
                 TextButton(
                   onPressed: () => _showReplyDialog(appeal.id),
-                  child: const Text(AppDictionary.tr(context, 'btn_reply')),
+                  child: Text(AppDictionary.tr(context, 'btn_reply')),
                 )
             ],
           ),
@@ -441,7 +442,7 @@ class _ManagementAppealsScreenState extends State<ManagementAppealsScreen> with 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text(AppDictionary.tr(context, 'lbl_appeal_answer')),
+        title: Text(AppDictionary.tr(context, 'lbl_appeal_answer')),
         content: TextField(
           controller: controller,
           maxLines: 3,
@@ -451,7 +452,7 @@ class _ManagementAppealsScreenState extends State<ManagementAppealsScreen> with 
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text(AppDictionary.tr(context, 'btn_cancel'))),
+          TextButton(onPressed: () => Navigator.pop(context), child: Text(AppDictionary.tr(context, 'btn_cancel'))),
           ElevatedButton(
             onPressed: () async {
               final text = controller.text.trim();
@@ -460,7 +461,7 @@ class _ManagementAppealsScreenState extends State<ManagementAppealsScreen> with 
               Navigator.pop(context);
               await _replyToAppeal(id, text);
             },
-            child: const Text(AppDictionary.tr(context, 'btn_submit')),
+            child: Text(AppDictionary.tr(context, 'btn_submit')),
           ),
         ],
       ),
@@ -473,7 +474,7 @@ class _ManagementAppealsScreenState extends State<ManagementAppealsScreen> with 
       _loadData(); // Refresh
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text(AppDictionary.tr(context, 'msg_answer_sent_success')), backgroundColor: Colors.green)
+          SnackBar(content: Text(AppDictionary.tr(context, 'msg_answer_sent_success')), backgroundColor: Colors.green)
         );
       }
     } catch (e) {
@@ -489,7 +490,7 @@ class _ManagementAppealsScreenState extends State<ManagementAppealsScreen> with 
     try {
       await _service.resolveAppeal(id);
       _loadData(); // Refresh
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(AppDictionary.tr(context, 'msg_appeal_closed_2')), backgroundColor: Colors.green));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppDictionary.tr(context, 'msg_appeal_closed_2')), backgroundColor: Colors.green));
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Xatolik: $e"), backgroundColor: Colors.red));
     }

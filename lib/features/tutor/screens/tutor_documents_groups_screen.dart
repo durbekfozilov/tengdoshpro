@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:talabahamkor_mobile/core/services/data_service.dart';
 import 'package:talabahamkor_mobile/core/theme/app_theme.dart';
 import 'package:talabahamkor_mobile/features/tutor/screens/group_documents_screen.dart';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class TutorDocumentsGroupsScreen extends StatefulWidget {
   const TutorDocumentsGroupsScreen({super.key});
@@ -43,12 +44,12 @@ class _TutorDocumentsGroupsScreenState extends State<TutorDocumentsGroupsScreen>
     return Scaffold(
       backgroundColor: AppTheme.backgroundWhite,
       appBar: AppBar(
-        title: const Text(AppDictionary.tr(context, 'lbl_docs_stats')),
+        title: Text(AppDictionary.tr(context, 'lbl_docs_stats')),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _stats.isEmpty
-              ? const Center(child: Text(AppDictionary.tr(context, 'msg_no_assigned_groups')))
+              ? Center(child: Text(AppDictionary.tr(context, 'msg_no_assigned_groups')))
               : RefreshIndicator(
                   onRefresh: _loadStats,
                   child: ListView.builder(

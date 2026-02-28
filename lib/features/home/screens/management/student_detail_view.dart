@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/services/data_service.dart';
 import 'student_items_list_screen.dart';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class StudentDetailView extends StatefulWidget {
   final int studentId;
@@ -34,14 +35,14 @@ class _StudentDetailViewState extends State<StudentDetailView> {
   Widget build(BuildContext context) {
     if (_isLoading) {
       return Scaffold(
-        appBar: AppBar(title: const Text(AppDictionary.tr(context, 'lbl_student_data'))),
+        appBar: AppBar(title: Text(AppDictionary.tr(context, 'lbl_student_data'))),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
 
     if (_data == null || _data!['profile'] == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text(AppDictionary.tr(context, 'msg_error'))),
+        appBar: AppBar(title: Text(AppDictionary.tr(context, 'msg_error'))),
         body: const Center(child: Text("Ma'lumotlarni yuklab bo'lmadi")),
       );
     }
@@ -51,7 +52,7 @@ class _StudentDetailViewState extends State<StudentDetailView> {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: const Text(AppDictionary.tr(context, 'lbl_profile')),
+        title: Text(AppDictionary.tr(context, 'lbl_profile')),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         elevation: 0,

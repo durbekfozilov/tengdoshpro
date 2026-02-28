@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../services/market_service.dart';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class CreateMarketItemScreen extends StatefulWidget {
   const CreateMarketItemScreen({super.key});
@@ -53,12 +54,12 @@ class _CreateMarketItemScreenState extends State<CreateMarketItemScreen> {
 
     if (success) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(AppDictionary.tr(context, 'msg_ad_added_successfully'))));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppDictionary.tr(context, 'msg_ad_added_successfully'))));
         Navigator.pop(context, true);
       }
     } else {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(AppDictionary.tr(context, 'msg_error_occurred_2'))));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppDictionary.tr(context, 'msg_error_occurred_2'))));
       }
     }
   }

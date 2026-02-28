@@ -5,6 +5,7 @@ import '../../../../core/services/data_service.dart';
 import '../../../../core/providers/auth_provider.dart';
 import 'club_detail_screen.dart';
 import 'club_create_screen.dart';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class ClubsScreen extends StatefulWidget {
   const ClubsScreen({super.key});
@@ -37,7 +38,7 @@ class _ClubsScreenState extends State<ClubsScreen> {
       if (mounted) {
         setState(() => _isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text(AppDictionary.tr(context, 'msg_clubs_load_error'))),
+          SnackBar(content: Text(AppDictionary.tr(context, 'msg_clubs_load_error'))),
         );
       }
     }
@@ -77,7 +78,7 @@ class _ClubsScreenState extends State<ClubsScreen> {
               },
               backgroundColor: AppTheme.primaryBlue,
               icon: const Icon(Icons.add, color: Colors.white),
-              label: const Text(AppDictionary.tr(context, 'btn_add_club'), style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              label: Text(AppDictionary.tr(context, 'btn_add_club'), style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
             )
           : null,
       body: _isLoading 
@@ -283,7 +284,7 @@ class _ClubsScreenState extends State<ClubsScreen> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    const Text(AppDictionary.tr(context, 'btn_edit_club'), style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                    Text(AppDictionary.tr(context, 'btn_edit_club'), style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 16),
                     TextField(
                       controller: nameCtl,
@@ -336,7 +337,7 @@ class _ClubsScreenState extends State<ClubsScreen> {
                           
                           if (success) {
                             Navigator.pop(context);
-                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(AppDictionary.tr(context, 'msg_changes_saved')), backgroundColor: Colors.green));
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppDictionary.tr(context, 'msg_changes_saved')), backgroundColor: Colors.green));
                             _loadClubs();
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Xatolik yuz berdi. Sardor topilmagan bo'lishi mumkin."), backgroundColor: Colors.red));

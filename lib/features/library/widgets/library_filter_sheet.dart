@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class LibraryFilterSheet extends StatefulWidget {
   final List<String> categories;
@@ -61,7 +62,7 @@ class _LibraryFilterSheetState extends State<LibraryFilterSheet> {
             ),
           ),
           const SizedBox(height: 16),
-          const Text(AppDictionary.tr(context, 'lbl_filter'),
+          Text(AppDictionary.tr(context, 'lbl_filter'),
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 24),
@@ -85,23 +86,23 @@ class _LibraryFilterSheetState extends State<LibraryFilterSheet> {
             }).toList(),
           ),
           const SizedBox(height: 24),
-          const Text(AppDictionary.tr(context, 'lbl_status'), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+          Text(AppDictionary.tr(context, 'lbl_status'), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
           SwitchListTile(
             contentPadding: EdgeInsets.zero,
-            title: const Text(AppDictionary.tr(context, 'lib_available_only')),
+            title: Text(AppDictionary.tr(context, 'lib_available_only')),
             value: _availableOnly,
             onChanged: (val) => setState(() => _availableOnly = val),
             activeColor: AppTheme.primaryBlue,
           ),
           SwitchListTile(
             contentPadding: EdgeInsets.zero,
-            title: const Text(AppDictionary.tr(context, 'lib_has_ebook')),
+            title: Text(AppDictionary.tr(context, 'lib_has_ebook')),
             value: _ebookOnly,
             onChanged: (val) => setState(() => _ebookOnly = val),
             activeColor: AppTheme.primaryBlue,
           ),
           const SizedBox(height: 24),
-          const Text(AppDictionary.tr(context, 'lbl_sorting'), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+          Text(AppDictionary.tr(context, 'lbl_sorting'), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [

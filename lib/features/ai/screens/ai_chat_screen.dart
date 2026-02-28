@@ -4,6 +4,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/services/data_service.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/providers/auth_provider.dart';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class AiChatScreen extends StatefulWidget {
   final String? initialQuery;
@@ -214,10 +215,10 @@ class _AiChatScreenState extends State<AiChatScreen> {
                showDialog(
                  context: context,
                  builder: (ctx) => AlertDialog(
-                   title: const Text(AppDictionary.tr(context, 'btn_new_chat')),
+                   title: Text(AppDictionary.tr(context, 'btn_new_chat')),
                    content: const Text("Chat tarixini o'chirib, yangi suhbat boshlamoqchimisiz?"),
                    actions: [
-                     TextButton(onPressed: () => Navigator.pop(ctx), child: const Text(AppDictionary.tr(context, 'btn_cancel'))),
+                     TextButton(onPressed: () => Navigator.pop(ctx), child: Text(AppDictionary.tr(context, 'btn_cancel'))),
                      TextButton(
                        onPressed: () {
                          Navigator.pop(ctx);

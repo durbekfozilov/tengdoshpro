@@ -5,6 +5,7 @@ import '../../../../core/models/student.dart';
 import '../models/subscription_plan.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/services.dart';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class SubscriptionScreen extends StatefulWidget {
   const SubscriptionScreen({super.key});
@@ -121,7 +122,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                   final amount = int.tryParse(amountText) ?? 0;
                   if (amount <= 0) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text(AppDictionary.tr(context, 'msg_invalid_amount'))),
+                      SnackBar(content: Text(AppDictionary.tr(context, 'msg_invalid_amount'))),
                     );
                     return;
                   }
@@ -146,7 +147,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
   Future<void> _launchClickPay(int amount) async {
     final studentId = _student?.id;
     if (studentId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(AppDictionary.tr(context, 'msg_student_data_not_found'))));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppDictionary.tr(context, 'msg_student_data_not_found'))));
       return;
     }
 
@@ -221,7 +222,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text(AppDictionary.tr(context, 'btn_confirm')),
+        title: Text(AppDictionary.tr(context, 'btn_confirm')),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -264,14 +265,14 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
     // [COMPLIANCE] Hide for Apple Reviewer
     if (_student?.hemisLogin == '395251101411') {
        return Scaffold(
-         appBar: AppBar(title: const Text(AppDictionary.tr(context, 'lbl_account_status')), backgroundColor: Colors.white, elevation: 0, iconTheme: const IconThemeData(color: Colors.black)),
-         body: const Center(child: Text(AppDictionary.tr(context, 'msg_premium_unavailable'))),
+         appBar: AppBar(title: Text(AppDictionary.tr(context, 'lbl_account_status')), backgroundColor: Colors.white, elevation: 0, iconTheme: const IconThemeData(color: Colors.black)),
+         body: Center(child: Text(AppDictionary.tr(context, 'msg_premium_unavailable'))),
        );
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(AppDictionary.tr(context, 'lbl_premium_subscription'), style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        title: Text(AppDictionary.tr(context, 'lbl_premium_subscription'), style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.white,
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.black),
@@ -308,7 +309,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
               const SizedBox(height: 30),
               
               // 5. Subscription Plans
-              const Text(AppDictionary.tr(context, 'lbl_tariffs'), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+              Text(AppDictionary.tr(context, 'lbl_tariffs'), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
               const SizedBox(height: 15),
               _buildPlansList(),
 
@@ -372,7 +373,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
               style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
             )
           else
-            const Text(AppDictionary.tr(context, 'lbl_use_all_features_unlimited'),
+            Text(AppDictionary.tr(context, 'lbl_use_all_features_unlimited'),
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.white70, fontSize: 15),
             ),
@@ -548,16 +549,16 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
                 showDialog(
                   context: context,
                   builder: (ctx) => AlertDialog(
-                    title: const Text(AppDictionary.tr(context, 'btn_confirm')),
-                    content: const Text(AppDictionary.tr(context, 'msg_one_time_use_continue')),
+                    title: Text(AppDictionary.tr(context, 'btn_confirm')),
+                    content: Text(AppDictionary.tr(context, 'msg_one_time_use_continue')),
                     actions: [
-                      TextButton(onPressed: () => Navigator.pop(ctx), child: const Text(AppDictionary.tr(context, 'btn_no'))),
+                      TextButton(onPressed: () => Navigator.pop(ctx), child: Text(AppDictionary.tr(context, 'btn_no'))),
                       ElevatedButton(
                         onPressed: () {
                           Navigator.pop(ctx);
                           _activateTrial();
                         },
-                        child: const Text(AppDictionary.tr(context, 'btn_yes_start')),
+                        child: Text(AppDictionary.tr(context, 'btn_yes_start')),
                       )
                     ],
                   )
@@ -570,7 +571,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
               ),
               child: loading
                 ? const CircularProgressIndicator(color: Colors.white)
-                : const Text(AppDictionary.tr(context, 'btn_start_now'), style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+                : Text(AppDictionary.tr(context, 'btn_start_now'), style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
             ),
           )
         ],

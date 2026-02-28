@@ -4,6 +4,7 @@ import 'package:talabahamkor_mobile/core/theme/app_theme.dart';
 import '../models/appeal_model.dart';
 import '../services/appeal_service.dart';
 import 'management_appeal_detail_screen.dart';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class FacultyAppealsScreen extends StatefulWidget {
   final FacultyPerformance facultyStats;

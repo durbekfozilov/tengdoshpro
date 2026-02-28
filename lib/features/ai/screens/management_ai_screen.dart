@@ -3,6 +3,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/services/data_service.dart';
 
 import 'ai_chat_screen.dart';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class ManagementAiScreen extends StatefulWidget {
   const ManagementAiScreen({super.key});
@@ -84,7 +85,7 @@ class _ManagementAiScreenState extends State<ManagementAiScreen> {
                 _generateReport(); // Regenerate
               }, 
               icon: const Icon(Icons.refresh), 
-              label: const Text(AppDictionary.tr(context, 'btn_regenerate')),
+              label: Text(AppDictionary.tr(context, 'btn_regenerate')),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.primaryBlue,
                 foregroundColor: Colors.white,
@@ -153,7 +154,7 @@ class _ManagementAiScreenState extends State<ManagementAiScreen> {
       case "Rahbariyat uchun AI hisobot":
          return const SizedBox(); 
       default:
-        return const Center(child: Text(AppDictionary.tr(context, 'msg_no_data')));
+        return Center(child: Text(AppDictionary.tr(context, 'msg_no_data')));
     }
   }
 
@@ -174,7 +175,7 @@ class _ManagementAiScreenState extends State<ManagementAiScreen> {
   }
 
   Widget _buildListContent(List<dynamic> items, IconData icon, Color color) {
-    if (items == null || items.isEmpty) return const Center(child: Text(AppDictionary.tr(context, 'msg_no_data')));
+    if (items == null || items.isEmpty) return Center(child: Text(AppDictionary.tr(context, 'msg_no_data')));
     return ListView.separated(
       itemCount: items.length,
       separatorBuilder: (_, __) => const Divider(),

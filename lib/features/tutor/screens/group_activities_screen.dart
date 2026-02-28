@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:talabahamkor_mobile/core/services/data_service.dart';
 import 'package:talabahamkor_mobile/core/theme/app_theme.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class GroupActivitiesScreen extends StatefulWidget {
   final String groupNumber;
@@ -88,7 +89,7 @@ class _GroupActivitiesScreenState extends State<GroupActivitiesScreen> with Sing
       _loadActivities(showLoading: false); 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text(AppDictionary.tr(context, 'msg_error_occurred')), backgroundColor: Colors.red)
+          SnackBar(content: Text(AppDictionary.tr(context, 'msg_error_occurred')), backgroundColor: Colors.red)
         );
       }
     }
@@ -199,7 +200,7 @@ class _GroupActivitiesScreenState extends State<GroupActivitiesScreen> with Sing
                             side: const BorderSide(color: Colors.red),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))
                           ),
-                          child: const Text(AppDictionary.tr(context, 'btn_reject')),
+                          child: Text(AppDictionary.tr(context, 'btn_reject')),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -212,7 +213,7 @@ class _GroupActivitiesScreenState extends State<GroupActivitiesScreen> with Sing
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                             elevation: 0
                           ),
-                          child: const Text(AppDictionary.tr(context, 'btn_confirm')),
+                          child: Text(AppDictionary.tr(context, 'btn_confirm')),
                         ),
                       ),
                     ],

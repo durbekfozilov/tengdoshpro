@@ -6,6 +6,7 @@ import '../services/community_service.dart';
 import '../widgets/post_card.dart';
 import '../../../../core/utils/role_mapper.dart'; // Import RoleMapper
 import 'dart:async';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class PostDetailScreen extends StatefulWidget {
   final Post post;
@@ -254,7 +255,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
             icon: const Icon(Icons.arrow_back, color: Colors.black),
             onPressed: () => Navigator.pop(context, _post), 
           ),
-          title: const Text(AppDictionary.tr(context, 'lbl_discussion'), style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+          title: Text(AppDictionary.tr(context, 'lbl_discussion'), style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
         ),
         body: Column(
           children: [

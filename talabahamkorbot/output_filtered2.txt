@@ -1,0 +1,140 @@
+# Tizim Foydalanuvchilari Hisoboti (Aniqlashtirilgan Loginlar)
+
+**Umumiy talabalar soni (Faqatgina to'liq avtorizatsiyadan o'tganlar):** 1920
+> **Eslatma:** Platformangizni yuklab olganlar soni (3000+) Play Market/App Store dagi o'rnatishlar soni bo'lib, ular dasturni ochgani bilan hammasi ham tizimga HEMIS orqali login qila olmagan. Ma'lumotlar bazasidagi `users` jadvalida bevosita tizimga kirib akkaunt ochganlar aniq **{total_students}** nafarni tashkil etadi.
+
+**Umumiy xodimlar soni:** 12
+
+## 🏛 Universitetlar va Fakultetlar bo'yicha (Talabalar)
+
+### O‘zbekiston jurnalistika va ommaviy kommunikatsiyalar universiteti (Jami: 1874)
+- Xalqaro munosabatlar va ijtimoiy-gumanitar fanlar fakulteti: 956
+- Jurnalistika fakulteti: 553
+- PR va menejment fakulteti: 360
+- Magistratura bo'limi: 3
+- SIRTQI FAKULTET: 2
+
+### Termiz davlat universiteti (Jami: 3)
+- Iqtisodiyot  fakulteti: 2
+- Xorijiy filologiya fakulteti: 1
+
+### Farg‘ona davlat universiteti (Jami: 3)
+- Jismoniy madaniyat fakulteti: 1
+- Pedagogika-psixologiya va san'atshunoslik  fakulteti: 1
+- Tarix fakulteti: 1
+
+### Nomalum Universitet (Jami: 2)
+- Nomalum Fakultet: 2
+
+### Jizzax politexnika instituti (Jami: 2)
+- Transport muhandisligi: 2
+
+### Toshkent davlat agrar universiteti (Jami: 2)
+- Zooinjeneriya fakulteti: 1
+- Agroiqtisodiyot, logistika va xizmatlar fakulteti: 1
+
+### University of Business and Science (Jami: 2)
+- UBS Toshkent filiali: 1
+- Iqtisodiyot fakulteti: 1
+
+### JMCU (Jami: 2)
+- Nomalum Fakultet: 1
+- : 1
+
+### Osiyo texnologiyalar universiteti (Jami: 2)
+- Pedagogika va raqamli ta'lim: 1
+- Akademik ishlar departamenti: 1
+
+### Toshkent davlat sharqshunoslik universiteti (Jami: 2)
+- Sharq xalqlari tillari va adabiyoti instituti: 1
+- Sharq sivilizatsiyasi va falsafa fakulteti: 1
+
+### Toshkent toʻqimachilik va yengil sanoat instituti (Jami: 1)
+- Iqtisodiyot fakulteti: 1
+
+### Toshkent davlat stomatologiya instituti (Jami: 1)
+- Jurnalistika fakulteti: 1
+
+### Zarmed Universiteti Samarqand Kampusi (Jami: 1)
+- Xalqaro munosabatlar va ijtimoiy-gumanitar fanlar fakulteti: 1
+
+### Toshkent davlat iqtisodiyot universiteti (Jami: 1)
+- Iqtisodiyot fakulteti: 1
+
+### Oʻzbekiston davlat jismoniy tarbiya va sport universiteti (Jami: 1)
+- Ofis registratori: 1
+
+### Turan International University (Jami: 1)
+- SIRTQI FAKULTET: 1
+
+### Samarqand davlat veterinariya meditsinasi, chorvachilik va biotexnologiyalar universiteti (Jami: 1)
+- Veterinariya proflaktikasi va davolash fakulteti: 1
+
+### University of management and future technologies (Jami: 1)
+- Raqamli texnologiyalar fakulteti: 1
+
+### OXUS University (Jami: 1)
+- Jurnalistika fakulteti: 1
+
+### Toshkent davlat transport universiteti (Jami: 1)
+- Elektrotexnika va kompyuter muhandisligi: 1
+
+### Mirzo Ulug‘bek nomidagi O‘zbekiston Milliy universitetining Jizzax filiali (Jami: 1)
+- Jurnalistika fakulteti: 1
+
+### Sharof Rashidov nomidagi Samarqand davlat universiteti (Jami: 1)
+- Markaziy Osiyo xalqlari tillari va madaniyati instituti : 1
+
+### Nizomiy nomidagi  O‘zbekiston milliy  pedagogika universiteti (Jami: 1)
+- Maktabgacha va boshlang'ich ta'lim  : 1
+
+### O‘zbekiston Respublikasi Bank-moliya akademiyasi (Jami: 1)
+- Biznes va menejment fakulteti: 1
+
+### Aniq va ijtimoiy fanlar universiteti (Jami: 1)
+- Fakultet 3: 1
+
+### Abu Rayhon Beruniy nomidagi Urganch davlat universiteti (Jami: 1)
+- Xorijiy filologiya fakulteti: 1
+
+### O‘zbekiston xalqaro islomshunoslik akademiyasi (Jami: 1)
+- SIRTQI FAKULTET: 1
+
+### UNIVERSITY OF SCIENCE AND TECHNOLOGIES (Jami: 1)
+- Kunduzgi bo‘lim: 1
+
+### Zahiriddin Muhammad Bobur nomidagi Andijon davlat universiteti (Jami: 1)
+- Fizika-matematika-IT fakulteti: 1
+
+### "INTERNATIONAL SCHOOL OF FINANCE TECHNOLOGY AND SCIENCE'' instituti (Jami: 1)
+- Akademik faoliyat va registrator departamenti Samarqand filiali: 1
+
+### Qo'qon universiteti Andijon filiali (Jami: 1)
+- Iqtisodiyot va pedagogika fakulteti: 1
+
+### Buxoro davlat universiteti (Jami: 1)
+- Iqtisodiyot va turizm fakulteti: 1
+
+### Test Universiteti (Jami: 1)
+- Test Fakulteti: 1
+
+### Toshkent Kimyo xalqaro universiteti (Jami: 1)
+- Tillar va tarjimashunoslik: 1
+
+### Namangan davlat universiteti (Jami: 1)
+- Filologiya: 1
+
+### Olmaliq davlat texnika instituti (Jami: 1)
+- Energetika va mashinasozlik fakulteti: 1
+
+## 👨‍💼 Xodimlar roliklari bo'yicha
+
+- **Rahbariyat**: 4
+- **Dekanat**: 3
+- **Owner**: 2
+- **Developer**: 2
+- **Yoshlar_yetakchisi**: 1
+
+---
+
+**Qamrab olingan universitetlar soni: 36 ta**

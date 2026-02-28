@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../services/community_service.dart';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class EditPostSheet extends StatefulWidget {
   final String postId;
@@ -89,7 +90,7 @@ class _EditPostSheetState extends State<EditPostSheet> {
     
     // Validate
     if (_contentController.text.trim().isEmpty) {
-       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(AppDictionary.tr(context, 'msg_please_write_text'))));
+       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppDictionary.tr(context, 'msg_please_write_text'))));
        return;
     }
 
@@ -107,7 +108,7 @@ class _EditPostSheetState extends State<EditPostSheet> {
     // The parent widget (PostCard) will handle the background API call.
     Navigator.pop(context, finalContent);
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text(AppDictionary.tr(context, 'msg_saving_post')), duration: Duration(milliseconds: 1000)),
+      SnackBar(content: Text(AppDictionary.tr(context, 'msg_saving_post')), duration: Duration(milliseconds: 1000)),
     );
   }
 
@@ -117,12 +118,12 @@ class _EditPostSheetState extends State<EditPostSheet> {
     final shouldPop = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text(AppDictionary.tr(context, 'msg_unsaved_changes')),
+        title: Text(AppDictionary.tr(context, 'msg_unsaved_changes')),
         content: const Text("Chiqib ketsangiz o'zgarishlaringiz yo'qoladi."),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text(AppDictionary.tr(context, 'btn_stay'), style: TextStyle(color: Colors.blue)),
+            child: Text(AppDictionary.tr(context, 'btn_stay'), style: TextStyle(color: Colors.blue)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
@@ -234,7 +235,7 @@ class _EditPostSheetState extends State<EditPostSheet> {
                                 onTap: () {
                                   // Placeholder for formatting menu
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text(AppDictionary.tr(context, 'msg_format_menu_soon')), duration: Duration(seconds: 1)),
+                                    SnackBar(content: Text(AppDictionary.tr(context, 'msg_format_menu_soon')), duration: Duration(seconds: 1)),
                                   );
                                 },
                                 borderRadius: BorderRadius.circular(50),

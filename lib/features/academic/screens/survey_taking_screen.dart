@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/services/data_service.dart';
 import '../models/survey_models.dart';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class SurveyTakingScreen extends StatefulWidget {
   final int surveyId;
@@ -72,7 +73,7 @@ class _SurveyTakingScreenState extends State<SurveyTakingScreen> {
   Widget build(BuildContext context) {
     if (_isLoading) {
       return Scaffold(
-        appBar: AppBar(title: const Text(AppDictionary.tr(context, 'lbl_loading'))),
+        appBar: AppBar(title: Text(AppDictionary.tr(context, 'lbl_loading'))),
         body: const Center(child: CircularProgressIndicator()),
       );
     }
@@ -195,11 +196,11 @@ class _SurveyTakingScreenState extends State<SurveyTakingScreen> {
        bool? confirm = await showDialog<bool>(
          context: context,
          builder: (context) => AlertDialog(
-           title: const Text(AppDictionary.tr(context, 'lbl_attention')),
-           content: const Text(AppDictionary.tr(context, 'msg_unanswered_questions')),
+           title: Text(AppDictionary.tr(context, 'lbl_attention')),
+           content: Text(AppDictionary.tr(context, 'msg_unanswered_questions')),
            actions: [
-             TextButton(onPressed: () => Navigator.pop(context, false), child: const Text(AppDictionary.tr(context, 'btn_no'))),
-             TextButton(onPressed: () => Navigator.pop(context, true), child: const Text(AppDictionary.tr(context, 'btn_yes'))),
+             TextButton(onPressed: () => Navigator.pop(context, false), child: Text(AppDictionary.tr(context, 'btn_no'))),
+             TextButton(onPressed: () => Navigator.pop(context, true), child: Text(AppDictionary.tr(context, 'btn_yes'))),
            ],
          )
        );
@@ -212,7 +213,7 @@ class _SurveyTakingScreenState extends State<SurveyTakingScreen> {
       if (success) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text(AppDictionary.tr(context, 'msg_survey_success'))),
+            SnackBar(content: Text(AppDictionary.tr(context, 'msg_survey_success'))),
           );
           Navigator.pop(context, true);
         }

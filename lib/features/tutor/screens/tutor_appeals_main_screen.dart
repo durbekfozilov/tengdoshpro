@@ -4,6 +4,7 @@ import 'package:talabahamkor_mobile/core/theme/app_theme.dart';
 import 'package:talabahamkor_mobile/core/constants/api_constants.dart';
 import 'package:talabahamkor_mobile/features/tutor/screens/tutor_groups_screen.dart';
 import 'package:talabahamkor_mobile/features/tutor/screens/tutor_appeal_chat_screen.dart';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class TutorAppealsMainScreen extends StatelessWidget {
   const TutorAppealsMainScreen({super.key});
@@ -15,7 +16,7 @@ class TutorAppealsMainScreen extends StatelessWidget {
       child: Scaffold(
         backgroundColor: AppTheme.backgroundWhite,
         appBar: AppBar(
-          title: const Text(AppDictionary.tr(context, 'menu_appeals')),
+          title: Text(AppDictionary.tr(context, 'menu_appeals')),
           bottom: const TabBar(
             labelColor: AppTheme.primaryBlue,
             unselectedLabelColor: Colors.grey,

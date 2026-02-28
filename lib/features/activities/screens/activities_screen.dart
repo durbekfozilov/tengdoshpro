@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:talabahamkor_mobile/core/utils/uzbek_name_formatter.dart';
 import 'package:talabahamkor_mobile/core/services/data_service.dart';
 import 'package:talabahamkor_mobile/core/theme/app_theme.dart';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class ActivitiesScreen extends StatefulWidget {
   const ActivitiesScreen({super.key});
@@ -96,7 +97,7 @@ class _ActivitiesScreenState extends State<ActivitiesScreen> {
         },
         backgroundColor: AppTheme.primaryBlue,
         icon: const Icon(Icons.add),
-        label: const Text(AppDictionary.tr(context, 'btn_new_activity')),
+        label: Text(AppDictionary.tr(context, 'btn_new_activity')),
       ),
     );
   }

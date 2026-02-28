@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class DormitoryDashboardScreen extends StatelessWidget {
   const DormitoryDashboardScreen({super.key});
@@ -152,7 +153,7 @@ class DormitoryDashboardScreen extends StatelessWidget {
                           color: Colors.green.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(20),
                         ),
-                        child: const Text(AppDictionary.tr(context, 'lbl_living'),
+                        child: Text(AppDictionary.tr(context, 'lbl_living'),
                           style: TextStyle(fontSize: 11, color: Colors.green, fontWeight: FontWeight.bold),
                         ),
                       ),

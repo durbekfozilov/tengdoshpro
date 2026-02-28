@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/services/data_service.dart';
 import 'student_detail_view.dart';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class StudentSearchScreen extends StatefulWidget {
   const StudentSearchScreen({super.key});
@@ -105,7 +106,7 @@ class _StudentSearchScreenState extends State<StudentSearchScreen> {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: const Text(AppDictionary.tr(context, 'tab_students')),
+        title: Text(AppDictionary.tr(context, 'tab_students')),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         elevation: 0,
@@ -399,7 +400,7 @@ class _StudentSearchScreenState extends State<StudentSearchScreen> {
     }
 
     if (_isSearching) return const Center(child: CircularProgressIndicator());
-    if (_searchResults.isEmpty) return const Center(child: Text(AppDictionary.tr(context, 'msg_info_not_found')));
+    if (_searchResults.isEmpty) return Center(child: Text(AppDictionary.tr(context, 'msg_info_not_found')));
 
     return ListView.builder(
       itemCount: _searchResults.length,

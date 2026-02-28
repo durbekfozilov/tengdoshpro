@@ -5,6 +5,7 @@ import '../services/chat_service.dart';
 import 'chat_detail_screen.dart';
 import '../widgets/user_search_delegate.dart'; // NEW
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class ChatListScreen extends StatefulWidget {
   const ChatListScreen({super.key});
@@ -33,7 +34,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text(AppDictionary.tr(context, 'btn_delete_chat')),
+        title: Text(AppDictionary.tr(context, 'btn_delete_chat')),
         content: Text("Haqiqatan ham ${chat.formattedName} bilan suhbatni o'chirib yubormoqchimisiz?"),
         actions: [
           TextButton(
@@ -55,13 +56,13 @@ class _ChatListScreenState extends State<ChatListScreen> {
         _refreshChats();
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text(AppDictionary.tr(context, 'msg_chat_deleted'))),
+            SnackBar(content: Text(AppDictionary.tr(context, 'msg_chat_deleted'))),
           );
         }
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text(AppDictionary.tr(context, 'msg_error_occurred'))),
+            SnackBar(content: Text(AppDictionary.tr(context, 'msg_error_occurred'))),
           );
         }
       }

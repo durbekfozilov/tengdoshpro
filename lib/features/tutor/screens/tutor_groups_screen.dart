@@ -3,6 +3,7 @@ import 'package:talabahamkor_mobile/core/services/data_service.dart';
 import 'package:talabahamkor_mobile/core/theme/app_theme.dart';
 import 'package:talabahamkor_mobile/features/tutor/screens/group_appeals_screen.dart';
 import 'package:talabahamkor_mobile/features/tutor/screens/tutor_group_students_screen.dart';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class TutorGroupsScreen extends StatefulWidget {
   final bool isAppealsMode;
@@ -50,7 +51,7 @@ class _TutorGroupsScreenState extends State<TutorGroupsScreen> {
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _groups.isEmpty
-              ? const Center(child: Text(AppDictionary.tr(context, 'msg_no_assigned_groups')))
+              ? Center(child: Text(AppDictionary.tr(context, 'msg_no_assigned_groups')))
               : ListView.builder(
                   padding: const EdgeInsets.all(16),
                   itemCount: _groups.length,

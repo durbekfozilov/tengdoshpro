@@ -10,6 +10,7 @@ import '../../management/screens/management_archive_screen.dart';
 import '../../management/screens/management_appeals_screen.dart';
 import '../screens/management/activity_monitoring_screen.dart'; // [NEW]
 import '../../library/screens/library_screen.dart';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class ManagementDashboard extends StatelessWidget {
   final Map<String, dynamic>? stats;
@@ -201,7 +202,7 @@ class ManagementDashboard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(AppDictionary.tr(context, 'lbl_platform_activity'),
+              Text(AppDictionary.tr(context, 'lbl_platform_activity'),
                 style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
               ),
               Container(

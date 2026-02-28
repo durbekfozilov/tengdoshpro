@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/services/data_service.dart';
 import 'resources_screen.dart';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class SubjectsScreen extends StatefulWidget {
   const SubjectsScreen({super.key});
@@ -32,7 +33,7 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
     return Scaffold(
       backgroundColor: AppTheme.backgroundWhite,
       appBar: AppBar(
-        title: const Text(AppDictionary.tr(context, 'lbl_subjects_and_resources'),
+        title: Text(AppDictionary.tr(context, 'lbl_subjects_and_resources'),
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18),
         ),
         centerTitle: false,
@@ -89,7 +90,7 @@ class _SubjectsScreenState extends State<SubjectsScreen> {
                       child: Container(
                         height: MediaQuery.of(context).size.height * 0.7,
                         alignment: Alignment.center,
-                        child: const Text(AppDictionary.tr(context, 'msg_info_not_found')),
+                        child: Text(AppDictionary.tr(context, 'msg_info_not_found')),
                       ),
                     )
                   : ListView.builder(

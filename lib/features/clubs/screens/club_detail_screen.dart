@@ -5,6 +5,7 @@ import 'package:talabahamkor_mobile/core/theme/app_theme.dart';
 import 'package:talabahamkor_mobile/core/services/data_service.dart';
 import 'package:talabahamkor_mobile/core/constants/api_constants.dart';
 import 'club_member_profile_screen.dart';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class ClubDetailScreen extends StatefulWidget {
   final Map<String, dynamic> club;
@@ -162,7 +163,7 @@ class _ClubDetailScreenState extends State<ClubDetailScreen> {
       // Success (fastapi didn't explicitly return {status: error...} so it reached end of join_club logic).
       if (mounted) {
         setState(() => isJoined = true);
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(AppDictionary.tr(context, 'msg_joined_club')), backgroundColor: Colors.green));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppDictionary.tr(context, 'msg_joined_club')), backgroundColor: Colors.green));
       }
     }
   }
@@ -178,7 +179,7 @@ class _ClubDetailScreenState extends State<ClubDetailScreen> {
           children: [
             const Icon(Icons.telegram, size: 60, color: Colors.blue),
             const SizedBox(height: 16),
-            const Text(AppDictionary.tr(context, 'btn_join_club'), style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            Text(AppDictionary.tr(context, 'btn_join_club'), style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
             const SizedBox(height: 12),
             const Text(
               "Klub tasdiqlangan bo'lishi uchun, iltimos avval telegram kanaliga a'zo bo'ling.",
@@ -294,7 +295,7 @@ class _InfoTab extends StatelessWidget {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                             decoration: BoxDecoration(color: Colors.grey[200], borderRadius: BorderRadius.circular(8)),
-                            child: const Text(AppDictionary.tr(context, 'lbl_university_club'), style: TextStyle(fontSize: 10, color: Colors.blueGrey, fontWeight: FontWeight.bold)),
+                            child: Text(AppDictionary.tr(context, 'lbl_university_club'), style: TextStyle(fontSize: 10, color: Colors.blueGrey, fontWeight: FontWeight.bold)),
                           ),
                         ],
                       ),
@@ -370,7 +371,7 @@ class _MembersTabState extends State<_MembersTab> {
   @override
   Widget build(BuildContext context) {
     if (isLoading) return const Center(child: CircularProgressIndicator());
-    if (members.isEmpty) return const Center(child: Text(AppDictionary.tr(context, 'msg_no_members_yet')));
+    if (members.isEmpty) return Center(child: Text(AppDictionary.tr(context, 'msg_no_members_yet')));
 
     return ListView.builder(
       itemCount: members.length,
@@ -490,10 +491,10 @@ class _MembersTabState extends State<_MembersTab> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text(AppDictionary.tr(context, 'btn_kick')),
+        title: Text(AppDictionary.tr(context, 'btn_kick')),
         content: Text("Rostdan ham $name ismli talabani klubdan o'chirmoqchimisiz?"),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text(AppDictionary.tr(context, 'btn_cancel'))),
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(AppDictionary.tr(context, 'btn_cancel'))),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
             child: const Text("O'chirish", style: TextStyle(color: Colors.red)),
@@ -510,10 +511,10 @@ class _MembersTabState extends State<_MembersTab> {
       Navigator.pop(context); // loading
 
       if (ok) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(AppDictionary.tr(context, 'msg_student_kicked')), backgroundColor: Colors.green));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppDictionary.tr(context, 'msg_student_kicked')), backgroundColor: Colors.green));
         _loadMembers();
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(AppDictionary.tr(context, 'msg_error_occurred')), backgroundColor: Colors.red));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppDictionary.tr(context, 'msg_error_occurred')), backgroundColor: Colors.red));
       }
     }
   }
@@ -581,7 +582,7 @@ class _AnnouncementsTabState extends State<_AnnouncementsTab> {
                 ),
                 const SizedBox(height: 16),
                 SwitchListTile(
-                  title: const Text(AppDictionary.tr(context, 'btn_send_to_telegram')),
+                  title: Text(AppDictionary.tr(context, 'btn_send_to_telegram')),
                   value: sendToTelegram,
                   onChanged: (val) => setModalState(() => sendToTelegram = val),
                   activeColor: AppTheme.primaryBlue,
@@ -618,7 +619,7 @@ class _AnnouncementsTabState extends State<_AnnouncementsTab> {
       body: isLoading 
          ? const Center(child: CircularProgressIndicator())
          : items.isEmpty
-             ? const Center(child: Text(AppDictionary.tr(context, 'msg_nothing_here')))
+             ? Center(child: Text(AppDictionary.tr(context, 'msg_nothing_here')))
              : ListView.builder(
                  itemCount: items.length,
                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -800,7 +801,7 @@ class _EventsTabState extends State<_EventsTab> {
       body: isLoading 
          ? const Center(child: CircularProgressIndicator())
          : items.isEmpty
-             ? const Center(child: Text(AppDictionary.tr(context, 'msg_no_events_yet')))
+             ? Center(child: Text(AppDictionary.tr(context, 'msg_no_events_yet')))
              : ListView.builder(
                  itemCount: items.length,
                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -906,7 +907,7 @@ class _EventsTabState extends State<_EventsTab> {
                                   children: [
                                      const Icon(Icons.location_on, size: 14, color: Colors.grey),
                                      const SizedBox(width: 4),
-                                     const Text(AppDictionary.tr(context, 'msg_event_loc_time_not_entered'), style: TextStyle(color: Colors.grey, fontSize: 12)),
+                                     Text(AppDictionary.tr(context, 'msg_event_loc_time_not_entered'), style: TextStyle(color: Colors.grey, fontSize: 12)),
                                   ]
                                ),
                                
@@ -919,7 +920,7 @@ class _EventsTabState extends State<_EventsTab> {
                                      style: OutlinedButton.styleFrom(
                                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                      ),
-                                     child: const Text(AppDictionary.tr(context, 'btn_add_or_edit')),
+                                     child: Text(AppDictionary.tr(context, 'btn_add_or_edit')),
                                    ),
                                  )
                                ]
@@ -1014,7 +1015,7 @@ class _EventsTabState extends State<_EventsTab> {
                   const SizedBox(height: 8),
                   Expanded(
                     child: parts.isEmpty
-                      ? const Center(child: Text(AppDictionary.tr(context, 'msg_list_empty')))
+                      ? Center(child: Text(AppDictionary.tr(context, 'msg_list_empty')))
                       : ListView.builder(
                           itemCount: parts.length,
                           itemBuilder: (ctx, i) {
@@ -1081,9 +1082,9 @@ class _EventsTabState extends State<_EventsTab> {
                       if (!context.mounted) return;
                       if (ok) {
                         Navigator.pop(context);
-                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(AppDictionary.tr(context, 'msg_activity_confirmed'))));
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppDictionary.tr(context, 'msg_activity_confirmed'))));
                       } else {
-                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(AppDictionary.tr(context, 'msg_action_failed_check_data'))));
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppDictionary.tr(context, 'msg_action_failed_check_data'))));
                       }
                     },
                     child: isSaving ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)) : const Text("3. Saqlash", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),

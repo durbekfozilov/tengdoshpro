@@ -4,6 +4,7 @@ import '../../../../core/theme/app_theme.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'secure_reader_screen.dart';
 import '../services/library_service.dart';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class BookDetailsScreen extends StatelessWidget {
   final Book book;
@@ -113,7 +114,7 @@ class BookDetailsScreen extends StatelessWidget {
                           );
                         },
                         icon: const Icon(Icons.menu_book),
-                        label: const Text(AppDictionary.tr(context, 'btn_read_ebook')),
+                        label: Text(AppDictionary.tr(context, 'btn_read_ebook')),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppTheme.primaryBlue,
                           foregroundColor: Colors.white,
@@ -336,7 +337,7 @@ class _ReservationSheetState extends State<_ReservationSheet> {
              const SizedBox(height: 12),
              _buildInfoRow(Icons.update, "Qaytarish muddati", "14 kun"),
           ] else
-             const Text(AppDictionary.tr(context, 'msg_all_copies_busy'),
+             Text(AppDictionary.tr(context, 'msg_all_copies_busy'),
                style: TextStyle(color: Colors.grey, height: 1.5),
              ),
           

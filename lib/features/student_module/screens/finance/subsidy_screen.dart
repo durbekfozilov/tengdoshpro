@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/services/data_service.dart';
 import 'package:intl/intl.dart';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class SubsidyScreen extends StatefulWidget {
   const SubsidyScreen({super.key});
@@ -53,7 +54,7 @@ class _SubsidyScreenState extends State<SubsidyScreen> {
     return Scaffold(
       backgroundColor: AppTheme.backgroundWhite,
       appBar: AppBar(
-        title: const Text(AppDictionary.tr(context, 'lbl_rent_subsidy'), style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        title: Text(AppDictionary.tr(context, 'lbl_rent_subsidy'), style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.white,
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.black),

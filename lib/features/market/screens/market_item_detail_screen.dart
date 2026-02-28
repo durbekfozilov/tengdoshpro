@@ -3,6 +3,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../models/market_item.dart';
 import '../services/market_service.dart';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class MarketItemDetailScreen extends StatelessWidget {
   final MarketItem item;
@@ -110,7 +111,7 @@ class MarketItemDetailScreen extends StatelessWidget {
                 child: ElevatedButton.icon(
                   onPressed: () => _launchTelegram(item.telegramUsername!),
                   icon: const Icon(Icons.send), // Telegram icon substitute
-                  label: const Text(AppDictionary.tr(context, 'lbl_telegram')),
+                  label: Text(AppDictionary.tr(context, 'lbl_telegram')),
                   style: ElevatedButton.styleFrom(backgroundColor: Colors.blue, padding: const EdgeInsets.symmetric(vertical: 12)),
                 ),
               ),

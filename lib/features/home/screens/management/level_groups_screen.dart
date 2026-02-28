@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/services/data_service.dart';
 import 'group_students_screen.dart';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class LevelGroupsScreen extends StatefulWidget {
   final int facultyId;
@@ -50,7 +51,7 @@ class _LevelGroupsScreenState extends State<LevelGroupsScreen> {
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _groups.isEmpty
-              ? const Center(child: Text(AppDictionary.tr(context, 'msg_groups_not_found')))
+              ? Center(child: Text(AppDictionary.tr(context, 'msg_groups_not_found')))
               : ListView.builder(
                   itemCount: _groups.length,
                   padding: const EdgeInsets.all(16),

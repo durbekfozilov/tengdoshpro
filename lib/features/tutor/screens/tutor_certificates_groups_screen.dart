@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:talabahamkor_mobile/core/services/data_service.dart';
 import 'package:talabahamkor_mobile/core/theme/app_theme.dart';
 import 'tutor_certificates_students_screen.dart';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class TutorCertificatesGroupsScreen extends StatefulWidget {
   const TutorCertificatesGroupsScreen({super.key});
@@ -55,7 +56,7 @@ class _TutorCertificatesGroupsScreenState extends State<TutorCertificatesGroupsS
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
-        title: const Text(AppDictionary.tr(context, 'lbl_groups_list'), style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(AppDictionary.tr(context, 'lbl_groups_list'), style: TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: Colors.white,
         elevation: 0,
         foregroundColor: Colors.black87,

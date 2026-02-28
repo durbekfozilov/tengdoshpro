@@ -5,6 +5,7 @@ import '../services/library_service.dart';
 import '../widgets/book_card.dart';
 import 'book_details_screen.dart';
 import '../../../../core/theme/app_theme.dart';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class LibrarySearchScreen extends StatefulWidget {
   const LibrarySearchScreen({super.key});

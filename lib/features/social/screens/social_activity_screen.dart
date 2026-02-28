@@ -121,7 +121,7 @@ class _AddActivitySheetState extends State<AddActivitySheet> {
          if (await canLaunchUrl(Uri.parse(urlToLaunch))) {
            await launchUrl(Uri.parse(urlToLaunch), mode: LaunchMode.externalApplication);
          } else {
-            if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(AppDictionary.tr(context, 'msg_cannot_open_tg'))));
+            if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppDictionary.tr(context, 'msg_cannot_open_tg'))));
          }
       }
       
@@ -426,7 +426,7 @@ class _AddActivitySheetState extends State<AddActivitySheet> {
                   backgroundColor: AppTheme.primaryBlue,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                 ),
-                child: Text(isEdit ? AppDictionary.tr(context, 'social_btn_update') : AppDictionary.tr(context, 'save'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+                child: Text(isEdit ? AppDictionary.tr(context, 'social_btn_update') : AppDictionary.tr(context, 'save'), style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
               ),
             ),
           ),
@@ -515,7 +515,7 @@ class _AddActivitySheetState extends State<AddActivitySheet> {
                   try {
                     setState(() => _isUploading = true);
                     await Provider.of<DataService>(context, listen: false).unlinkTelegram();
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(AppDictionary.tr(context, 'msg_old_account_disconnected_new'))));
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppDictionary.tr(context, 'msg_old_account_disconnected_new'))));
                     await _initUpload();
                   } catch (e) {
                     setState(() => _isUploading = false);
@@ -584,13 +584,13 @@ class _AddActivitySheetState extends State<AddActivitySheet> {
 
   void _saveActivity() {
     if (_titleController.text.isEmpty || _descController.text.isEmpty || _selectedDate == null) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(AppDictionary.tr(context, 'msg_fill_all_fields'))));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppDictionary.tr(context, 'msg_fill_all_fields'))));
       return;
     }
     
     // Check if image uploaded (ONLY FOR NEW)
     if (widget.activity == null && _uploadedCount == 0) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(AppDictionary.tr(context, 'msg_please_upload_image_first'))));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppDictionary.tr(context, 'msg_please_upload_image_first'))));
       return;
     }
 
@@ -663,7 +663,7 @@ class _SocialActivityScreenState extends State<SocialActivityScreen> {
     return Scaffold(
       backgroundColor: AppTheme.backgroundWhite,
       appBar: AppBar(
-        title: const Text(AppDictionary.tr(context, 'lbl_social_activity'), style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        title: Text(AppDictionary.tr(context, 'lbl_social_activity'), style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.white,
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.black),
@@ -726,7 +726,7 @@ class _SocialActivityScreenState extends State<SocialActivityScreen> {
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               elevation: 0,
             ),
-            child: const Text(AppDictionary.tr(context, 'btn_add_activity'),
+            child: Text(AppDictionary.tr(context, 'btn_add_activity'),
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
             ),
           ),
@@ -1103,7 +1103,7 @@ class _SocialActivityScreenState extends State<SocialActivityScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text("O'chirish"),
-        content: const Text(AppDictionary.tr(context, 'msg_confirm_delete_activity')),
+        content: Text(AppDictionary.tr(context, 'msg_confirm_delete_activity')),
         actions: [
            TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text("Yo'q", style: TextStyle(color: Colors.grey))),
            TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text("Ha, o'chirish", style: TextStyle(color: Colors.red))),
@@ -1118,9 +1118,9 @@ class _SocialActivityScreenState extends State<SocialActivityScreen> {
            setState(() {
              _activities.removeWhere((a) => a.id == activity.id);
            });
-           if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(AppDictionary.tr(context, 'msg_deleted'))));
+           if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppDictionary.tr(context, 'msg_deleted'))));
         } else {
-           if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(AppDictionary.tr(context, 'msg_error_occurred'))));
+           if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppDictionary.tr(context, 'msg_error_occurred'))));
         }
       } catch (e) {
         if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Xatolik: $e")));

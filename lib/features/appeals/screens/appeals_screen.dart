@@ -9,6 +9,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/constants/api_constants.dart';
 import '../../../../core/services/data_service.dart';
 import 'package:provider/provider.dart';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class AppealsScreen extends StatefulWidget {
   const AppealsScreen({super.key});
@@ -665,7 +666,7 @@ class _CreateAppealSheetState extends State<CreateAppealSheet> {
 
   Future<void> _submit() async {
       if (_textController.text.trim().isEmpty) {
-         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(AppDictionary.tr(context, 'msg_please_write_appeal'))));
+         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppDictionary.tr(context, 'msg_please_write_appeal'))));
          return;
       }
       
@@ -708,7 +709,7 @@ class _CreateAppealSheetState extends State<CreateAppealSheet> {
            if (await canLaunchUrl(Uri.parse(urlToLaunch))) {
              await launchUrl(Uri.parse(urlToLaunch), mode: LaunchMode.externalApplication);
            } else {
-             if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(AppDictionary.tr(context, 'msg_cannot_open_tg'))));
+             if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppDictionary.tr(context, 'msg_cannot_open_tg'))));
            }
           
           // Show instructions
@@ -717,7 +718,7 @@ class _CreateAppealSheetState extends State<CreateAppealSheet> {
                  context: context,
                  barrierDismissible: false,
                  builder: (ctx) => AlertDialog(
-                     title: const Text(AppDictionary.tr(context, 'msg_upload_file_to_bot')),
+                     title: Text(AppDictionary.tr(context, 'msg_upload_file_to_bot')),
                      content: const Column(
                          mainAxisSize: MainAxisSize.min,
                          children: [
@@ -747,12 +748,12 @@ class _CreateAppealSheetState extends State<CreateAppealSheet> {
                                  try {
                                      // Call unlink via data_service/appeal_service
                                      await Provider.of<DataService>(context, listen: false).unlinkTelegram();
-                                     if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(AppDictionary.tr(context, 'msg_old_account_disconnected_retry'))));
+                                     if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppDictionary.tr(context, 'msg_old_account_disconnected_retry'))));
                                  } catch(e) {
                                      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Xatolik: \$e")));
                                  }
                              }, 
-                             child: const Text(AppDictionary.tr(context, 'msg_my_tg_is_new'), style: TextStyle(color: Colors.orange))
+                             child: Text(AppDictionary.tr(context, 'msg_my_tg_is_new'), style: TextStyle(color: Colors.orange))
                          )
                      ],
                  )
@@ -801,11 +802,11 @@ class _CreateAppealSheetState extends State<CreateAppealSheet> {
             Navigator.pop(context); // Close sheet
             widget.onAppealCreated();
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text(AppDictionary.tr(context, 'msg_appeal_sent_success')), backgroundColor: Colors.green)
+              SnackBar(content: Text(AppDictionary.tr(context, 'msg_appeal_sent_success')), backgroundColor: Colors.green)
             );
           } else {
              ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text(AppDictionary.tr(context, 'msg_error_occurred_2')), backgroundColor: Colors.red)
+              SnackBar(content: Text(AppDictionary.tr(context, 'msg_error_occurred_2')), backgroundColor: Colors.red)
             );
           }
       }
@@ -1017,7 +1018,7 @@ class _CreateAppealSheetState extends State<CreateAppealSheet> {
                     child: SwitchListTile(
                         contentPadding: EdgeInsets.zero,
                         title: const Text("Anonim yuborish", style: TextStyle(fontWeight: FontWeight.w600)),
-                        subtitle: const Text(AppDictionary.tr(context, 'msg_name_kept_secret'), style: TextStyle(fontSize: 12, color: Colors.grey)),
+                        subtitle: Text(AppDictionary.tr(context, 'msg_name_kept_secret'), style: TextStyle(fontSize: 12, color: Colors.grey)),
                         value: _isAnonymous,
                         onChanged: (v) => setState(() => _isAnonymous = v),
                         activeColor: Colors.black,
@@ -1057,8 +1058,8 @@ class _CreateAppealSheetState extends State<CreateAppealSheet> {
                     ),
                     child: SwitchListTile(
                         contentPadding: EdgeInsets.zero,
-                        title: const Text(AppDictionary.tr(context, 'btn_attach_file_tg'), style: TextStyle(fontWeight: FontWeight.w600)), // Matches screenshot
-                        subtitle: const Text(AppDictionary.tr(context, 'lbl_send_media'), style: TextStyle(fontSize: 12, color: Colors.grey)),
+                        title: Text(AppDictionary.tr(context, 'btn_attach_file_tg'), style: TextStyle(fontWeight: FontWeight.w600)), // Matches screenshot
+                        subtitle: Text(AppDictionary.tr(context, 'lbl_send_media'), style: TextStyle(fontSize: 12, color: Colors.grey)),
                         value: _isFileEnabled,
                         onChanged: (v) => setState(() => _isFileEnabled = v),
                         activeColor: Colors.black,
@@ -1133,7 +1134,7 @@ class _AppealDetailScreenState extends State<AppealDetailScreen> {
               _loadDetail(); // Refresh
           } else {
               ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text(AppDictionary.tr(context, 'msg_error_occurred')))
+                  SnackBar(content: Text(AppDictionary.tr(context, 'msg_error_occurred')))
               );
           }
       }
@@ -1153,7 +1154,7 @@ class _AppealDetailScreenState extends State<AppealDetailScreen> {
               _loadDetail(); // Refresh
           } else {
               ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text(AppDictionary.tr(context, 'msg_answer_send_error')))
+                  SnackBar(content: Text(AppDictionary.tr(context, 'msg_answer_send_error')))
               );
           }
       }
@@ -1171,8 +1172,8 @@ class _AppealDetailScreenState extends State<AppealDetailScreen> {
     if (_detail == null) {
         return Scaffold(
              backgroundColor: AppTheme.backgroundWhite,
-             appBar: AppBar(title: const Text(AppDictionary.tr(context, 'msg_error'))),
-             body: const Center(child: Text(AppDictionary.tr(context, 'msg_appeal_not_found')))
+             appBar: AppBar(title: Text(AppDictionary.tr(context, 'msg_error'))),
+             body: Center(child: Text(AppDictionary.tr(context, 'msg_appeal_not_found')))
         );
     }
     
@@ -1302,7 +1303,7 @@ class _AppealDetailScreenState extends State<AppealDetailScreen> {
               borderRadius: BorderRadius.circular(12),
             ),
             alignment: Alignment.center,
-            child: const Text(AppDictionary.tr(context, 'msg_waiting_for_reply'),
+            child: Text(AppDictionary.tr(context, 'msg_waiting_for_reply'),
               style: TextStyle(color: Colors.grey, fontWeight: FontWeight.w600),
             ),
           ),

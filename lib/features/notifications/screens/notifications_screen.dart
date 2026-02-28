@@ -7,6 +7,7 @@ import '../../../../core/providers/auth_provider.dart';
 import '../../../../core/providers/notification_provider.dart';
 import '../../../../core/services/data_service.dart';
 import '../../../../core/theme/app_theme.dart';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});
@@ -97,7 +98,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(AppDictionary.tr(context, 'lbl_notifications')),
+        title: Text(AppDictionary.tr(context, 'lbl_notifications')),
         centerTitle: true,
         actions: [
           if (_isRefreshingProfile)
@@ -257,7 +258,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                         ),
                         onPressed: _isRefreshingProfile ? null : _refreshProfile,
                         icon: const Icon(Icons.sync_rounded, size: 18),
-                        label: const Text(AppDictionary.tr(context, 'btn_activate_premium'), style: TextStyle(fontSize: 13)),
+                        label: Text(AppDictionary.tr(context, 'btn_activate_premium'), style: TextStyle(fontSize: 13)),
                       ),
                     ),
                   ],

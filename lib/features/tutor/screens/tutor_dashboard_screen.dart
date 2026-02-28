@@ -10,6 +10,7 @@ import 'package:talabahamkor_mobile/features/tutor/screens/tutor_documents_group
 import 'package:talabahamkor_mobile/features/tutor/screens/tutor_certificates_groups_screen.dart';
 import 'package:talabahamkor_mobile/features/tutor/screens/tutor_appeals_main_screen.dart';
 import '../../library/screens/library_screen.dart';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 
 class TutorDashboardScreen extends StatelessWidget {

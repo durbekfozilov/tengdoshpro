@@ -4,6 +4,7 @@ import 'package:uuid/uuid.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/services/data_service.dart';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class CertificateUploadDialog extends StatefulWidget {
   final VoidCallback onUploadSuccess;
@@ -37,7 +38,7 @@ class _CertificateUploadDialogState extends State<CertificateUploadDialog> {
   Future<void> _initiateUpload() async {
     if (_titleController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text(AppDictionary.tr(context, 'msg_please_enter_cert_name'))),
+        SnackBar(content: Text(AppDictionary.tr(context, 'msg_please_enter_cert_name'))),
       );
       return;
     }
@@ -68,7 +69,7 @@ class _CertificateUploadDialogState extends State<CertificateUploadDialog> {
              await launchUrl(Uri.parse(urlToLaunch), mode: LaunchMode.externalApplication);
            } else {
              ScaffoldMessenger.of(context).showSnackBar(
-               const SnackBar(content: Text(AppDictionary.tr(context, 'msg_cannot_open_tg')), backgroundColor: Colors.orange),
+               SnackBar(content: Text(AppDictionary.tr(context, 'msg_cannot_open_tg')), backgroundColor: Colors.orange),
              );
            }
            
@@ -122,7 +123,7 @@ class _CertificateUploadDialogState extends State<CertificateUploadDialog> {
         widget.onUploadSuccess();
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text(AppDictionary.tr(context, 'msg_cert_saved_success')), backgroundColor: Colors.green),
+          SnackBar(content: Text(AppDictionary.tr(context, 'msg_cert_saved_success')), backgroundColor: Colors.green),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -177,7 +178,7 @@ class _CertificateUploadDialogState extends State<CertificateUploadDialog> {
                 try {
                   setState(() => _isLoading = true);
                   await _dataService.unlinkTelegram();
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(AppDictionary.tr(context, 'msg_old_account_disconnected_new'))));
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppDictionary.tr(context, 'msg_old_account_disconnected_new'))));
                   await _initiateUpload();
                 } catch (e) {
                   setState(() => _isLoading = false);

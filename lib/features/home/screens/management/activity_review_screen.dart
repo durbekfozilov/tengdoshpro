@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/services/data_service.dart';
 import 'package:intl/intl.dart';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class ActivityReviewScreen extends StatefulWidget {
   final String? initialStatus;
@@ -132,7 +133,7 @@ class _ActivityReviewScreenState extends State<ActivityReviewScreen> {
   Future<void> _approve(int id) async {
     final success = await _dataService.approveActivity(id);
     if (success && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(AppDictionary.tr(context, 'msg_activity_approved'))));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppDictionary.tr(context, 'msg_activity_approved'))));
       setState(() {
         final index = _activities.indexWhere((a) => a['id'] == id);
         if (index != -1) {
@@ -153,20 +154,20 @@ class _ActivityReviewScreenState extends State<ActivityReviewScreen> {
       builder: (context) {
         final controller = TextEditingController();
         return AlertDialog(
-          title: const Text(AppDictionary.tr(context, 'btn_reject')),
+          title: Text(AppDictionary.tr(context, 'btn_reject')),
           content: TextField(
             controller: controller,
-            decoration: const InputDecoration(hintText: AppDictionary.tr(context, 'hint_enter_reason_opt')),
+            decoration: InputDecoration(hintText: AppDictionary.tr(context, 'hint_enter_reason_opt')),
             maxLines: 3,
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(context, false), child: const Text(AppDictionary.tr(context, 'btn_cancel'))),
+            TextButton(onPressed: () => Navigator.pop(context, false), child: Text(AppDictionary.tr(context, 'btn_cancel'))),
             ElevatedButton(
               onPressed: () {
                 comment = controller.text;
                 Navigator.pop(context, true);
               },
-              child: const Text(AppDictionary.tr(context, 'btn_reject')),
+              child: Text(AppDictionary.tr(context, 'btn_reject')),
             ),
           ],
         );
@@ -176,7 +177,7 @@ class _ActivityReviewScreenState extends State<ActivityReviewScreen> {
     if (confirmed == true) {
       final success = await _dataService.rejectActivity(id, comment);
       if (success && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(AppDictionary.tr(context, 'msg_activity_rejected'))));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppDictionary.tr(context, 'msg_activity_rejected'))));
         setState(() {
           final index = _activities.indexWhere((a) => a['id'] == id);
           if (index != -1) {
@@ -567,7 +568,7 @@ class _ActivityReviewScreenState extends State<ActivityReviewScreen> {
                     children: [
                       TextButton(onPressed: () => _reject(id), child: const Text("Rad etish", style: TextStyle(color: Colors.red))),
                       const SizedBox(width: 8),
-                      ElevatedButton(onPressed: () => _approve(id), child: const Text(AppDictionary.tr(context, 'btn_confirm'))),
+                      ElevatedButton(onPressed: () => _approve(id), child: Text(AppDictionary.tr(context, 'btn_confirm'))),
                     ],
                   ),
               ],

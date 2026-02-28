@@ -3,6 +3,7 @@ import '../../../core/theme/app_theme.dart';
 
 import '../../../core/services/data_service.dart';
 import '../widgets/certificate_upload_dialog.dart';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class CertificatesScreen extends StatefulWidget {
   const CertificatesScreen({super.key});
@@ -54,7 +55,7 @@ class _CertificatesScreenState extends State<CertificatesScreen> {
         title: const Text("Sertifikatni o'chirish"),
         content: Text("Rostdan ham '$title' sertifikatini o'chirmoqchimisiz?"),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text(AppDictionary.tr(context, 'btn_cancel'))),
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(AppDictionary.tr(context, 'btn_cancel'))),
           TextButton(
             onPressed: () => Navigator.pop(context, true), 
             style: TextButton.styleFrom(foregroundColor: Colors.red),
@@ -83,7 +84,7 @@ class _CertificatesScreenState extends State<CertificatesScreen> {
 
   Future<void> _sendToBot(int certId) async {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text(AppDictionary.tr(context, 'msg_sending_cert_to_bot'))),
+      SnackBar(content: Text(AppDictionary.tr(context, 'msg_sending_cert_to_bot'))),
     );
     
     final msg = await _dataService.sendCertificateToBot(certId);

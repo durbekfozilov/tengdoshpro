@@ -5,6 +5,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../models/community_models.dart';
 import '../services/chat_service.dart';
 import 'user_profile_screen.dart';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class ChatDetailScreen extends StatefulWidget {
   final Chat chat;
@@ -76,7 +77,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
       });
     } else {
       // Error
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(AppDictionary.tr(context, 'msg_msg_send_error'))));
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppDictionary.tr(context, 'msg_msg_send_error'))));
     }
   }
 
@@ -331,7 +332,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
             children: [
               ListTile(
                 leading: const Icon(Icons.edit, color: Colors.blue),
-                title: const Text(AppDictionary.tr(context, 'btn_edit')),
+                title: Text(AppDictionary.tr(context, 'btn_edit')),
                 onTap: () {
                   Navigator.pop(context);
                   _showEditDialog(msg);
@@ -359,10 +360,10 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
       builder: (context) {
         return AlertDialog(
           scrollable: true,
-          title: const Text(AppDictionary.tr(context, 'lbl_edit_message')),
+          title: Text(AppDictionary.tr(context, 'lbl_edit_message')),
           content: TextField(
             controller: editController,
-            decoration: const InputDecoration(hintText: AppDictionary.tr(context, 'hint_new_text')),
+            decoration: InputDecoration(hintText: AppDictionary.tr(context, 'hint_new_text')),
             minLines: 1,
             maxLines: 5,
           ),
@@ -386,11 +387,11 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                     });
                     _loadMessages(silent: true); // Refresh just in case
                   } else {
-                    if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(AppDictionary.tr(context, 'msg_error_occurred'))));
+                    if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppDictionary.tr(context, 'msg_error_occurred'))));
                   }
                 }
               },
-              child: const Text(AppDictionary.tr(context, 'btn_save')),
+              child: Text(AppDictionary.tr(context, 'btn_save')),
             )
           ],
         );
@@ -403,7 +404,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text(AppDictionary.tr(context, 'btn_delete_message')),
+          title: Text(AppDictionary.tr(context, 'btn_delete_message')),
           content: const Text("Haqiqatan ham ushbu xabarni o'chirib yubormoqchimisiz?"),
           actions: [
             TextButton(
@@ -420,7 +421,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                     _messages.removeWhere((m) => m.id == msg.id);
                   });
                 } else {
-                  if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(AppDictionary.tr(context, 'msg_del_error'))));
+                  if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppDictionary.tr(context, 'msg_del_error'))));
                 }
               },
               child: const Text("O'chirish", style: TextStyle(color: Colors.white)),
@@ -447,7 +448,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(AppDictionary.tr(context, 'lbl_replying'),
+                      Text(AppDictionary.tr(context, 'lbl_replying'),
                         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: AppTheme.primaryBlue),
                       ),
                       Text(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/services/data_service.dart';
 import 'package:intl/intl.dart';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class StaffSearchScreen extends StatefulWidget {
   const StaffSearchScreen({super.key});
@@ -85,7 +86,7 @@ class _StaffSearchScreenState extends State<StaffSearchScreen> {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: const Text(AppDictionary.tr(context, 'lbl_staff_monitoring')),
+        title: Text(AppDictionary.tr(context, 'lbl_staff_monitoring')),
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         elevation: 0,

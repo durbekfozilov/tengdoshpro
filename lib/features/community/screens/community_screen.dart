@@ -11,6 +11,7 @@ import '../screens/create_post_screen.dart';
 import 'chat_list_screen.dart';
 import 'package:talabahamkor_mobile/features/community/services/chat_service.dart'; // NEW
 import '../widgets/user_search_delegate.dart';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class CommunityScreen extends StatefulWidget {
   const CommunityScreen({super.key});
@@ -245,7 +246,7 @@ class _CommunityScreenState extends State<CommunityScreen> with SingleTickerProv
     return Scaffold(
         backgroundColor: AppTheme.backgroundWhite,
         appBar: AppBar(
-          title: const Text(AppDictionary.tr(context, 'lbl_teahouse'), style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+          title: Text(AppDictionary.tr(context, 'lbl_teahouse'), style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
           backgroundColor: Colors.white,
           elevation: 0,
           centerTitle: false,
@@ -417,9 +418,9 @@ class _CommunityScreenState extends State<CommunityScreen> with SingleTickerProv
      final myValue = user?.universityId ?? 0;
      
      final items = [
-        PopupMenuItem<int>(value: allValue, child: const Text(AppDictionary.tr(context, 'lbl_all_universities'))),
+        PopupMenuItem<int>(value: allValue, child: Text(AppDictionary.tr(context, 'lbl_all_universities'))),
         if (myValue != 0)
-           PopupMenuItem<int>(value: myValue, child: const Text(AppDictionary.tr(context, 'lbl_my_university'))),
+           PopupMenuItem<int>(value: myValue, child: Text(AppDictionary.tr(context, 'lbl_my_university'))),
      ];
      
      // Note: We don't have _selectedUniversityId state yet, assuming 'university' scope relies on backend user context mostly.
@@ -433,9 +434,9 @@ class _CommunityScreenState extends State<CommunityScreen> with SingleTickerProv
     final myValue = user?.facultyId ?? 0;
     
     final menuItems = [
-       PopupMenuItem<int>(value: allValue, child: const Text(AppDictionary.tr(context, 'lbl_all_faculties'))),
+       PopupMenuItem<int>(value: allValue, child: Text(AppDictionary.tr(context, 'lbl_all_faculties'))),
        if (myValue != 0)
-         PopupMenuItem<int>(value: myValue, child: const Text(AppDictionary.tr(context, 'lbl_my_faculty'))),
+         PopupMenuItem<int>(value: myValue, child: Text(AppDictionary.tr(context, 'lbl_my_faculty'))),
     ];
 
     showMenu<int>(
@@ -458,9 +459,9 @@ class _CommunityScreenState extends State<CommunityScreen> with SingleTickerProv
     final myValue = user?.specialtyName;
     
     final items = [
-      const PopupMenuItem<String>(value: "ALL", child: Text(AppDictionary.tr(context, 'lbl_all_directions'))),
+      PopupMenuItem<String>(value: "ALL", child: Text(AppDictionary.tr(context, 'lbl_all_directions'))),
       if (myValue != null)
-        PopupMenuItem<String>(value: myValue, child: const Text(AppDictionary.tr(context, 'lbl_my_direction'))),
+        PopupMenuItem<String>(value: myValue, child: Text(AppDictionary.tr(context, 'lbl_my_direction'))),
     ];
     
     showMenu<String>(

@@ -5,6 +5,7 @@ import '../screens/user_profile_screen.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/providers/auth_provider.dart';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class CommentItem extends StatelessWidget {
   final Comment comment;
@@ -47,7 +48,7 @@ class CommentItem extends StatelessWidget {
               title: const Text("O'chirish"),
               content: const Text("Ushbu sharhni o'chirmoqchimisiz?"),
               actions: [
-                TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text(AppDictionary.tr(context, 'btn_no'))),
+                TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(AppDictionary.tr(context, 'btn_no'))),
                 TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text("Ha", style: TextStyle(color: Colors.red))),
               ],
             ),
@@ -115,7 +116,7 @@ class CommentItem extends StatelessWidget {
                     children: [
                       ListTile(
                         leading: const Icon(Icons.edit, color: Colors.blue),
-                        title: const Text(AppDictionary.tr(context, 'btn_edit')),
+                        title: Text(AppDictionary.tr(context, 'btn_edit')),
                         onTap: () {
                           Navigator.pop(ctx);
                           _showEditDialog(context);
@@ -295,14 +296,14 @@ class CommentItem extends StatelessWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         scrollable: true,
-        title: const Text(AppDictionary.tr(context, 'lbl_edit_comment')),
+        title: Text(AppDictionary.tr(context, 'lbl_edit_comment')),
         content: TextField(
           controller: controller,
           maxLines: 3,
           decoration: const InputDecoration(border: OutlineInputBorder()),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text(AppDictionary.tr(context, 'btn_cancel'))),
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(AppDictionary.tr(context, 'btn_cancel'))),
           TextButton(
             onPressed: () {
               if (controller.text.trim().isNotEmpty) {
@@ -310,7 +311,7 @@ class CommentItem extends StatelessWidget {
                  Navigator.pop(ctx);
               }
             }, 
-            child: const Text(AppDictionary.tr(context, 'btn_save'))
+            child: Text(AppDictionary.tr(context, 'btn_save'))
           ),
         ],
       ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:talabahamkor_mobile/core/services/data_service.dart';
 import 'package:talabahamkor_mobile/core/theme/app_theme.dart';
 import 'package:talabahamkor_mobile/core/constants/api_constants.dart';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class GroupAppealsScreen extends StatefulWidget {
   final String groupNumber;
@@ -57,7 +58,7 @@ class _GroupAppealsScreenState extends State<GroupAppealsScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text(AppDictionary.tr(context, 'btn_cancel')),
+            child: Text(AppDictionary.tr(context, 'btn_cancel')),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -65,7 +66,7 @@ class _GroupAppealsScreenState extends State<GroupAppealsScreen> {
               Navigator.pop(context); // Close dialog
               await _sendReply(appealId, _replyController.text.trim());
             },
-            child: const Text(AppDictionary.tr(context, 'btn_submit')),
+            child: Text(AppDictionary.tr(context, 'btn_submit')),
           ),
         ],
       ),
@@ -78,7 +79,7 @@ class _GroupAppealsScreenState extends State<GroupAppealsScreen> {
       await _dataService.replyToTutorAppeal(appealId, text);
       if (mounted) {
          ScaffoldMessenger.of(context).showSnackBar(
-           const SnackBar(content: Text(AppDictionary.tr(context, 'msg_answer_sent_tick'))),
+           SnackBar(content: Text(AppDictionary.tr(context, 'msg_answer_sent_tick'))),
          );
          _loadAppeals(); // Refresh
       }
@@ -306,7 +307,7 @@ class _GroupAppealsScreenState extends State<GroupAppealsScreen> {
                       elevation: 0,
                     ),
                     icon: const Icon(Icons.reply_rounded, size: 18),
-                    label: const Text(AppDictionary.tr(context, 'btn_reply')),
+                    label: Text(AppDictionary.tr(context, 'btn_reply')),
                   ),
               ],
             ),

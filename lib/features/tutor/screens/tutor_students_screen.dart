@@ -4,6 +4,7 @@ import 'package:talabahamkor_mobile/core/services/data_service.dart';
 import 'package:talabahamkor_mobile/core/theme/app_theme.dart';
 import 'package:talabahamkor_mobile/features/community/screens/user_profile_screen.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class TutorStudentsScreen extends StatefulWidget {
   final String? groupNumber;
@@ -51,7 +52,7 @@ class _TutorStudentsScreenState extends State<TutorStudentsScreen> {
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _students.isEmpty
-              ? const Center(child: Text(AppDictionary.tr(context, 'msg_students_not_found')))
+              ? Center(child: Text(AppDictionary.tr(context, 'msg_students_not_found')))
               : ListView.builder(
                   padding: const EdgeInsets.all(16),
                   itemCount: _students.length,

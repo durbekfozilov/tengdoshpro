@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:talabahamkor_mobile/core/services/data_service.dart';
 import 'package:talabahamkor_mobile/core/theme/app_theme.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class GroupDocumentsScreen extends StatefulWidget {
   final String groupNumber;
@@ -113,13 +114,13 @@ class _GroupDocumentsScreenState extends State<GroupDocumentsScreen> {
                         : "$catName yuklamagan barcha talabalarga eslatma yuborilsinmi?",
                   ),
                   actions: [
-                    TextButton(onPressed: () => Navigator.pop(ctx), child: const Text(AppDictionary.tr(context, 'btn_cancel'))),
+                    TextButton(onPressed: () => Navigator.pop(ctx), child: Text(AppDictionary.tr(context, 'btn_cancel'))),
                     ElevatedButton(
                       onPressed: () {
                         Navigator.pop(ctx);
                         _requestFromAll();
                       },
-                      child: const Text(AppDictionary.tr(context, 'btn_submit')),
+                      child: Text(AppDictionary.tr(context, 'btn_submit')),
                     ),
                   ],
                 ),

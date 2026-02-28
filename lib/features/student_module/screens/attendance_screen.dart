@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/services/data_service.dart';
 import '../../../core/models/attendance.dart';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class AttendanceScreen extends StatefulWidget {
   const AttendanceScreen({super.key});
@@ -130,7 +131,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                           const Icon(Icons.error_outline, size: 48, color: Colors.orange),
                           const SizedBox(height: 16),
                           Text("Ma'lumot topilmadi", style: TextStyle(color: Colors.grey[700])),
-                          TextButton(onPressed: () => _loadData(forceRefresh: true), child: const Text(AppDictionary.tr(context, 'btn_retry')))
+                          TextButton(onPressed: () => _loadData(forceRefresh: true), child: Text(AppDictionary.tr(context, 'btn_retry')))
                         ],
                       ),
                     ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/services/data_service.dart';
 import 'package:intl/intl.dart';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class ContractScreen extends StatefulWidget {
   const ContractScreen({super.key});
@@ -99,7 +100,7 @@ class _ContractScreenState extends State<ContractScreen> {
                 backgroundColor: AppTheme.primaryBlue,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
-              child: const Text(AppDictionary.tr(context, 'btn_retry')),
+              child: Text(AppDictionary.tr(context, 'btn_retry')),
             ),
           ],
         ),
@@ -165,7 +166,7 @@ class _ContractScreenState extends State<ContractScreen> {
                 children: [
                   const Icon(Icons.info_outline, color: AppTheme.primaryBlue),
                   const SizedBox(width: 12),
-                  const Text(AppDictionary.tr(context, 'lbl_status_colon'),
+                  Text(AppDictionary.tr(context, 'lbl_status_colon'),
                     style: TextStyle(fontWeight: FontWeight.w600, color: AppTheme.primaryBlue),
                   ),
                   const Spacer(),
@@ -179,7 +180,7 @@ class _ContractScreenState extends State<ContractScreen> {
             const SizedBox(height: 24),
 
             // Financial Summary
-            const Text(AppDictionary.tr(context, 'lbl_finance_summary'),
+            Text(AppDictionary.tr(context, 'lbl_finance_summary'),
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 16),
@@ -324,7 +325,7 @@ class _ContractScreenState extends State<ContractScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(AppDictionary.tr(context, 'lbl_income'), // Most items in history are payments (kirim)
+                Text(AppDictionary.tr(context, 'lbl_income'), // Most items in history are payments (kirim)
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                 ),
                 const SizedBox(height: 4),

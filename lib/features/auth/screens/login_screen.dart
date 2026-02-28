@@ -4,7 +4,7 @@ import '../../../core/providers/locale_provider.dart' as core_providers;
 import '../../../core/providers/auth_provider.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/constants/api_constants.dart';
-import '../../../core/localization/app_dictionary.dart';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -295,7 +295,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             child: auth.isLoading
                                 ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 3))
-                                : Text(AppDictionary.tr(context, 'login_btn'), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                                : Text(AppDictionary.tr(context, 'login_btn'), style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                           ),
                           const SizedBox(height: 16),
                           OutlinedButton.icon(
@@ -444,7 +444,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       padding: const EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
-                    child: Text(AppDictionary.tr(context, 'policy_accept_btn'), style: const TextStyle(fontSize: 16, color: Colors.white)),
+                    child: Text(AppDictionary.tr(context, 'policy_accept_btn'), style: TextStyle(fontSize: 16, color: Colors.white)),
                   ),
                 )
               ],

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/services/data_service.dart';
 import 'package:talabahamkor_mobile/features/home/screens/management/student_detail_view.dart';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class TutorGroupStudentsScreen extends StatefulWidget {
   final String groupNumber;
@@ -52,7 +53,7 @@ class _TutorGroupStudentsScreenState extends State<TutorGroupStudentsScreen> {
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _students.isEmpty
-              ? const Center(child: Text(AppDictionary.tr(context, 'msg_students_not_found')))
+              ? Center(child: Text(AppDictionary.tr(context, 'msg_students_not_found')))
               : Column(
                   children: [
                     // --- STATISTICS HEADER ---

@@ -11,7 +11,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/models/student.dart';
 import '../../../../core/services/data_service.dart';
 import '../../../../core/utils/role_mapper.dart';
-import '../../../../core/localization/app_dictionary.dart';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 import 'subscription_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -66,7 +66,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _saveUsername() async {
     final value = _usernameController.text.trim();
     if (value.length < 2 || value.length > 25) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(AppDictionary.tr(context, 'msg_username_length_err'))));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppDictionary.tr(context, 'msg_username_length_err'))));
       return;
     }
     if (_usernameError != null) return;
@@ -79,7 +79,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       setState(() {
         _isEditingUsername = false;
       });
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(AppDictionary.tr(context, 'msg_username_saved'))));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppDictionary.tr(context, 'msg_username_saved'))));
     } else {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(result['message'] ?? "Xatolik")));
     }
@@ -91,7 +91,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final student = auth.currentUser;
 
     if (student == null) {
-      return const Center(child: Text(AppDictionary.tr(context, 'msg_info_not_found')));
+      return Center(child: Text(AppDictionary.tr(context, 'msg_info_not_found')));
     }
 
     // Initialize controller only once if not editing or empty
@@ -499,7 +499,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: TextButton.icon(
               onPressed: () => _showDeleteAccountDialog(context),
               icon: const Icon(Icons.delete_forever_rounded, color: Colors.red),
-              label: const Text(AppDictionary.tr(context, 'btn_delete_account'), style: TextStyle(color: Colors.red, fontSize: 16)),
+              label: Text(AppDictionary.tr(context, 'btn_delete_account'), style: TextStyle(color: Colors.red, fontSize: 16)),
               style: TextButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: BorderSide(color: Colors.red.withOpacity(0.3))),
@@ -514,7 +514,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: ElevatedButton.icon(
               onPressed: () => _logout(context),
               icon: const Icon(Icons.logout_rounded, color: Colors.white),
-              label: Text(AppDictionary.tr(context, 'profile_logout_btn'), style: const TextStyle(color: Colors.white, fontSize: 16)),
+              label: Text(AppDictionary.tr(context, 'profile_logout_btn'), style: TextStyle(color: Colors.white, fontSize: 16)),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.redAccent,
                 padding: const EdgeInsets.symmetric(vertical: 16),
@@ -594,7 +594,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Navigator.pop(ctx);
               Provider.of<AuthProvider>(context, listen: false).logout();
             },
-            child: Text(AppDictionary.tr(context, 'yes'), style: const TextStyle(color: Colors.red)),
+            child: Text(AppDictionary.tr(context, 'yes'), style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -609,7 +609,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (image != null) {
       // Show loading
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text(AppDictionary.tr(context, 'msg_preparing_image'))),
+        SnackBar(content: Text(AppDictionary.tr(context, 'msg_preparing_image'))),
       );
 
       File originalFile = File(image.path);
@@ -624,12 +624,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
       }
 
       if (compressedFile == null) {
-         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(AppDictionary.tr(context, 'msg_image_process_error'))));
+         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppDictionary.tr(context, 'msg_image_process_error'))));
          return;
       }
 
       // Upload
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(AppDictionary.tr(context, 'msg_uploading_image'))));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppDictionary.tr(context, 'msg_uploading_image'))));
       
       final DataService dataService = DataService();
       final newUrl = await dataService.uploadAvatar(compressedFile);
@@ -643,7 +643,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
          );
       } else if (context.mounted) {
          ScaffoldMessenger.of(context).showSnackBar(
-           const SnackBar(content: Text(AppDictionary.tr(context, 'msg_image_upload_error'))),
+           SnackBar(content: Text(AppDictionary.tr(context, 'msg_image_upload_error'))),
          );
       }
       
@@ -720,7 +720,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           children: [
             ListTile(
               leading: const Icon(Icons.photo_library, color: AppTheme.primaryBlue),
-              title: const Text(AppDictionary.tr(context, 'btn_select_gallery')),
+              title: Text(AppDictionary.tr(context, 'btn_select_gallery')),
               onTap: () {
                 Navigator.pop(ctx);
                 _pickAndUploadImage(context);
@@ -754,7 +754,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(AppDictionary.tr(context, 'lbl_choose_status_icon'), style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Text(AppDictionary.tr(context, 'lbl_choose_status_icon'), style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 15),
             Wrap(
               spacing: 15,
@@ -777,7 +777,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     }
                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Belgi o'zgartirildi: $emoji")));
                   } else if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(AppDictionary.tr(context, 'msg_error_occurred'))));
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppDictionary.tr(context, 'msg_error_occurred'))));
                   }
                 },
                 child: Container(
@@ -811,7 +811,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       builder: (ctx) => StatefulBuilder(
         builder: (context, setState) {
           return AlertDialog(
-            title: const Text(AppDictionary.tr(context, 'btn_delete_account'), style: TextStyle(color: Colors.red)),
+            title: Text(AppDictionary.tr(context, 'btn_delete_account'), style: TextStyle(color: Colors.red)),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -848,7 +848,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(ctx),
-                child: const Text(AppDictionary.tr(context, 'btn_cancel')),
+                child: Text(AppDictionary.tr(context, 'btn_cancel')),
               ),
               ElevatedButton(
                 onPressed: isLoading ? null : () async {
@@ -876,7 +876,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Navigator.pop(ctx); // Close dialog
                       auth.logout(); // Logout locally
                       ScaffoldMessenger.of(context).showSnackBar(
-                         const SnackBar(content: Text(AppDictionary.tr(context, 'msg_account_deleted_success')), backgroundColor: Colors.red),
+                         SnackBar(content: Text(AppDictionary.tr(context, 'msg_account_deleted_success')), backgroundColor: Colors.red),
                       );
                     }
                   } else {

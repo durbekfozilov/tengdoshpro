@@ -3,6 +3,7 @@ import 'package:talabahamkor_mobile/core/services/data_service.dart';
 import 'package:talabahamkor_mobile/core/theme/app_theme.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'tutor_student_certificates_screen.dart';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class TutorCertificatesStudentsScreen extends StatefulWidget {
   final String groupNumber;

@@ -5,6 +5,7 @@ import '../services/community_service.dart';
 import '../../../../core/models/student.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../screens/user_profile_screen.dart';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class UserSearchDelegate extends SearchDelegate {
   final CommunityService _service = CommunityService();
@@ -115,13 +116,13 @@ class UserSearchDelegate extends SearchDelegate {
           return const Center(child: CircularProgressIndicator());
         }
         if (snapshot.hasError) {
-           return const Center(child: Text(AppDictionary.tr(context, 'msg_error_occurred')));
+           return Center(child: Text(AppDictionary.tr(context, 'msg_error_occurred')));
         }
         
         final students = snapshot.data ?? [];
         
         if (students.isEmpty) {
-           return const Center(child: Text(AppDictionary.tr(context, 'msg_no_one_found')));
+           return Center(child: Text(AppDictionary.tr(context, 'msg_no_one_found')));
         }
 
         return ListView.separated(

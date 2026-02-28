@@ -4,6 +4,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../../core/providers/auth_provider.dart';
 import '../models/community_models.dart';
 import '../services/community_service.dart';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class CreatePostScreen extends StatefulWidget {
   final String? initialScope;
@@ -79,7 +80,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
     final content = _contentController.text.trim();
 
     if (content.isEmpty) {
-       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text(AppDictionary.tr(context, 'msg_please_write_text'))));
+       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppDictionary.tr(context, 'msg_please_write_text'))));
        return;
     }
 
@@ -138,7 +139,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
         actions: [
           TextButton(
             onPressed: _publish, 
-            child: const Text(AppDictionary.tr(context, 'btn_publish'), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16))
+            child: Text(AppDictionary.tr(context, 'btn_publish'), style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16))
           )
         ],
       ),
@@ -241,7 +242,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
               TextButton.icon(
                 onPressed: _addPollOption,
                 icon: const Icon(Icons.add),
-                label: const Text(AppDictionary.tr(context, 'btn_add_variant')),
+                label: Text(AppDictionary.tr(context, 'btn_add_variant')),
               )
             ]
           ],
@@ -261,7 +262,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
           DropdownButton<int?>(
             value: _selectedTargetFacultyId,
             isExpanded: true,
-             hint: const Text(AppDictionary.tr(context, 'hint_select_faculty_opt')),
+             hint: Text(AppDictionary.tr(context, 'hint_select_faculty_opt')),
             items: [
               const DropdownMenuItem<int?>(value: null, child: Text("📌 O'z fakultetim")),
               ..._faculties.map((f) => DropdownMenuItem<int?>(

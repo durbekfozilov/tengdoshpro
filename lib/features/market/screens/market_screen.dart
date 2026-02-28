@@ -7,6 +7,7 @@ import 'market_item_detail_screen.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/providers/auth_provider.dart';
 import '../../profile/screens/subscription_screen.dart';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class MarketScreen extends StatefulWidget {
   const MarketScreen({super.key});
@@ -79,7 +80,7 @@ class _MarketScreenState extends State<MarketScreen> {
           if (_isLoading)
             const SliverFillRemaining(child: Center(child: CircularProgressIndicator()))
           else if (_featuredItems.isEmpty && _newItems.isEmpty)
-            const SliverFillRemaining(child: Center(child: Text(AppDictionary.tr(context, 'msg_no_ads_yet'))))
+            SliverFillRemaining(child: Center(child: Text(AppDictionary.tr(context, 'msg_no_ads_yet'))))
           else ...[
             _buildHeroSection(),
             if (_featuredItems.isNotEmpty) ...[

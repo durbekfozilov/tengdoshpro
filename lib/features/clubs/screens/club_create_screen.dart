@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/services/data_service.dart';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class ClubCreateScreen extends StatefulWidget {
   const ClubCreateScreen({super.key});
@@ -42,7 +43,7 @@ class _ClubCreateScreenState extends State<ClubCreateScreen> {
 
     if (result['success'] == true) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text(AppDictionary.tr(context, 'msg_club_created_success'), style: TextStyle(color: Colors.white)), backgroundColor: AppTheme.accentGreen),
+        SnackBar(content: Text(AppDictionary.tr(context, 'msg_club_created_success'), style: TextStyle(color: Colors.white)), backgroundColor: AppTheme.accentGreen),
       );
       Navigator.pop(context, true);
     } else {
