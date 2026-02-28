@@ -211,7 +211,7 @@ class _AddGroupActivitySheetState extends State<AddGroupActivitySheet> {
   }
 
   void _nextPage() {
-    if (_currentPage == 0 && !_formKey.currentState!.validate()) return;
+    if (_currentPage == 1 && !_formKey.currentState!.validate()) return;
     
     _pageController.nextPage(
       duration: const Duration(milliseconds: 300), 
@@ -223,10 +223,10 @@ class _AddGroupActivitySheetState extends State<AddGroupActivitySheet> {
   }
 
   void _prevPage() {
-    if (_currentPage == 2) {
+    if (_currentPage == 3) {
       // Going back from specific group students to groups list
       setState(() {
-        _currentPage = 1;
+        _currentPage = 2;
         _activeGroup = null;
       });
       _pageController.previousPage(
@@ -244,6 +244,38 @@ class _AddGroupActivitySheetState extends State<AddGroupActivitySheet> {
     }
   }
 
+  Widget _buildStepZeroCategorySelection() {
+    return ListView.builder(
+      padding: const EdgeInsets.all(20),
+      itemCount: _categories.length,
+      itemBuilder: (context, index) {
+        final category = _categories[index];
+        final isSelected = _selectedCategory == category;
+        return Card(
+          elevation: 0,
+          margin: const EdgeInsets.only(bottom: 8),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+            side: BorderSide(
+              color: isSelected ? AppTheme.primaryBlue : Colors.grey.withOpacity(0.2),
+              width: isSelected ? 2 : 1,
+            ),
+          ),
+          child: ListTile(
+            title: Text(category, style: TextStyle(fontWeight: isSelected ? FontWeight.bold : FontWeight.normal)),
+            trailing: isSelected ? const Icon(Icons.check_circle, color: AppTheme.primaryBlue) : null,
+            onTap: () {
+              setState(() {
+                _selectedCategory = category;
+              });
+              _nextPage();
+            },
+          ),
+        );
+      },
+    );
+  }
+
   Widget _buildStepOneDetails() {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
@@ -252,28 +284,6 @@ class _AddGroupActivitySheetState extends State<AddGroupActivitySheet> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text("Faollik Kategoriyasi", style: TextStyle(fontWeight: FontWeight.w500)),
-            const SizedBox(height: 8),
-            Container(
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey[300]!),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton<String>(
-                  isExpanded: true,
-                  value: _categories.contains(_selectedCategory) ? _selectedCategory : null,
-                  hint: const Text("Kategoriyani tanlang"),
-                  items: _categories.map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
-                  onChanged: (v) {
-                    if (v != null) setState(() => _selectedCategory = v);
-                  },
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            
             TextFormField(
               controller: _titleController,
               decoration: InputDecoration(
@@ -412,7 +422,7 @@ class _AddGroupActivitySheetState extends State<AddGroupActivitySheet> {
             onTap: () {
               setState(() {
                 _activeGroup = gName;
-                _currentPage = 2; // Jump to specific group
+                _currentPage = 3; // Jump to specific group
               });
               _pageController.nextPage(duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
             },
@@ -543,8 +553,10 @@ class _AddGroupActivitySheetState extends State<AddGroupActivitySheet> {
                 Expanded(
                   child: Text(
                     _currentPage == 0 
+                      ? "Kategoriyani Tanlang" :
+                    (_currentPage == 1 
                       ? "Yangi Faollik Qo'shish" 
-                      : (_currentPage == 1 ? "Guruhlarni Tanlash" : "Talabalarni Tanlash"),
+                      : (_currentPage == 2 ? "Guruhlarni Tanlash" : "Talabalarni Tanlash")),
                     textAlign: TextAlign.center,
                     style: const TextStyle(
                       fontSize: 18,
@@ -567,6 +579,7 @@ class _AddGroupActivitySheetState extends State<AddGroupActivitySheet> {
               controller: _pageController,
               physics: const NeverScrollableScrollPhysics(), // Disable swipe to force button navigation
               children: [
+                _buildStepZeroCategorySelection(),
                 _buildStepOneDetails(),
                 _buildStepTwoGroupsList(),
                 _buildStepThreeGroupStudents(),
@@ -580,7 +593,7 @@ class _AddGroupActivitySheetState extends State<AddGroupActivitySheet> {
               padding: const EdgeInsets.all(16),
               child: SizedBox(
                 width: double.infinity,
-                child: _currentPage == 0
+                child: _currentPage < 2
                     ? ElevatedButton(
                         onPressed: _nextPage,
                         style: ElevatedButton.styleFrom(
