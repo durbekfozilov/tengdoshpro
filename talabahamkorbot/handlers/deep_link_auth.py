@@ -129,6 +129,28 @@ async def cmd_start_deep_link(message: Message, command: CommandObject, session:
         )
         return
 
+    # Handle Tutor Bulk Upload Link
+    if token.startswith("upload_tutor_"):
+        session_id = token[13:]
+        result = await session.execute(select(TgAccount).where(TgAccount.telegram_id == user_id).options(selectinload(TgAccount.staff)))
+        tg_account = result.scalar_one_or_none()
+        if not tg_account or not tg_account.staff:
+            await message.answer("❌ Botdan foydalanish uchun avval <b>Tengdosh</b> mobil ilovasiga Tyutor sifatida kiring va 'Telegramga ulanish' tugmasini bosing.", parse_mode="HTML")
+            return
+            
+        from models.states import TutorDocumentAddStates
+        await state.set_state(TutorDocumentAddStates.WAIT_FOR_APP_FILE)
+        await state.update_data(app_upload_session=session_id)
+        
+        await message.answer(
+            "📁 <b>Tutor Faollik Rasmlarini Yuklash</b>\n\n"
+            "Iltimos, jamoaviy faollik rasmlarini shu yerga yuboring.\n"
+            "<i>(Maksimal 5 ta gacha rasm yuborishingiz mumkin)</i>",
+            parse_mode="HTML"
+        )
+        return
+
+
     # Handle Club Event Upload Link
     if token.startswith("clubevent_"):
         event_id = token[10:]

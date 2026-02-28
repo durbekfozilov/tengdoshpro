@@ -119,6 +119,10 @@ class DocumentAddStates(StatesGroup):
     FILE = State()
     WAIT_FOR_APP_FILE = State() # [NEW] Specifically for App-initiated flow
 
+class TutorDocumentAddStates(StatesGroup):
+    WAIT_FOR_APP_FILE = State() # [NEW] Specifically for Tutor App bulk activity
+
+
 class CertificateAddStates(StatesGroup):
     TITLE = State()
     FILE = State()

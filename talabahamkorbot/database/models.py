@@ -1093,6 +1093,25 @@ class PendingUpload(Base):
 
 
 # ============================================================
+# TUTOR PENDING UPLOAD (BULK ACTIVITIES)
+# ============================================================
+
+class TutorPendingUpload(Base):
+    __tablename__ = "tutor_pending_uploads"
+
+    session_id: Mapped[str] = mapped_column(String(64), primary_key=True) # UUID from App
+    tutor_id: Mapped[int] = mapped_column(Integer, ForeignKey("staff.id", ondelete="CASCADE"), nullable=False, index=True)
+    category: Mapped[str | None] = mapped_column(String(64), nullable=True) 
+    file_ids: Mapped[str] = mapped_column(Text, default="") # Comma-separated list of file_ids
+    
+    file_unique_id: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    file_size: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
+    mime_type: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    
+    created_at: Mapped[datetime] = mapped_column(DateTime(), default=datetime.utcnow)
+
+    tutor: Mapped["Staff"] = relationship("Staff")
+# ============================================================
 # AI CHAT HISTORY (PERSISTENT)
 # ============================================================
 class AiMessage(Base):

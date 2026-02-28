@@ -46,6 +46,12 @@ class ApiConstants {
  
   // Extended Features (Backend)
   static const String activities = '$backendUrl/student/activities'; 
+  
+  // Tutor Features (Backend)
+  static const String tutorActivitiesUploadInit = '$backendUrl/tutor/activities/upload/init';
+  static const String tutorActivitiesUploadStatus = '$backendUrl/tutor/activities/upload/status';
+  static const String tutorActivitiesBulk = '$backendUrl/tutor/activities/bulk';
+
   static const String clubsMy = '$backendUrl/student/clubs/my';
   static const String feedback = '$backendUrl/student/feedback';
   static const String documents = '$backendUrl/student/documents';

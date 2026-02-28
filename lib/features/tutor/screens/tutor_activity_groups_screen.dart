@@ -6,6 +6,7 @@ import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:talabahamkor_mobile/core/constants/api_constants.dart';
 import 'package:talabahamkor_mobile/features/home/screens/management/student_detail_view.dart';
+import 'package:talabahamkor_mobile/features/tutor/widgets/add_group_activity_sheet.dart';
 
 class TutorActivityGroupsScreen extends StatefulWidget {
   const TutorActivityGroupsScreen({super.key});
@@ -135,6 +136,23 @@ class _TutorActivityGroupsScreenState extends State<TutorActivityGroupsScreen> w
                 _buildGroupsTab(),
               ],
             ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          showModalBottomSheet(
+            context: context,
+            isScrollControlled: true,
+            backgroundColor: Colors.transparent,
+            builder: (context) => AddGroupActivitySheet(
+              onSaved: () {
+                _loadData();
+              },
+            ),
+          );
+        },
+        backgroundColor: AppTheme.primaryBlue,
+        icon: const Icon(Icons.add, color: Colors.white),
+        label: const Text("Faollik Qo'shish", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+      ),
     );
   }
 

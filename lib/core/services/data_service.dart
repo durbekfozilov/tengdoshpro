@@ -526,6 +526,78 @@ class DataService {
     return {"status": "pending"};
   }
 
+  // --- TUTOR BULK ACTIVITY ENDPOINTS ---
+  Future<Map<String, dynamic>> tutorInitUploadSession(String sessionId, String category) async {
+    final token = await _authService.getToken();
+    final response = await http.post(
+      Uri.parse(ApiConstants.tutorActivitiesUploadInit),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: {
+        'session_id': sessionId,
+        'category': category
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw Exception('Failed to init tutor upload session: ${response.body}');
+    }
+  }
+
+  Future<Map<String, dynamic>> tutorCheckUploadStatus(String sessionId) async {
+    final token = await _authService.getToken();
+    final response = await http.get(
+      Uri.parse('${ApiConstants.tutorActivitiesUploadStatus}/$sessionId'),
+      headers: {'Authorization': 'Bearer $token'},
+    );
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    }
+    return {"status": "pending"};
+  }
+
+  Future<Map<String, dynamic>> createTutorBulkActivities({
+    required String category,
+    required String name,
+    required String description,
+    required String date,
+    required List<int> studentIds,
+    String? sessionId,
+  }) async {
+    final token = await _authService.getToken();
+    
+    final payload = {
+      "category": category,
+      "name": name,
+      "description": description,
+      "date": date,
+      "student_ids": studentIds,
+      if (sessionId != null) "session_id": sessionId,
+    };
+
+    final response = await http.post(
+      Uri.parse(ApiConstants.tutorActivitiesBulk),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: json.encode(payload),
+    );
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw Exception('Failed to create tutor bulk activities: ${response.body}');
+    }
+  }
+  // --- END TUTOR BULK ACTIVITY ENDPOINTS ---
+
+
   // NEW: Unlink Telegram Account
   Future<Map<String, dynamic>> unlinkTelegram() async {
     final response = await authPost('${ApiConstants.backendUrl}/student/unlink-telegram');

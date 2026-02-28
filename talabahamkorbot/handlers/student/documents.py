@@ -2,8 +2,8 @@ from aiogram import Router, F, types
 from aiogram.filters import StateFilter
 from sqlalchemy import select
 from database.db_connect import get_session
-from database.models import PendingUpload, Student, TgAccount
-from models.states import DocumentAddStates, CertificateAddStates, FeedbackStates, ActivityUploadState
+from database.models import PendingUpload, Student, TgAccount, TutorPendingUpload
+from models.states import DocumentAddStates, CertificateAddStates, FeedbackStates, ActivityUploadState, TutorDocumentAddStates
 from bot import bot
 
 router = Router()
@@ -157,3 +157,84 @@ async def handle_activity_photo(message: types.Message, state):
     except Exception as e:
         print(f"Error in handle_activity_photo: {e}")
         await message.answer("❌ Xatolik yuz berdi.")
+
+@router.message(StateFilter(TutorDocumentAddStates.WAIT_FOR_APP_FILE), F.document | F.photo)
+async def handle_tutor_app_file_upload(message: types.Message, state):
+    """
+    Handles file upload when a Tutor is in WAIT_FOR_APP_FILE state.
+    """
+    try:
+        user_id = message.from_user.id
+        
+        file_id = ""
+        file_unique_id = ""
+        file_size = 0
+        mime_type = ""
+        
+        if message.document:
+            file_id = message.document.file_id
+            file_unique_id = message.document.file_unique_id
+            file_size = message.document.file_size
+            mime_type = message.document.mime_type or "application/octet-stream"
+        elif message.photo:
+            photo = message.photo[-1]
+            file_id = photo.file_id
+            file_unique_id = photo.file_unique_id
+            file_size = photo.file_size
+            mime_type = "image/jpeg"
+            
+        if not file_id:
+             await message.answer("❌ Fayl aniqlanmadi. Iltimos qaytadan urining.")
+             return
+
+        async for db in get_session():
+             stmt = select(TgAccount).where(TgAccount.telegram_id == user_id)
+             result = await db.execute(stmt)
+             tg_account = result.scalars().first()
+             
+             if not tg_account or not tg_account.staff_id:
+                 await message.answer("❌ Sizning Telegram hisobingiz tyutor profiliga ulanmagan.")
+                 return
+                 
+             stmt = select(TutorPendingUpload).where(
+                 TutorPendingUpload.tutor_id == tg_account.staff_id
+             ).order_by(TutorPendingUpload.created_at.desc())
+             
+             result = await db.execute(stmt)
+             pending = result.scalars().first()
+             
+             if not pending:
+                 await message.answer("⚠️ Faollik yuklash sessiyasi topilmadi yoki muddati tugagan. Ilovadan qayta urinib ko'ring.")
+                 await state.clear()
+                 return
+                 
+             # Check if we already have 5 photos
+             current_files = []
+             if pending.file_ids:
+                 current_files = pending.file_ids.split(",")
+                 
+             if len(current_files) >= 5:
+                 await message.answer("⚠️ Maksimal 5 ta rasm yuklash mumkin. Ilovaga qaytib 'Saqlash' tugmasini bosing.")
+                 return
+                 
+             current_files.append(file_id)
+             pending.file_ids = ",".join(current_files)
+             
+             pending.file_unique_id = file_unique_id
+             pending.file_size = file_size
+             pending.mime_type = mime_type
+             
+             await db.commit()
+             
+             # Notify
+             count = len(current_files)
+             if count >= 5:
+                 await message.answer(f"✅ {count}-rasm qabul qilindi. Limit tugadi.\n\nEndi ilovaga qaytib <b>'Saqlash'</b> tugmasini bosing.", parse_mode="HTML")
+                 await state.clear()
+             else:
+                 await message.answer(f"✅ {count}-rasm qabul qilindi.\n\nYana {5-count} ta yuklashingiz mumkin.", parse_mode="HTML")
+
+    except Exception as e:
+        print(f"Error in handle_tutor_app_file_upload: {e}")
+        await message.answer("❌ Tizimda xatolik yuz berdi. Iltimos keyinroq urinib ko'ring.")
+        await state.clear()

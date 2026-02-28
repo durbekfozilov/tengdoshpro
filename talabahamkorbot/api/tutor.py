@@ -1112,3 +1112,116 @@ async def send_student_cert_to_tutor(
     except Exception as e:
         logger.error(f"Error sending cert to tutor: {e}")
         return {"success": False, "message": f"Botda xatolik yuz berdi: {str(e)}"}
+
+from fastapi import Form
+from database.models import TutorPendingUpload, TgAccount, UserActivityImage
+from pydantic import BaseModel
+
+@router.post("/activities/upload/init")
+async def init_tutor_upload_session(
+    session_id: str = Form(...),
+    category: str = Form("Faollik"),
+    tutor: Staff = Depends(get_current_staff),
+    db: AsyncSession = Depends(get_session)
+):
+    existing = await db.get(TutorPendingUpload, session_id)
+    if existing:
+        await db.delete(existing)
+        
+    new_pending = TutorPendingUpload(
+        session_id=session_id,
+        tutor_id=tutor.id,
+        category=category,
+        file_ids=""
+    )
+    db.add(new_pending)
+    await db.commit()
+    
+    from config import BOT_USERNAME
+    auth_link = f"https://t.me/{BOT_USERNAME}?start=upload_tutor_{session_id}"
+    
+    tg_acc = await db.scalar(select(TgAccount).where(TgAccount.staff_id == tutor.id))
+    
+    if not tg_acc:
+        return {"success": False, "requires_auth": True, "auth_link": auth_link, "session_id": session_id}
+        
+    try:
+        from bot import bot
+        from keyboards.inline_kb import get_upload_button
+        await bot.send_message(
+            tg_acc.telegram_id,
+            f"📁 <b>Tutor Faollik Rasmlarini Yuklash</b>\n\nIltimos jamoaviy faollik rasmlarini shu yerga yuboring (Maksimal 5 ta).",
+            parse_mode="HTML"
+        )
+    except Exception as e:
+        return {"success": False, "requires_auth": True, "auth_link": auth_link, "session_id": session_id}
+        
+    return {"success": True, "requires_auth": False, "bot_link": f"https://t.me/{BOT_USERNAME}", "session_id": session_id}
+
+
+@router.get("/activities/upload/status/{session_id}")
+async def check_tutor_upload_status(
+    session_id: str,
+    tutor: Staff = Depends(get_current_staff),
+    db: AsyncSession = Depends(get_session)
+):
+    pending = await db.get(TutorPendingUpload, session_id)
+    if not pending or pending.tutor_id != tutor.id:
+        return {"status": "waiting", "count": 0}
+        
+    if not pending.file_ids:
+        return {"status": "waiting", "count": 0}
+        
+    count = len(pending.file_ids.split(","))
+    return {"status": "uploaded", "count": count}
+
+
+class BulkActivityRequest(BaseModel):
+    category: str
+    name: str
+    description: str
+    date: str
+    session_id: Optional[str] = None
+    student_ids: List[int]
+
+@router.post("/activities/bulk")
+async def create_bulk_activities(
+    req: BulkActivityRequest,
+    tutor: Staff = Depends(get_current_staff),
+    db: AsyncSession = Depends(get_session)
+):
+    saved_images = []
+    if req.session_id:
+        pending = await db.get(TutorPendingUpload, req.session_id)
+        if pending and pending.tutor_id == tutor.id and pending.file_ids:
+            saved_images = [fid for fid in pending.file_ids.split(",") if fid]
+
+    created_count = 0
+    for sid in set(req.student_ids):
+        new_act = UserActivity(
+            student_id=sid,
+            category=req.category,
+            name=req.name,
+            description=req.description,
+            date=req.date,
+            status="approved" # Automatically approved because tutor created it
+        )
+        db.add(new_act)
+        await db.flush() # flush to get id
+        
+        for fid in saved_images:
+            db.add(UserActivityImage(
+                activity_id=new_act.id,
+                file_id=fid,
+                file_type="photo"
+            ))
+        created_count += 1
+        
+    if req.session_id:
+        pending = await db.get(TutorPendingUpload, req.session_id)
+        if pending:
+            await db.delete(pending)
+            
+    await db.commit()
+    return {"success": True, "created_count": created_count}
+
