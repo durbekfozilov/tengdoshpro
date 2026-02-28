@@ -198,21 +198,62 @@ class _GroupActivitiesScreenState extends State<GroupActivitiesScreen> with Sing
                       separatorBuilder: (_, __) => const SizedBox(width: 8),
                       itemBuilder: (context, idx) {
                         final imgFileId = item['images'][idx]['file_id'];
-                        return ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: CachedNetworkImage(
-                            imageUrl: "${ApiConstants.backendUrl}/api/v1/files/$imgFileId",
-                            width: 120,
-                            fit: BoxFit.cover,
-                            placeholder: (context, url) => Container(
-                              width: 120, 
-                              color: Colors.grey[200], 
-                              child: const Icon(Icons.image, color: Colors.grey)
-                            ),
-                            errorWidget: (context, url, err) => Container(
-                              width: 120, 
-                              color: Colors.grey[200], 
-                              child: const Icon(Icons.broken_image, color: Colors.grey)
+                        final imageUrl = "${ApiConstants.backendUrl}/api/v1/files/$imgFileId";
+                        return GestureDetector(
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (context) => Dialog(
+                                backgroundColor: Colors.black.withOpacity(0.9),
+                                insetPadding: EdgeInsets.zero,
+                                child: Stack(
+                                  alignment: Alignment.center,
+                                  children: [
+                                    InteractiveViewer(
+                                      minScale: 0.5,
+                                      maxScale: 4.0,
+                                      child: ConstrainedBox(
+                                        constraints: BoxConstraints(
+                                          maxWidth: MediaQuery.of(context).size.width,
+                                          maxHeight: MediaQuery.of(context).size.height,
+                                        ),
+                                        child: CachedNetworkImage(
+                                          imageUrl: imageUrl,
+                                          fit: BoxFit.contain,
+                                          placeholder: (context, url) => const Center(child: CircularProgressIndicator(color: Colors.white)),
+                                          errorWidget: (context, url, err) => const Icon(Icons.broken_image, color: Colors.white, size: 50),
+                                        ),
+                                      ),
+                                    ),
+                                    Positioned(
+                                      top: 40,
+                                      right: 20,
+                                      child: IconButton(
+                                        icon: const Icon(Icons.close, color: Colors.white, size: 32),
+                                        onPressed: () => Navigator.pop(context),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: CachedNetworkImage(
+                              imageUrl: imageUrl,
+                              width: 120,
+                              fit: BoxFit.cover,
+                              placeholder: (context, url) => Container(
+                                width: 120, 
+                                color: Colors.grey[200], 
+                                child: const Icon(Icons.image, color: Colors.grey)
+                              ),
+                              errorWidget: (context, url, err) => Container(
+                                width: 120, 
+                                color: Colors.grey[200], 
+                                child: const Icon(Icons.broken_image, color: Colors.grey)
+                              ),
                             ),
                           ),
                         );
