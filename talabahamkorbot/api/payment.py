@@ -17,9 +17,6 @@ def get_payme_url(amount: int = 10000, current_student: Student = Depends(get_cu
     """
     Get Payme Checkout URL for Premium Subscription
     """
-    # [COMPLIANCE] Hide for Apple Reviewer
-    if current_student.hemis_login == "395251101411":
-        raise HTTPException(status_code=403, detail="Service not available")
 
     import time
     # Unique order ID
@@ -107,10 +104,6 @@ from services.payment_service import ClickHandler
 
 @router.get("/click-url")
 def get_click_url(amount: int = 10000, current_student: Student = Depends(get_current_student)):
-    # [COMPLIANCE] Hide for Apple Reviewer
-    if current_student.hemis_login == "395251101411":
-        raise HTTPException(status_code=403, detail="Service not available")
-
     import time
     order_id = f"click_{current_student.id}_{int(time.time())}"
     
@@ -164,10 +157,6 @@ from config import UZUM_SECRET_KEY, UZUM_SERVICE_ID
 
 @router.get("/uzum-url")
 def get_uzum_url(amount: int = 10000, current_student: Student = Depends(get_current_student)):
-    # [COMPLIANCE] Hide for Apple Reviewer
-    if current_student.hemis_login == "395251101411":
-        raise HTTPException(status_code=403, detail="Service not available")
-
     import time
     order_id = f"prem_{current_student.id}_{int(time.time())}"
     # Temporarily redirect to Coming Soon page
