@@ -589,7 +589,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               _isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : _reposts.isEmpty
-                      ? const Center(
+                      ? Center(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [

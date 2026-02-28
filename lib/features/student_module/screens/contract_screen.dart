@@ -109,7 +109,7 @@ class _ContractScreenState extends State<ContractScreen> {
   }
 
   Widget _buildEmptyView() {
-    return const Center(
+    return Center(
       child: Padding(
         padding: EdgeInsets.all(24.0),
         child: Column(

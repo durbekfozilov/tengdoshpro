@@ -57,7 +57,7 @@ class UserSearchDelegate extends SearchDelegate {
               if (history.isEmpty) {
                 return Container(
                   color: Colors.white,
-                  child: const Center(
+                  child: Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
