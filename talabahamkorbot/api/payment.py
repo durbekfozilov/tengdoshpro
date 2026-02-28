@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from services.payment_service import PaymentService, PaymeHandler, PaymeException
 from services.hemis_service import HemisService 
-from api.dependencies import get_current_student, get_db, get_current_token
+from api.dependencies import get_current_student, get_db, get_current_token, get_student_or_staff
 from database.db_connect import AsyncSessionLocal
 from database.models import Student
 from config import PAYME_KEY
@@ -13,7 +13,7 @@ router = APIRouter(tags=["Payment"])
 security = HTTPBasic()
 
 @router.get("/payme-url")
-def get_payme_url(amount: int = 10000, current_student: Student = Depends(get_current_student)):
+def get_payme_url(amount: int = 10000, current_student = Depends(get_student_or_staff)):
     """
     Get Payme Checkout URL for Premium Subscription
     """
@@ -103,7 +103,7 @@ from fastapi import Form
 from services.payment_service import ClickHandler
 
 @router.get("/click-url")
-def get_click_url(amount: int = 10000, current_student: Student = Depends(get_current_student)):
+def get_click_url(amount: int = 10000, current_student = Depends(get_student_or_staff)):
     import time
     order_id = f"click_{current_student.id}_{int(time.time())}"
     
@@ -156,7 +156,7 @@ from services.payment_service import UzumHandler
 from config import UZUM_SECRET_KEY, UZUM_SERVICE_ID
 
 @router.get("/uzum-url")
-def get_uzum_url(amount: int = 10000, current_student: Student = Depends(get_current_student)):
+def get_uzum_url(amount: int = 10000, current_student = Depends(get_student_or_staff)):
     import time
     order_id = f"prem_{current_student.id}_{int(time.time())}"
     # Temporarily redirect to Coming Soon page

@@ -3,6 +3,7 @@ import 'package:talabahamkor_mobile/core/services/data_service.dart';
 import 'package:talabahamkor_mobile/core/theme/app_theme.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
+import 'package:talabahamkor_mobile/core/constants/api_constants.dart';
 
 class GroupActivitiesScreen extends StatefulWidget {
   final String groupNumber;
@@ -186,6 +187,39 @@ class _GroupActivitiesScreenState extends State<GroupActivitiesScreen> with Sing
                 const SizedBox(height: 8),
                 if (item['description'] != null)
                   Text(item['description'], style: const TextStyle(color: Colors.black87)),
+                  
+                if (item['images'] != null && (item['images'] as List).isNotEmpty) ...[
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    height: 120,
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: item['images'].length,
+                      separatorBuilder: (_, __) => const SizedBox(width: 8),
+                      itemBuilder: (context, idx) {
+                        final imgFileId = item['images'][idx]['file_id'];
+                        return ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: CachedNetworkImage(
+                            imageUrl: "${ApiConstants.backendUrl}/api/v1/files/$imgFileId",
+                            width: 120,
+                            fit: BoxFit.cover,
+                            placeholder: (context, url) => Container(
+                              width: 120, 
+                              color: Colors.grey[200], 
+                              child: const Icon(Icons.image, color: Colors.grey)
+                            ),
+                            errorWidget: (context, url, err) => Container(
+                              width: 120, 
+                              color: Colors.grey[200], 
+                              child: const Icon(Icons.broken_image, color: Colors.grey)
+                            ),
+                          ),
+                        );
+                      }
+                    ),
+                  ),
+                ],
                   
                 // Actions
                 if (isPending) ...[

@@ -726,9 +726,13 @@ async def get_tutor_recent_activities(
     pending = stats_row.pending_count if stats_row else 0
     today = stats_row.today_count if stats_row else 0
 
+    from sqlalchemy.orm import selectinload
     stmt = (
         select(UserActivity)
-        .options(joinedload(UserActivity.student))
+        .options(
+            joinedload(UserActivity.student),
+            selectinload(UserActivity.images)
+        )
         .join(Student)
         .where(or_(*conditions))
         .order_by(
@@ -757,7 +761,8 @@ async def get_tutor_recent_activities(
                 "image": act.student.image_url,
                 "hemis_id": act.student.hemis_id,
                 "group_number": act.student.group_number
-            }
+            },
+            "images": [{"file_id": img.file_id, "file_type": img.file_type} for img in act.images]
         })
 
     return {
@@ -812,8 +817,12 @@ async def get_group_activities(
         pass
         
     # Re-query with eager load to be efficient
-    stmt = select(UserActivity).options(joinedload(UserActivity.student)).join(Student).where(
-        Student.group_number == group_number
+    from sqlalchemy.orm import selectinload
+    stmt = select(UserActivity).options(
+        joinedload(UserActivity.student),
+        selectinload(UserActivity.images)
+    ).join(Student).where(
+        Student.group_number.ilike(f"{group_number.strip()}%")
     ).order_by(
         case(
             (UserActivity.status == 'pending', 0),
@@ -836,8 +845,8 @@ async def get_group_activities(
                 "full_name": act.student.full_name,
                 "image": act.student.image_url,
                 "hemis_id": act.student.hemis_id
-            }
-            # Add images if related
+            },
+            "images": [{"file_id": img.file_id, "file_type": img.file_type} for img in act.images]
         })
 
     return {"success": True, "data": data}
