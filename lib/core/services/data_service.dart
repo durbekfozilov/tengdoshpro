@@ -1673,6 +1673,23 @@ class DataService {
     return [];
   }
 
+  // 34.5 Get Tutor Recent Activities (and general stat)
+  Future<Map<String, dynamic>?> getTutorRecentActivities() async {
+    try {
+      final response = await _get("${ApiConstants.backendUrl}/tutor/activities/recent");
+      if (response.statusCode == 200) {
+        final body = json.decode(response.body);
+        if (body['success'] == true) {
+          return body;
+        }
+      }
+    } catch (e) {
+      debugPrint("DataService: Error fetching recent activities: $e");
+      return null;
+    }
+    return null;
+  }
+
   // 35. Get Group Activities
   Future<List<dynamic>?> getGroupActivities(String groupNumber) async {
     try {

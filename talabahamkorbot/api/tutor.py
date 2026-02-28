@@ -689,6 +689,78 @@ async def get_tutor_activity_stats(
         
     return {"success": True, "data": stats}
 
+@router.get("/activities/recent")
+async def get_tutor_recent_activities(
+    db: AsyncSession = Depends(get_session),
+    tutor: Staff = Depends(get_current_staff)
+):
+    """
+    Get recent activities across all groups for a tutor, and total stats.
+    """
+    groups_result = await db.execute(select(TutorGroup).where(TutorGroup.tutor_id == tutor.id))
+    tutor_groups = groups_result.scalars().all()
+    group_numbers = [g.group_number for g in tutor_groups]
+    
+    if not group_numbers:
+        return {"success": True, "stats": {"pending": 0, "today": 0}, "data": []}
+
+    from datetime import datetime
+    today_start = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+    
+    stmt_stats = (
+        select(
+            func.count(case((UserActivity.status == 'pending', 1), else_=None)).label("pending_count"),
+            func.count(case((UserActivity.created_at >= today_start, 1), else_=None)).label("today_count")
+        )
+        .join(Student, UserActivity.student_id == Student.id)
+        .where(Student.group_number.in_(group_numbers))
+    )
+    res_stats = await db.execute(stmt_stats)
+    stats_row = res_stats.first()
+    pending = stats_row.pending_count if stats_row else 0
+    today = stats_row.today_count if stats_row else 0
+
+    stmt = (
+        select(UserActivity)
+        .options(joinedload(UserActivity.student))
+        .join(Student)
+        .where(Student.group_number.in_(group_numbers))
+        .order_by(
+            case(
+                (UserActivity.status == 'pending', 0),
+                else_=1
+            ),
+            UserActivity.created_at.desc()
+        )
+        .limit(50)
+    )
+    result = await db.execute(stmt)
+    activities = result.scalars().all()
+
+    data = []
+    for act in activities:
+        data.append({
+            "id": act.id,
+            "category": act.category,
+            "name": act.name,
+            "description": act.description,
+            "status": act.status,
+            "created_at": act.created_at.isoformat() if act.created_at else None,
+            "student": {
+                "full_name": act.student.full_name,
+                "image": act.student.image_url,
+                "hemis_id": act.student.hemis_id,
+                "group_number": act.student.group_number
+            }
+        })
+
+    return {
+        "success": True, 
+        "stats": {"pending": pending, "today": today},
+        "data": data
+    }
+
+
 
 @router.get("/activities/group/{group_number}")
 async def get_group_activities(
