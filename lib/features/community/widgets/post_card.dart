@@ -201,7 +201,7 @@ class _PostCardState extends State<PostCard> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text("O'chirish"),
+        title: Text("O'chirish"),
         content: Text(AppDictionary.tr(context, 'msg_confirm_delete_post')),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: Text(AppDictionary.tr(context, 'btn_no'))),
@@ -254,7 +254,7 @@ class _PostCardState extends State<PostCard> {
                   if (mounted) {
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
+                      SnackBar(
                         content: Text(AppDictionary.tr(context, 'msg_link_copied'), style: TextStyle(color: Colors.white)), 
                         backgroundColor: Colors.black87, 
                         behavior: SnackBarBehavior.floating,
@@ -270,7 +270,7 @@ class _PostCardState extends State<PostCard> {
                   decoration: BoxDecoration(color: Colors.grey[100], shape: BoxShape.circle),
                   child: const Icon(Icons.share, color: Colors.green),
                 ),
-                title: const Text("Boshqa ilovalar orqali...", style: TextStyle(fontWeight: FontWeight.w500)),
+                title: Text("Boshqa ilovalar orqali...", style: TextStyle(fontWeight: FontWeight.w500)),
                 subtitle: Text(AppDictionary.tr(context, 'hint_share_options')),
                 onTap: () {
                    Navigator.pop(context);

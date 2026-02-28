@@ -1017,7 +1017,7 @@ class _CreateAppealSheetState extends State<CreateAppealSheet> {
                     ),
                     child: SwitchListTile(
                         contentPadding: EdgeInsets.zero,
-                        title: const Text("Anonim yuborish", style: TextStyle(fontWeight: FontWeight.w600)),
+                        title: Text("Anonim yuborish", style: TextStyle(fontWeight: FontWeight.w600)),
                         subtitle: Text(AppDictionary.tr(context, 'msg_name_kept_secret'), style: TextStyle(fontSize: 12, color: Colors.grey)),
                         value: _isAnonymous,
                         onChanged: (v) => setState(() => _isAnonymous = v),
@@ -1039,7 +1039,7 @@ class _CreateAppealSheetState extends State<CreateAppealSheet> {
                         minLines: 5,
                         maxLines: 10,
                         textAlignVertical: TextAlignVertical.top,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                             hintText: AppDictionary.tr(context, 'hint_appeal_details'),
                             border: InputBorder.none,
                             hintStyle: TextStyle(color: Colors.grey)

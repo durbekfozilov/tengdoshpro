@@ -196,7 +196,7 @@ class _MyBooksScreenState extends State<MyBooksScreen> with SingleTickerProvider
         dividerColor: Colors.transparent,
         labelPadding: EdgeInsets.zero, // Reduce padding to fit 4 tabs
         labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13), // Slightly smaller font
-        tabs: const [
+        tabs: [
           Tab(text: "O'qish"),
           Tab(text: "Bron"),
           Tab(text: "Qo'lda"),

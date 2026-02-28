@@ -366,11 +366,8 @@ class _LoginScreenState extends State<LoginScreen> {
           minChildSize: 0.5,
           maxChildSize: 0.95,
           expand: false,
-          shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24.0)),
-        ),
-        builder: (context) {
-          return Container(
+          builder: (context, scrollController) {
+            return Container(
             padding: const EdgeInsets.all(24.0),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -448,6 +445,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 )
               ],
+            ),
             );
           },
         );

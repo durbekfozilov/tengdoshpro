@@ -310,7 +310,7 @@ class _AcademicScreenState extends State<AcademicScreen> {
                       TextField(
                         controller: phoneCtrl,
                         readOnly: true,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           labelText: AppDictionary.tr(context, 'lbl_phone_number'),
                           border: OutlineInputBorder(),
                           prefixIcon: Icon(Icons.phone),
@@ -322,7 +322,7 @@ class _AcademicScreenState extends State<AcademicScreen> {
                       TextField(
                         controller: emailCtrl,
                         readOnly: true,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           labelText: AppDictionary.tr(context, 'lbl_email'),
                           border: OutlineInputBorder(),
                           prefixIcon: Icon(Icons.email),
@@ -341,7 +341,7 @@ class _AcademicScreenState extends State<AcademicScreen> {
                       const SizedBox(height: 8),
                       TextField(
                         controller: passCtrl,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           labelText: AppDictionary.tr(context, 'hint_new_password'),
                           hintText: "O'zgartirish uchun kiriting",
                           border: OutlineInputBorder(),
@@ -351,7 +351,7 @@ class _AcademicScreenState extends State<AcademicScreen> {
                       const SizedBox(height: 12),
                       TextField(
                         controller: confirmPassCtrl,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           labelText: AppDictionary.tr(context, 'hint_confirm_password'),
                           hintText: AppDictionary.tr(context, 'hint_reenter_password'),
                           border: OutlineInputBorder(),

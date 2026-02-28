@@ -47,7 +47,7 @@ class _PasswordUpdateDialogState extends State<PasswordUpdateDialog> {
       authProvider.resetAuthUpdateRequired();
       if (mounted) {
          ScaffoldMessenger.of(context).showSnackBar(
-           const SnackBar(
+           SnackBar(
              content: Text(AppDictionary.tr(context, 'msg_pass_updated_tick')),
              backgroundColor: Colors.green,
            )

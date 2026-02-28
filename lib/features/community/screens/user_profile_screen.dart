@@ -562,7 +562,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
             children: [
               // 1. User Posts
               _isLoading 
-                 ? const Center(child: CircularProgressIndicator()) 
+                 ? Center(child: CircularProgressIndicator()) 
                  : _posts.isEmpty 
                     ? Center(child: Text(AppDictionary.tr(context, 'msg_no_posts'), style: TextStyle(color: Colors.grey)))
                     : ListView.builder(

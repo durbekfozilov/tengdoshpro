@@ -50,7 +50,7 @@ class _TutorActivityGroupsScreenState extends State<TutorActivityGroupsScreen> {
         title: Text(AppDictionary.tr(context, 'lbl_activity_stats')),
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? Center(child: CircularProgressIndicator())
           : _stats.isEmpty
               ? Center(child: Text(AppDictionary.tr(context, 'msg_no_assigned_groups')))
               : RefreshIndicator(

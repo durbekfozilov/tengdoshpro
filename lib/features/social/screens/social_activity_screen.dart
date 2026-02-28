@@ -1102,7 +1102,7 @@ class _SocialActivityScreenState extends State<SocialActivityScreen> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text("O'chirish"),
+        title: Text("O'chirish"),
         content: Text(AppDictionary.tr(context, 'msg_confirm_delete_activity')),
         actions: [
            TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text("Yo'q", style: TextStyle(color: Colors.grey))),

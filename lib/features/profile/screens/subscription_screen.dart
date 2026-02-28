@@ -530,7 +530,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
             children: [
               const Icon(Icons.card_giftcard, color: Colors.amber),
               const SizedBox(width: 10),
-              const Expanded(
+              Expanded(
                 child: Text(AppDictionary.tr(context, 'msg_one_week_trial'),
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.amber),
                 ),

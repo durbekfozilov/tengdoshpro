@@ -399,7 +399,7 @@ class _StudentSearchScreenState extends State<StudentSearchScreen> {
       );
     }
 
-    if (_isSearching) return const Center(child: CircularProgressIndicator());
+    if (_isSearching) return Center(child: CircularProgressIndicator());
     if (_searchResults.isEmpty) return Center(child: Text(AppDictionary.tr(context, 'msg_info_not_found')));
 
     return ListView.builder(

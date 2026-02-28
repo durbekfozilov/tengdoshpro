@@ -95,7 +95,7 @@ class _LibrarySearchScreenState extends State<LibrarySearchScreen> {
             controller: _searchController,
             autofocus: true,
             onChanged: _performSearch,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               hintText: AppDictionary.tr(context, 'hint_book_search'),
               prefixIcon: Icon(Icons.search, color: Colors.grey),
               border: InputBorder.none,

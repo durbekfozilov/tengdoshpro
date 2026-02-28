@@ -113,7 +113,7 @@ class _GradesScreenState extends State<GradesScreen> {
         child: _isLoading
             ? const Center(child: CircularProgressIndicator())
             : _grades.isEmpty
-                ? const Center(
+                ? Center(
                     child: SingleChildScrollView(
                       physics: AlwaysScrollableScrollPhysics(),
                       child: Text(AppDictionary.tr(context, 'msg_info_not_found')),

@@ -168,7 +168,7 @@ class _GroupDocumentsScreenState extends State<GroupDocumentsScreen> {
                     value: _selectedStatus,
                     label: AppDictionary.tr(context, 'lbl_status'),
                     icon: Icons.filter_list_rounded,
-                    items: const [
+                    items: [
                       DropdownMenuItem(value: "all", child: Text("Barchasi", style: TextStyle(fontSize: 12))),
                       DropdownMenuItem(value: "missing", child: Text(AppDictionary.tr(context, 'lbl_not_uploaded'), style: TextStyle(fontSize: 12))),
                       DropdownMenuItem(value: "uploaded", child: Text(AppDictionary.tr(context, 'lbl_uploaded'), style: TextStyle(fontSize: 12))),

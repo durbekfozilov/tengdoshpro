@@ -77,7 +77,7 @@ class DormitoryDashboardScreen extends StatelessWidget {
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
+                      children: [
                         Text(
                           "Arizalar",
                           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),

@@ -45,7 +45,7 @@ class _TutorGroupsListScreenState extends State<TutorGroupsListScreen> {
         title: Text(AppDictionary.tr(context, 'lbl_my_groups')),
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? Center(child: CircularProgressIndicator())
           : _groups.isEmpty
               ? Center(child: Text(AppDictionary.tr(context, 'msg_no_assigned_groups')))
               : ListView.builder(

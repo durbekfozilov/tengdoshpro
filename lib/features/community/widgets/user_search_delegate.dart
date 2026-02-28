@@ -113,7 +113,7 @@ class UserSearchDelegate extends SearchDelegate {
       future: _service.searchStudents(query),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return Center(child: CircularProgressIndicator());
         }
         if (snapshot.hasError) {
            return Center(child: Text(AppDictionary.tr(context, 'msg_error_occurred')));

@@ -197,7 +197,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     if (index == 1) {
                       ScaffoldMessenger.of(context).hideCurrentSnackBar();
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
+                        SnackBar(
                           content: Text(AppDictionary.tr(context, 'msg_market_soon')),
                           duration: Duration(seconds: 2),
                           behavior: SnackBarBehavior.floating,
@@ -216,7 +216,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   items: [
                     BottomNavigationBarItem(icon: const Icon(Icons.grid_view_rounded), label: AppDictionary.tr(context, 'home_tab_main')),
                     const BottomNavigationBarItem(icon: Icon(Icons.shopping_bag_rounded), label: "Bozor"),
-                    const BottomNavigationBarItem(icon: Icon(Icons.smart_toy_rounded), label: "AI"),
+                    BottomNavigationBarItem(icon: Icon(Icons.smart_toy_rounded), label: "AI"),
                     BottomNavigationBarItem(icon: Icon(Icons.forum_rounded), label: AppDictionary.tr(context, 'lbl_teahouse')),
                     BottomNavigationBarItem(icon: const Icon(Icons.person_rounded), label: AppDictionary.tr(context, 'home_tab_profile')),
                   ],
@@ -515,7 +515,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   onTap: () {
                     ScaffoldMessenger.of(context).hideCurrentSnackBar();
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
+                      SnackBar(
                         content: Text(AppDictionary.tr(context, 'msg_library_soon')),
                         duration: Duration(seconds: 2),
                         behavior: SnackBarBehavior.floating,
@@ -758,7 +758,7 @@ class _HomeScreenState extends State<HomeScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Row(
+        title: Row(
           children: [
             Icon(Icons.workspace_premium, color: Colors.amber),
             SizedBox(width: 10),

@@ -109,7 +109,7 @@ class _ManagementAppealsScreenState extends State<ManagementAppealsScreen> with 
           labelColor: AppTheme.primaryBlue,
           unselectedLabelColor: Colors.grey,
           indicatorColor: AppTheme.primaryBlue,
-          tabs: const [
+          tabs: [
             Tab(text: "Statistika"),
             Tab(text: "Ro'yxat"),
           ],
@@ -446,7 +446,7 @@ class _ManagementAppealsScreenState extends State<ManagementAppealsScreen> with 
         content: TextField(
           controller: controller,
           maxLines: 3,
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             hintText: AppDictionary.tr(context, 'hint_enter_answer_text'),
             border: OutlineInputBorder(),
           ),

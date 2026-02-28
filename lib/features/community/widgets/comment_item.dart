@@ -46,7 +46,7 @@ class CommentItem extends StatelessWidget {
             context: context,
             builder: (ctx) => AlertDialog(
               title: const Text("O'chirish"),
-              content: const Text("Ushbu sharhni o'chirmoqchimisiz?"),
+              content: Text("Ushbu sharhni o'chirmoqchimisiz?"),
               actions: [
                 TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(AppDictionary.tr(context, 'btn_no'))),
                 TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text("Ha", style: TextStyle(color: Colors.red))),
@@ -300,7 +300,7 @@ class CommentItem extends StatelessWidget {
         content: TextField(
           controller: controller,
           maxLines: 3,
-          decoration: const InputDecoration(border: OutlineInputBorder()),
+          decoration: InputDecoration(border: OutlineInputBorder()),
         ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: Text(AppDictionary.tr(context, 'btn_cancel'))),

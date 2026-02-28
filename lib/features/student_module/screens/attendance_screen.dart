@@ -159,7 +159,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                         child: _attendanceList.isEmpty
                             ? ListView(
                                 physics: const AlwaysScrollableScrollPhysics(),
-                                children: const [
+                                children: [
                                   SizedBox(height: 100),
                                   Center(child: Text("Qoldirilgan darslar yo'q 🎉"))
                                 ],

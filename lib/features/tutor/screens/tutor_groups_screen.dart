@@ -49,7 +49,7 @@ class _TutorGroupsScreenState extends State<TutorGroupsScreen> {
         title: Text(widget.isAppealsMode ? "Murojaatlar (Guruhlar)" : "Guruhlarim"),
       ) : null,
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? Center(child: CircularProgressIndicator())
           : _groups.isEmpty
               ? Center(child: Text(AppDictionary.tr(context, 'msg_no_assigned_groups')))
               : ListView.builder(

@@ -107,7 +107,7 @@ class _GroupActivitiesScreenState extends State<GroupActivitiesScreen> with Sing
         title: Text("Barcha Faolliklar: ${widget.groupNumber}"),
         bottom: TabBar(
           controller: _tabController,
-          tabs: const [
+          tabs: [
             Tab(text: "Kutayotgan"),
             Tab(text: "Tarix"),
           ],

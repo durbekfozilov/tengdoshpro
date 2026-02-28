@@ -159,7 +159,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                 child: DropdownButton<String>(
                   value: _selectedScope,
                   isExpanded: true,
-                  items: const [
+                  items: [
                     DropdownMenuItem(value: 'university', child: Text(AppDictionary.tr(context, 'lbl_university_all'))),
                     DropdownMenuItem(value: 'faculty', child: Text(AppDictionary.tr(context, 'lbl_faculty_dean'))),
                     DropdownMenuItem(value: 'specialty', child: Text("🎯  Yo'nalish (Guruhga)")),
@@ -179,7 +179,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
             // Title
             TextField(
               controller: _titleController,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 hintText: AppDictionary.tr(context, 'hint_title_opt'),
                 border: InputBorder.none,
                 hintStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey),
@@ -193,7 +193,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
               controller: _contentController,
               maxLines: null,
               minLines: 5,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 hintText: AppDictionary.tr(context, 'hint_type_here'),
                 border: InputBorder.none,
               ),

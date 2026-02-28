@@ -151,7 +151,7 @@ class ManagementDashboard extends StatelessWidget {
                   onTap: () {
                     ScaffoldMessenger.of(context).hideCurrentSnackBar();
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
+                      SnackBar(
                         content: Text(AppDictionary.tr(context, 'msg_library_soon')),
                         duration: Duration(seconds: 2),
                         behavior: SnackBarBehavior.floating,

@@ -49,7 +49,7 @@ class _LevelGroupsScreenState extends State<LevelGroupsScreen> {
         elevation: 0,
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? Center(child: CircularProgressIndicator())
           : _groups.isEmpty
               ? Center(child: Text(AppDictionary.tr(context, 'msg_groups_not_found')))
               : ListView.builder(

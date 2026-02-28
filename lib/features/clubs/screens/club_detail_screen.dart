@@ -370,7 +370,7 @@ class _MembersTabState extends State<_MembersTab> {
 
   @override
   Widget build(BuildContext context) {
-    if (isLoading) return const Center(child: CircularProgressIndicator());
+    if (isLoading) return Center(child: CircularProgressIndicator());
     if (members.isEmpty) return Center(child: Text(AppDictionary.tr(context, 'msg_no_members_yet')));
 
     return ListView.builder(
@@ -617,7 +617,7 @@ class _AnnouncementsTabState extends State<_AnnouncementsTab> {
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: isLoading 
-         ? const Center(child: CircularProgressIndicator())
+         ? Center(child: CircularProgressIndicator())
          : items.isEmpty
              ? Center(child: Text(AppDictionary.tr(context, 'msg_nothing_here')))
              : ListView.builder(
@@ -799,7 +799,7 @@ class _EventsTabState extends State<_EventsTab> {
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: isLoading 
-         ? const Center(child: CircularProgressIndicator())
+         ? Center(child: CircularProgressIndicator())
          : items.isEmpty
              ? Center(child: Text(AppDictionary.tr(context, 'msg_no_events_yet')))
              : ListView.builder(

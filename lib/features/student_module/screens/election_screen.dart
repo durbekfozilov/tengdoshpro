@@ -227,7 +227,7 @@ class _ElectionScreenState extends State<ElectionScreen> {
               children: [
                 _buildHeader(),
                 const SizedBox(height: 32),
-                const Row(
+                Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(AppDictionary.tr(context, 'lbl_candidates_list'), style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),

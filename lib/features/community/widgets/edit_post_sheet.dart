@@ -184,7 +184,7 @@ class _EditPostSheetState extends State<EditPostSheet> {
                     // Title Field (Plain)
                     TextField(
                       controller: _titleController,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         hintText: AppDictionary.tr(context, 'hint_title_opt'),
                         border: InputBorder.none,
                         hintStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey),
@@ -214,7 +214,7 @@ class _EditPostSheetState extends State<EditPostSheet> {
                               maxLines: null, // Infinite
                               expands: true,
                               textAlignVertical: TextAlignVertical.top,
-                              decoration: const InputDecoration(
+                              decoration: InputDecoration(
                                 hintText: AppDictionary.tr(context, 'hint_type_here'),
                                 border: InputBorder.none,
                                 contentPadding: EdgeInsets.fromLTRB(16, 16, 16, 60), // Space for button at bottom

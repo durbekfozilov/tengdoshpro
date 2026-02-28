@@ -164,7 +164,7 @@ class _SurveyTakingScreenState extends State<SurveyTakingScreen> {
               TextField(
                 controller: _controllers[question.id],
                 onChanged: (val) => _saveAnswer(question, val),
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   hintText: AppDictionary.tr(context, 'hint_enter_your_answer'),
                   border: OutlineInputBorder(),
                 ),

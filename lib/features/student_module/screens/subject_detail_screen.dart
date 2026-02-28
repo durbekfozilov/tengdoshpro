@@ -62,7 +62,7 @@ class _SubjectDetailScreenState extends State<SubjectDetailScreen> {
         iconTheme: const IconThemeData(color: Colors.black),
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? Center(child: CircularProgressIndicator())
           : _details == null
               ? Center(child: Text(AppDictionary.tr(context, 'msg_info_not_found')))
               : SingleChildScrollView(

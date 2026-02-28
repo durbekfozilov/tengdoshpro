@@ -49,7 +49,7 @@ class _ClubMemberProfileScreenState extends State<ClubMemberProfileScreen> {
         future: _profileFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return Center(child: CircularProgressIndicator());
           }
           if (!snapshot.hasData || snapshot.data == null) {
             return Center(child: Text(AppDictionary.tr(context, 'msg_info_not_found')));
@@ -95,7 +95,7 @@ class _ClubMemberProfileScreenState extends State<ClubMemberProfileScreen> {
                 ],
                 const SizedBox(height: 32),
                 
-                const Align(
+                Align(
                   alignment: Alignment.centerLeft,
                   child: Text(AppDictionary.tr(context, 'lbl_club_activities_events'), 
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)
@@ -103,7 +103,7 @@ class _ClubMemberProfileScreenState extends State<ClubMemberProfileScreen> {
                 ),
                 const SizedBox(height: 16),
                 if (acts.isEmpty)
-                  const Padding(
+                  Padding(
                     padding: EdgeInsets.all(20),
                     child: Text(AppDictionary.tr(context, 'msg_no_activities_yet'), style: TextStyle(color: Colors.grey)),
                   ),

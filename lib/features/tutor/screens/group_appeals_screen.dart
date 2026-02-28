@@ -50,7 +50,7 @@ class _GroupAppealsScreenState extends State<GroupAppealsScreen> {
         content: TextField(
           controller: _replyController,
           maxLines: 4,
-          decoration: const InputDecoration(
+          decoration: InputDecoration(
             hintText: AppDictionary.tr(context, 'hint_write_answer_here'),
             border: OutlineInputBorder(),
           ),
