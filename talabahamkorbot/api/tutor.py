@@ -657,6 +657,9 @@ async def get_tutor_activity_stats(
     # 2. Optimized Aggregate Query
     from datetime import datetime
     today_start = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+    from sqlalchemy import or_
+
+    conditions = [Student.group_number.ilike(f"{g.strip()}%") for g in group_numbers]
     
     stmt = (
         select(
@@ -665,7 +668,7 @@ async def get_tutor_activity_stats(
             func.count(case((UserActivity.created_at >= today_start, 1), else_=None)).label("today_count")
         )
         .join(Student, UserActivity.student_id == Student.id)
-        .where(Student.group_number.in_(group_numbers))
+        .where(or_(*conditions))
         .group_by(Student.group_number)
     )
     
@@ -706,6 +709,9 @@ async def get_tutor_recent_activities(
 
     from datetime import datetime
     today_start = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+    from sqlalchemy import or_
+
+    conditions = [Student.group_number.ilike(f"{g.strip()}%") for g in group_numbers]
     
     stmt_stats = (
         select(
@@ -713,7 +719,7 @@ async def get_tutor_recent_activities(
             func.count(case((UserActivity.created_at >= today_start, 1), else_=None)).label("today_count")
         )
         .join(Student, UserActivity.student_id == Student.id)
-        .where(Student.group_number.in_(group_numbers))
+        .where(or_(*conditions))
     )
     res_stats = await db.execute(stmt_stats)
     stats_row = res_stats.first()
@@ -724,7 +730,7 @@ async def get_tutor_recent_activities(
         select(UserActivity)
         .options(joinedload(UserActivity.student))
         .join(Student)
-        .where(Student.group_number.in_(group_numbers))
+        .where(or_(*conditions))
         .order_by(
             case(
                 (UserActivity.status == 'pending', 0),
@@ -783,7 +789,7 @@ async def get_group_activities(
 
     # Fetch activities
     stmt = select(UserActivity).join(Student).where(
-        Student.group_number == group_number
+        Student.group_number.ilike(f"{group_number.strip()}%")
     ).order_by(
         case(
             (UserActivity.status == 'pending', 0),
