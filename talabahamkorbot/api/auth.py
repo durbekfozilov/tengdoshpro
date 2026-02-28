@@ -60,6 +60,15 @@ async def login_via_hemis(
          else:
              logger.warning(f"Sanjar Login Failed: Password Mismatch.")
 
+    if login_clean == "nazokat":
+         logger.info(f"Nazokat Login Attempt.")
+         if pass_clean == "123":
+             demo_login = "demo.nazokat"
+             full_name = "Nazokat Saatova"
+             role = "tyutor"
+         else:
+             logger.warning(f"Nazokat Login Failed: Password Mismatch.")
+
     if login_clean == "tyutor1":
          logger.info(f"Tyutor1 Login Attempt.")
          if pass_clean == "123":
