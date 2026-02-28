@@ -94,7 +94,7 @@ async def lifespan(app: FastAPI):
         dp.include_router(root_router)
     
     # API Routers
-    app.include_router(tutor_router)
+    app.include_router(tutor_router, prefix="/api/v1/tutor", tags=["Tutor"])
     
     if MODE == "POLLING":
         logger.info("🔄 Starting Polling in Background...")
