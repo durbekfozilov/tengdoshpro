@@ -288,13 +288,13 @@ async def get_schedule(
 
     # Filter to Target Week (Monday - Sunday) using Tashkent Timezone
     try:
-        from datetime import timedelta
+        from datetime import timedelta, datetime
         import pytz
         
         tz = pytz.timezone('Asia/Tashkent')
         if target_date:
-            from datetime import datetime
-            now = datetime.strptime(target_date, "%Y-%m-%d").replace(tzinfo=tz)
+            naive_dt = datetime.strptime(target_date, "%Y-%m-%d")
+            now = tz.localize(naive_dt)
         else:
             now = datetime.now(tz)
             
@@ -316,7 +316,8 @@ async def get_schedule(
         
         schedule_data = filtered_data
     except Exception as e:
-        logger.error(f"Schedule filter error: {e}")
+        import logging
+        logging.getLogger(__name__).error(f"Schedule filter error: {e}")
 
     lessons_by_group = {}
     for item in schedule_data:
