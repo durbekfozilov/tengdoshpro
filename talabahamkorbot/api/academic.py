@@ -263,6 +263,7 @@ async def get_subjects(
 async def get_schedule(
     semester: str = None,
     refresh: bool = False,
+    target_date: str = None, # Expected format: YYYY-MM-DD
     student: Student = Depends(get_student_or_staff),
     db: AsyncSession = Depends(get_session)
 ):
@@ -285,10 +286,18 @@ async def get_schedule(
 
     if not schedule_data: return {"success": True, "data": []}
 
-    # Filter to Current Week (Monday - Sunday)
+    # Filter to Target Week (Monday - Sunday) using Tashkent Timezone
     try:
         from datetime import timedelta
-        now = datetime.now()
+        import pytz
+        
+        tz = pytz.timezone('Asia/Tashkent')
+        if target_date:
+            from datetime import datetime
+            now = datetime.strptime(target_date, "%Y-%m-%d").replace(tzinfo=tz)
+        else:
+            now = datetime.now(tz)
+            
         # Find Monday (0)
         start_of_week = now - timedelta(days=now.weekday())
         start_of_week = start_of_week.replace(hour=0, minute=0, second=0, microsecond=0)
