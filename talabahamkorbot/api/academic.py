@@ -360,27 +360,43 @@ async def get_attendance(
             token, semester_code=sem_code, student_id=student.id, force_refresh=refresh, base_url=base_url
         )
         
-        # Fetch schedule to calculate exact hours per class type (since curriculumSubject omits detail)
+        # Fetch schedule to discover which class types (Ma'ruza/Amaliy) exist for each subject
         schedule = await HemisService.get_student_schedule_cached(
+            token, semester_code=sem_code, student_id=student.id, force_refresh=refresh, base_url=base_url
+        )
+        
+        # New approach: Use subject-list for total_acload math
+        subjects = await HemisService.get_student_subject_list(
             token, semester_code=sem_code, student_id=student.id, force_refresh=refresh, base_url=base_url
         )
         
         subject_active_hours = {}
         subject_training_hours = {}
         
-        for item in schedule:
-             s_id = str(item.get("subject", {}).get("id"))
-             t_type = item.get("trainingType", {}).get("name")
-             if s_id and t_type:
-                  if s_id not in subject_active_hours:
-                       subject_active_hours[s_id] = 0
-                       subject_training_hours[s_id] = {}
-                  if t_type not in subject_training_hours[s_id]:
-                       subject_training_hours[s_id][t_type] = 0
-                       
-                  # Typically 2 hours per schedule entry (1 Juftlik)
-                  subject_active_hours[s_id] += 2
-                  subject_training_hours[s_id][t_type] += 2
+        for subj_item in subjects:
+            s_id = str(subj_item.get("subject", {}).get("id") or subj_item.get("curriculumSubject", {}).get("subject", {}).get("id"))
+            if not s_id: continue
+            
+            # Find which types are taught for this subject in the schedule
+            types_in_schedule = set()
+            for s in schedule:
+                if str(s.get("subject", {}).get("id")) == s_id:
+                    t_type = s.get("trainingType", {}).get("name")
+                    if t_type: types_in_schedule.add(t_type)
+            
+            cs = subj_item.get("curriculumSubject", {})
+            total_acload = int(cs.get("total_acload") or 0)
+            
+            # Standard Oliy Ta'lim formula: 50% is Mustaqil ta'lim, 50% is Auditorium (active class)
+            auditorium_hours = total_acload // 2
+            
+            if len(types_in_schedule) > 0 and auditorium_hours > 0:
+                per_type = auditorium_hours // len(types_in_schedule)
+                
+                subject_active_hours[s_id] = auditorium_hours
+                subject_training_hours[s_id] = {}
+                for tt in types_in_schedule:
+                    subject_training_hours[s_id][tt] = per_type
         
         parsed = []
         for item in (data or []):
@@ -456,20 +472,23 @@ async def get_subject_details_endpoint(subject_id: str, semester: str = None, st
     
     subject_absence = [{"date": datetime.fromtimestamp(item.get("lesson_date")).strftime("%d.%m.%Y") if item.get("lesson_date") else "", "hours": item.get("absent_on", 0) + item.get("absent_off", 0) or item.get("hour", 2)} for item in absence_items if str(item.get("subject", {}).get("id")) == str(subject_id)]
     
-    # Get schedule to build real active training class hours
-    training_hours = {}
+    # Get schedule to discover class types
+    types_in_schedule = set()
     for item in schedule:
         s_id = str(item.get("subject", {}).get("id"))
         if s_id == str(subject_id):
             t_type = item.get("trainingType", {}).get("name")
-            if t_type:
-                if t_type not in training_hours:
-                    training_hours[t_type] = 0
-                training_hours[t_type] += 2
-                
-    total_active_hours = sum(training_hours.values())
-    if total_active_hours == 0:
-        total_active_hours = int(target_subject.get("curriculumSubject", {}).get("total_acload") or 0)
+            if t_type: types_in_schedule.add(t_type)
+            
+    cs = target_subject.get("curriculumSubject", {})
+    total_acload = int(cs.get("total_acload") or 0)
+    total_active_hours = total_acload // 2
+    
+    training_hours = {}
+    if len(types_in_schedule) > 0 and total_active_hours > 0:
+        per_type = total_active_hours // len(types_in_schedule)
+        for tt in types_in_schedule:
+            training_hours[tt] = per_type
         
     total_missed = sum(a['hours'] for a in subject_absence)
     percent = round((total_missed / total_active_hours) * 100, 1) if total_active_hours > 0 else 0.0
