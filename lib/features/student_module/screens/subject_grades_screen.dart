@@ -48,7 +48,10 @@ class _SubjectGradesScreenState extends State<SubjectGradesScreen> {
           final s = item['subject'];
           if (s == null) return false;
           // Compare as strings just in case Int/String parsing varies
-          return s['id'].toString() == widget.subjectId.toString();
+          bool idMatch = s['id']?.toString() == widget.subjectId.toString();
+          bool nameMatch = (s['name']?.toString().trim().toLowerCase() ?? "") == widget.subjectName.trim().toLowerCase();
+          
+          return idMatch || nameMatch;
       }).toList();
 
       // Sort by date descending
