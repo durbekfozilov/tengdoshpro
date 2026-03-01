@@ -283,7 +283,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         children: [
                           Flexible(
                             child: Text(
-                              "${AppDictionary.tr(context, 'home_greeting')}, ${() {
+                              () {
                                 if (student == null) return "Foydalanuvchi";
                                 
                                 final fullName = student.fullName;
@@ -299,7 +299,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 }
                                 
                                 return fullName;
-                              }()}!",
+                              }(),
                               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                               overflow: TextOverflow.ellipsis,
                               maxLines: 1,
