@@ -959,7 +959,7 @@ class HemisService:
         except: return []
 
     @staticmethod
-    async def get_student_performance(token: str, student_id: int = None, semester_code: str = None, base_url: Optional[str] = None):
+    async def get_student_gpa(token: str, student_id: int = None, semester_code: str = None, base_url: Optional[str] = None):
         try:
             # Reuses get_student_subject_list which is cached
             subjects = await HemisService.get_student_subject_list(token, semester_code=semester_code, student_id=student_id, base_url=base_url)

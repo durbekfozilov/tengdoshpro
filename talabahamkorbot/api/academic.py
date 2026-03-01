@@ -363,16 +363,22 @@ async def get_attendance(
             token, semester_code=sem_code, student_id=student.id, force_refresh=refresh, base_url=base_url
         )
         
-        # Pre-calculate active hours per subject name
+        # Pre-calculate active hours per subject id
         subject_active_hours = {}
+        subject_training_hours = {}
         for item in schedule:
-             s_name = item.get("subject", {}).get("name")
+             s_id = str(item.get("subject", {}).get("id"))
              t_type = item.get("trainingType", {}).get("name")
-             if s_name and t_type:
-                  if s_name not in subject_active_hours:
-                       subject_active_hours[s_name] = 0
+             if s_id and t_type:
+                  if s_id not in subject_active_hours:
+                       subject_active_hours[s_id] = 0
+                       subject_training_hours[s_id] = {}
+                  if t_type not in subject_training_hours[s_id]:
+                       subject_training_hours[s_id][t_type] = 0
+                       
                   # Typically 2 hours per schedule entry (1 Juftlik)
-                  subject_active_hours[s_name] += 2
+                  subject_active_hours[s_id] += 2
+                  subject_training_hours[s_id][t_type] += 2
         
         parsed = []
         for item in (data or []):
@@ -380,13 +386,16 @@ async def get_attendance(
             if hours == 0: hours = item.get("hour", 2)
             
             s_name = item.get("subject", {}).get("name", "Fan")
+            s_id = str(item.get("subject", {}).get("id", ""))
+            
             parsed.append({
                 "subject": s_name,
                 "date": datetime.fromtimestamp(item.get("lesson_date")).strftime("%Y-%m-%d") if item.get("lesson_date") else "",
                 "theme": item.get("trainingType", {}).get("name", ""), 
                 "hours": hours, 
                 "is_excused": item.get("explicable", False),
-                "total_subject_hours": subject_active_hours.get(s_name, 0)
+                "total_subject_hours": subject_active_hours.get(s_id, 0),
+                "total_training_hours": subject_training_hours.get(s_id, {})
             })
 
         total = sum(p['hours'] for p in parsed)
@@ -457,8 +466,12 @@ async def get_subject_details_endpoint(subject_id: str, semester: str = None, st
                     training_hours[t_type] = 0
                 training_hours[t_type] += 2 # Typically 2 hours per schedule entry
                 
-    total_active_hours = sum(training_hours.values())
+    # Primary source for total hours: curriculum total_acload
+    total_active_hours = int(target_subject.get("curriculumSubject", {}).get("total_acload") or sum(training_hours.values()))
+    if total_active_hours == 0:
+        total_active_hours = sum(training_hours.values())
+        
     total_missed = sum(a['hours'] for a in subject_absence)
     percent = round((total_missed / total_active_hours) * 100, 1) if total_active_hours > 0 else 0.0
     
-    return {"success": True, "data": {"subject": {"name": target_subject.get("subject", {}).get("name"), "total_hours": total_active_hours, "training_hours": training_hours, "grades": {"overall": target_subject.get("overallScore", {}).get("grade", 0), "detailed": detailed_list}}, "teachers": list(teachers), "attendance": {"total_missed": total_missed, "percent": percent, "details": subject_absence}}}
+    return {"success": True, "data": {"subject": {"name": target_subject.get("subject", {}).get("name") or target_subject.get("curriculumSubject", {}).get("subject", {}).get("name"), "total_hours": total_active_hours, "training_hours": training_hours, "grades": {"overall": target_subject.get("overallScore", {}).get("grade", 0), "detailed": detailed_list}}, "teachers": list(teachers), "attendance": {"total_missed": total_missed, "percent": percent, "details": subject_absence}}}

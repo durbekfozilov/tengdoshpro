@@ -1011,7 +1011,7 @@ async def get_mgmt_student_details(
                 
                 # Update GPA if 0
                 if student.gpa == 0.0:
-                    live_gpa = await HemisService.get_student_performance(user_token, student_id=student.id)
+                    live_gpa = await HemisService.get_student_gpa(user_token, student_id=student.id)
                     if live_gpa:
                         student.gpa = live_gpa
                         await db.commit()

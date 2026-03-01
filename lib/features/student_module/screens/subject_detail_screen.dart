@@ -7,11 +7,13 @@ import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 class SubjectDetailScreen extends StatefulWidget {
   final String subjectId;
   final String subjectName;
+  final String? semesterId;
 
   const SubjectDetailScreen({
     super.key,
     required this.subjectId,
     required this.subjectName,
+    this.semesterId,
   });
 
   @override
@@ -22,6 +24,7 @@ class _SubjectDetailScreenState extends State<SubjectDetailScreen> {
   final DataService _dataService = DataService();
   bool _isLoading = true;
   Map<String, dynamic>? _details;
+  List<dynamic> _dailyGrades = [];
 
   @override
   void initState() {
@@ -30,13 +33,36 @@ class _SubjectDetailScreenState extends State<SubjectDetailScreen> {
   }
 
   Future<void> _loadDetails() async {
-    final data = await _dataService.getSubjectDetails(widget.subjectId);
+    final futures = await Future.wait([
+      _dataService.getSubjectDetails(widget.subjectId, semesterId: widget.semesterId),
+      _dataService.getStudentPerformance(semesterId: widget.semesterId),
+    ]);
+
     if (mounted) {
       setState(() {
-        _details = data;
+        _details = futures[0] as Map<String, dynamic>?;
+        
+        // Filter daily grades for this specific subject
+        final allGrades = futures[1] as List<dynamic>;
+        _dailyGrades = allGrades.where((g) => strSubjectId(g) == widget.subjectId).toList();
+        
+        // Sort newest first
+        _dailyGrades.sort((a, b) {
+           int tA = a['items']?[0]?['date'] ?? 0;
+           int tB = b['items']?[0]?['date'] ?? 0;
+           return tB.compareTo(tA);
+        });
+        
         _isLoading = false;
       });
     }
+  }
+  
+  String strSubjectId(dynamic item) {
+    if (item['subject'] != null && item['subject'] is Map) {
+      return item['subject']['id']?.toString() ?? "";
+    }
+    return "";
   }
 
   @override
@@ -100,6 +126,31 @@ class _SubjectDetailScreenState extends State<SubjectDetailScreen> {
                       ] else 
                         const Text("Qoldirilgan darslar yo'q ✅", style: TextStyle(color: Colors.green, fontWeight: FontWeight.w500)),
                         
+                      const SizedBox(height: 20),
+                      
+                      // 4. Daily Grades
+                      if (_dailyGrades.isNotEmpty) ...[
+                        const Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text("Kunlik baholar", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                        ),
+                        const SizedBox(height: 12),
+                        ..._dailyGrades.expand((g) => ((g['items'] as List?) ?? []).map((item) => _buildDailyGradeItem(item))).toList(),
+                      ] else
+                        const Align(
+                            alignment: Alignment.center,
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(vertical: 20),
+                              child: Column(
+                                children: [
+                                  Icon(Icons.assignment_outlined, size: 40, color: Colors.grey),
+                                  SizedBox(height: 10),
+                                  Text("Hozircha kunlik baholar yo'q", style: TextStyle(color: Colors.grey, fontSize: 14)),
+                                ],
+                              ),
+                            )
+                        ),
+
                       const SizedBox(height: 30),
                     ],
                   ),
@@ -286,6 +337,57 @@ class _SubjectDetailScreenState extends State<SubjectDetailScreen> {
             "$hours soat",
             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDailyGradeItem(dynamic item) {
+    if (item == null) return const SizedBox();
+    
+    final tStamp = item['date'] ?? 0;
+    final dateStr = tStamp > 0 ? DateTime.fromMillisecondsSinceEpoch(tStamp * 1000).toString().split(' ')[0] : "Sana noma'lum";
+    final type = item['type'] ?? "Baho";
+    final val = item['value']?.toString() ?? "-";
+    
+    // Choose Color based on score
+    Color scoreColor = Colors.grey;
+    if (val == "5" || val == "4") scoreColor = Colors.green;
+    else if (val == "3") scoreColor = Colors.orange;
+    else if (val == "2" || val == "1" || val == "0") scoreColor = Colors.red;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 8, offset: const Offset(0, 2))
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+           Column(
+             crossAxisAlignment: CrossAxisAlignment.start,
+             children: [
+                Text(dateStr, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppTheme.primaryBlue)),
+                const SizedBox(height: 4),
+                Text(type, style: TextStyle(color: Colors.grey[600], fontSize: 13)),
+             ],
+           ),
+           Container(
+             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+             decoration: BoxDecoration(
+               color: scoreColor.withOpacity(0.1),
+               borderRadius: BorderRadius.circular(12),
+             ),
+             child: Text(
+               val,
+               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: scoreColor),
+             ),
+           )
         ],
       ),
     );

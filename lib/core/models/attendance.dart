@@ -6,6 +6,7 @@ class Attendance {
   final int hours;
   final bool isExcused; // true = sababli (11), false = sababsiz (12)
   final int totalSubjectHours;
+  final Map<String, int> trainingHours;
 
   Attendance({
     required this.id,
@@ -15,6 +16,7 @@ class Attendance {
     required this.hours,
     required this.isExcused,
     this.totalSubjectHours = 0,
+    this.trainingHours = const {},
   });
 
   factory Attendance.fromJson(Map<String, dynamic> json) {
@@ -53,6 +55,14 @@ class Attendance {
        excused = status == 11 || valid;
     }
 
+    Map<String, int> parsedTrainingHours = {};
+    if (json.containsKey('total_training_hours') && json['total_training_hours'] is Map) {
+         final dynamic rawMap = json['total_training_hours'];
+         rawMap.forEach((k, v) {
+              parsedTrainingHours[k.toString()] = int.tryParse(v.toString()) ?? 0;
+         });
+    }
+
     return Attendance(
       id: json['id'] ?? 0,
       subjectName: subject,
@@ -61,6 +71,7 @@ class Attendance {
       hours: hourVal,
       isExcused: excused,
       totalSubjectHours: json['total_subject_hours'] ?? 0,
+      trainingHours: parsedTrainingHours,
     );
   }
 }

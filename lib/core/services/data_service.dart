@@ -133,7 +133,7 @@ class DataService {
       final token = await _authService.getToken();
       if (token == null) return [];
 
-      String url = '${ApiConstants.baseUrl}/student/performance';
+      String url = '${ApiConstants.backendUrl}/student/performance';
       if (semesterId != null && semesterId.isNotEmpty) {
         url += '?semester_id=$semesterId';
       }
@@ -1406,10 +1406,15 @@ class DataService {
   }
 
   // 16. Get Subject Details
-  Future<Map<String, dynamic>?> getSubjectDetails(String subjectId) async {
+  Future<Map<String, dynamic>?> getSubjectDetails(String subjectId, {String? semesterId}) async {
     try {
+      String url = "${ApiConstants.academic}/subject/$subjectId/details";
+      if (semesterId != null && semesterId.isNotEmpty) {
+        url += "?semester=$semesterId";
+      }
+      
       final response = await http.get(
-        Uri.parse("${ApiConstants.academic}/subject/$subjectId/details"),
+        Uri.parse(url),
         headers: await _getHeaders(),
       );
 
