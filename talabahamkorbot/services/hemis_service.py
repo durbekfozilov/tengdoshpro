@@ -743,6 +743,51 @@ class HemisService:
             return []
 
     @staticmethod
+    async def get_student_performance(token: str, semester_code: str = None, student_id: int = None, force_refresh: bool = False, base_url: Optional[str] = None):
+        key = f"performance_{semester_code}" if semester_code else "performance_all"
+        final_base = base_url or HemisService.BASE_URL
+        
+        # Check Cache
+        if student_id and not force_refresh:
+            try:
+                async with AsyncSessionLocal() as session:
+                    cache = await session.scalar(select(StudentCache).where(StudentCache.student_id == student_id, StudentCache.key == key))
+                    # Cache validity: 1 hour for performance
+                    if cache and (datetime.utcnow() - cache.updated_at).total_seconds() < 3600:
+                        return cache.data
+            except Exception as e: 
+                pass
+
+        client = await HemisService.get_client()
+        try:
+            params = {"semester": semester_code} if semester_code else {}
+            response = await HemisService.fetch_with_retry(
+                client, "GET", 
+                f"{final_base}/education/performance",
+                headers=HemisService.get_headers(token), params=params
+            )
+            if response.status_code == 200:
+                data = response.json().get("data", [])
+                # Update Cache ONLY if data is present
+                if student_id and data:
+                     try:
+                         async with AsyncSessionLocal() as session:
+                             c = await session.scalar(select(StudentCache).where(StudentCache.student_id == student_id, StudentCache.key == key))
+                             if c: 
+                                 c.data = data
+                                 c.updated_at = datetime.utcnow()
+                             else:
+                                 session.add(StudentCache(student_id=student_id, key=key, data=data))
+                             await session.commit()
+                     except Exception as e:
+                         logger.error(f"Cache Write Error: {e}")
+                return data
+            return []
+        except Exception as e:
+            logger.error(f"Performance List Error: {e}")
+            return []
+
+    @staticmethod
     async def get_student_schedule_cached(token: str, semester_code: str = None, student_id: int = None, force_refresh: bool = False, base_url: Optional[str] = None):
         key = f"schedule_{semester_code}" if semester_code else "schedule_all"
         final_base = base_url or HemisService.BASE_URL

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/services/data_service.dart';
 import 'subject_detail_screen.dart';
+import 'subject_grades_screen.dart';
 import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class GradesScreen extends StatefulWidget {
@@ -166,9 +167,10 @@ class _GradesScreenState extends State<GradesScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => SubjectDetailScreen(
-                    subjectId: id.toString(),
+                  builder: (context) => SubjectGradesScreen(
+                    subjectId: int.tryParse(id.toString()) ?? 0,
                     subjectName: name,
+                    semesterId: _selectedSemester,
                   ),
                 ),
               );

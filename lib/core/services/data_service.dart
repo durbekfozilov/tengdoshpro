@@ -128,6 +128,33 @@ class DataService {
     }
   }
 
+  Future<List<dynamic>> getStudentPerformance({String? semesterId}) async {
+    try {
+      final token = await _authService.getToken();
+      if (token == null) return [];
+
+      String url = '${ApiConstants.baseUrl}/student/performance';
+      if (semesterId != null && semesterId.isNotEmpty) {
+        url += '?semester_id=$semesterId';
+      }
+
+      final response = await _get(url);
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+        if (data['success'] == true && data['data'] != null) {
+          if (data['data'] is List) {
+             return data['data'] as List<dynamic>;
+          }
+        }
+      }
+      return [];
+    } catch (e) {
+      debugPrint("Get Student Performance Error: $e");
+      return [];
+    }
+  }
+
   // 2. Get Dashboard Stats (Via Backend Proxy for Real Data)
   Future<Map<String, dynamic>> getDashboardStats({bool refresh = false, String? semester}) async {
     final student = await _authService.getSavedUser();
