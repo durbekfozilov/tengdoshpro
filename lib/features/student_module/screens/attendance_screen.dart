@@ -206,14 +206,18 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                   breakdownChips.add(
                     Container(
                       margin: const EdgeInsets.only(right: 6, bottom: 6),
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                       decoration: BoxDecoration(
-                        color: AppTheme.primaryBlue.withOpacity(0.08),
+                        color: typePercent > 25 ? Colors.red.withOpacity(0.1) : Colors.green.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
-                        "$type: $typeMissed/$typeTotalHours soat (${typePercent.toStringAsFixed(0)}%)",
-                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppTheme.primaryBlue),
+                        "$type: $typeMissed / $typeTotalHours soat (${typePercent.toStringAsFixed(1)}%)",
+                        style: TextStyle(
+                            fontSize: 12, 
+                            fontWeight: FontWeight.w700, 
+                            color: typePercent > 25 ? Colors.red : Colors.green[700]
+                        ),
                       )
                     )
                   );
@@ -241,31 +245,22 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
                           height: 1.3,
                         )
                       ),
-                      const SizedBox(height: 6),
-                      Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: percent > 25 ? Colors.red.withOpacity(0.1) : Colors.green.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(6)
-                            ),
-                            child: Text(
-                              "$missedHours / $totalSubjectHours soat (${percent.toStringAsFixed(1)}%)",
-                              style: TextStyle(
-                                fontSize: 12, 
-                                fontWeight: FontWeight.bold, 
-                                color: percent > 25 ? Colors.red : Colors.green[700]
-                              )
-                            )
-                          ),
-                        ],
-                      ),
+                      const SizedBox(height: 8),
                       if (breakdownChips.isNotEmpty)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 8),
-                          child: Wrap(children: breakdownChips),
-                        )
+                        Wrap(children: breakdownChips)
+                      else 
+                        // Fallback if schedule is completely empty
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.grey.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(6)
+                          ),
+                          child: Text(
+                            "$missedHours soat qoldirilgan",
+                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey[700])
+                          )
+                        ),
                     ],
                   ),
                ),

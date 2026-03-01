@@ -360,35 +360,27 @@ async def get_attendance(
             token, semester_code=sem_code, student_id=student.id, force_refresh=refresh, base_url=base_url
         )
         
-        # New approach: Use subject-list for accurate hours instead of schedule
-        subjects = await HemisService.get_student_subject_list(
+        # Fetch schedule to calculate exact hours per class type (since curriculumSubject omits detail)
+        schedule = await HemisService.get_student_schedule_cached(
             token, semester_code=sem_code, student_id=student.id, force_refresh=refresh, base_url=base_url
         )
         
         subject_active_hours = {}
         subject_training_hours = {}
         
-        for subj_item in subjects:
-            s_id = str(subj_item.get("subject", {}).get("id") or subj_item.get("curriculumSubject", {}).get("subject", {}).get("id"))
-            if not s_id: continue
-            
-            cs = subj_item.get("curriculumSubject", {})
-            lecture = int(cs.get("lecture_hour") or 0)
-            practice = int(cs.get("practice_hour") or 0)
-            seminar = int(cs.get("seminar_hour") or 0)
-            laboratory = int(cs.get("laboratory_hour") or 0)
-            
-            # The exact total hours strictly for these 4 physical class types
-            total = lecture + practice + seminar + laboratory
-            
-            # Skip if none found
-            if total > 0:
-                subject_active_hours[s_id] = total
-                subject_training_hours[s_id] = {}
-                if lecture > 0: subject_training_hours[s_id]["Ma'ruza"] = lecture
-                if practice > 0: subject_training_hours[s_id]["Amaliy"] = practice
-                if seminar > 0: subject_training_hours[s_id]["Seminar"] = seminar
-                if laboratory > 0: subject_training_hours[s_id]["Laboratoriya"] = laboratory
+        for item in schedule:
+             s_id = str(item.get("subject", {}).get("id"))
+             t_type = item.get("trainingType", {}).get("name")
+             if s_id and t_type:
+                  if s_id not in subject_active_hours:
+                       subject_active_hours[s_id] = 0
+                       subject_training_hours[s_id] = {}
+                  if t_type not in subject_training_hours[s_id]:
+                       subject_training_hours[s_id][t_type] = 0
+                       
+                  # Typically 2 hours per schedule entry (1 Juftlik)
+                  subject_active_hours[s_id] += 2
+                  subject_training_hours[s_id][t_type] += 2
         
         parsed = []
         for item in (data or []):
