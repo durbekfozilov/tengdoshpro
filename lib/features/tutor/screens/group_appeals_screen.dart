@@ -46,6 +46,7 @@ class _GroupAppealsScreenState extends State<GroupAppealsScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
+        scrollable: true,
         title: Text("Javob yozish: $studentName"),
         content: TextField(
           controller: _replyController,
@@ -264,8 +265,11 @@ class _GroupAppealsScreenState extends State<GroupAppealsScreen> {
               color: Colors.grey[50],
               borderRadius: const BorderRadius.vertical(bottom: Radius.circular(16)),
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            child: Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 8,
+              runSpacing: 8,
               children: [
                 // Status Badge
                 Container(
