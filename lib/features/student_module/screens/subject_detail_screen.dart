@@ -233,10 +233,41 @@ class _SubjectDetailScreenState extends State<SubjectDetailScreen> {
   }
 
   Widget _buildAttendanceCard(dynamic missed, dynamic percent, String totalHoursTxt) {
+    if (missed == 0 && percent == 0) {
+      return Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 15, offset: const Offset(0, 5))],
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(color: Colors.green.withOpacity(0.12), shape: BoxShape.circle),
+              child: Icon(Icons.check_circle_rounded, color: Colors.green[600], size: 28),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text("Davomat", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  const SizedBox(height: 4),
+                  Text("Qoldirilgan darslar yo'q 🎉", style: TextStyle(color: Colors.grey[600], fontSize: 13)),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     // Color logic
-    Color color = Colors.green;
-    if (percent > 20) color = Colors.red;
-    else if (percent > 10) color = Colors.orange;
+    Color color = Colors.green[600]!;
+    if (percent > 20) color = Colors.red[600]!;
+    else if (percent > 10) color = Colors.orange[600]!;
 
     return Container(
       padding: const EdgeInsets.all(20),
@@ -249,16 +280,16 @@ class _SubjectDetailScreenState extends State<SubjectDetailScreen> {
         children: [
           // Circular Percent
           Container(
-            width: 80,
-            height: 80,
+            width: 72,
+            height: 72,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              border: Border.all(color: color.withOpacity(0.2), width: 8),
+              color: color.withOpacity(0.1),
             ),
             child: Center(
               child: Text(
                 "$percent%",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: color),
+                style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: color),
               ),
             ),
           ),
@@ -267,10 +298,19 @@ class _SubjectDetailScreenState extends State<SubjectDetailScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("Davomat", style: TextStyle(color: Colors.grey[600], fontSize: 14)),
-                const SizedBox(height: 6),
-                Text("$missed soat qoldirilgan", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-                Text("Jami $totalHoursTxtdan", style: const TextStyle(color: Colors.grey, fontSize: 12)),
+                Text("Davomat", style: TextStyle(color: Colors.grey[500], fontSize: 13, fontWeight: FontWeight.w600)),
+                const SizedBox(height: 4),
+                RichText(
+                  text: TextSpan(
+                    text: "$missed soat ",
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.black87),
+                    children: [
+                      TextSpan(text: " qoldirilgan", style: TextStyle(fontSize: 14, fontWeight: FontWeight.normal, color: Colors.grey[700]))
+                    ]
+                  )
+                ),
+                const SizedBox(height: 2),
+                Text("Jami $totalHoursTxt soatdan", style: const TextStyle(color: Colors.grey, fontSize: 12)),
               ],
             ),
           ),

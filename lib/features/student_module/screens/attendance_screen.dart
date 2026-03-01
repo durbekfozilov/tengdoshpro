@@ -192,45 +192,87 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
         int missedHours = items.fold(0, (sum, item) => sum + item.hours);
         Map<String, int> trainingHours = items.isNotEmpty ? items.first.trainingHours : {};
         
-        String percentStr = "";
+        double percent = 0.0;
         if (totalSubjectHours > 0) {
-          double percent = (missedHours / totalSubjectHours) * 100;
-          
-          List<String> breakdowns = [];
-          if (trainingHours.isNotEmpty) {
-             trainingHours.forEach((type, typeTotalHours) {
-                int typeMissed = items.where((i) => i.lessonTheme == type).fold(0, (sum, i) => sum + i.hours);
-                if (typeTotalHours > 0) {
-                    double typePercent = (typeMissed / typeTotalHours) * 100;
-                    breakdowns.add("$type: $typeMissed/$typeTotalHours (${typePercent.toStringAsFixed(1)}%)");
-                }
-             });
-          }
-          
-          String breakdownStr = breakdowns.isNotEmpty ? "\n[${breakdowns.join(', ')}]" : "";
-          percentStr = " • $missedHours/$totalSubjectHours soat (${percent.toStringAsFixed(1)}% qoldirilgan)$breakdownStr";
+           percent = (missedHours / totalSubjectHours) * 100;
+        }
+
+        List<Widget> breakdownChips = [];
+        if (trainingHours.isNotEmpty) {
+           trainingHours.forEach((type, typeTotalHours) {
+              int typeMissed = items.where((i) => i.lessonTheme == type).fold(0, (sum, i) => sum + i.hours);
+              if (typeTotalHours > 0) {
+                  double typePercent = (typeMissed / typeTotalHours) * 100;
+                  breakdownChips.add(
+                    Container(
+                      margin: const EdgeInsets.only(right: 6, bottom: 6),
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: AppTheme.primaryBlue.withOpacity(0.08),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        "$type: $typeMissed/$typeTotalHours soat (${typePercent.toStringAsFixed(0)}%)",
+                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppTheme.primaryBlue),
+                      )
+                    )
+                  );
+              }
+           });
         }
         
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-             // Subject Header
-             Padding(
-                padding: const EdgeInsets.only(top: 12, bottom: 8, left: 4),
-                child: Text(
-                  "$subject$percentStr", 
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold, 
-                    fontSize: 14,
-                    color: AppTheme.primaryBlue,
-                    height: 1.4,
-                  )
-                ),
-             ),
-             // Items
-             ...items.map((item) => _buildItem(item)).toList(),
-             const Divider(),
-          ],
+        return Container(
+          margin: const EdgeInsets.only(bottom: 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+               // Subject Header
+               Padding(
+                  padding: const EdgeInsets.only(left: 4, bottom: 12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        subject, 
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold, 
+                          fontSize: 15,
+                          color: Colors.black87,
+                          height: 1.3,
+                        )
+                      ),
+                      const SizedBox(height: 6),
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: percent > 25 ? Colors.red.withOpacity(0.1) : Colors.green.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(6)
+                            ),
+                            child: Text(
+                              "$missedHours / $totalSubjectHours soat (${percent.toStringAsFixed(1)}%)",
+                              style: TextStyle(
+                                fontSize: 12, 
+                                fontWeight: FontWeight.bold, 
+                                color: percent > 25 ? Colors.red : Colors.green[700]
+                              )
+                            )
+                          ),
+                        ],
+                      ),
+                      if (breakdownChips.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8),
+                          child: Wrap(children: breakdownChips),
+                        )
+                    ],
+                  ),
+               ),
+               // Items
+               ...items.map((item) => _buildItem(item)).toList(),
+            ],
+          ),
         );
       }
     );
@@ -243,36 +285,51 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 8, offset: const Offset(0, 2))
-        ],
+        border: Border.all(color: Colors.grey.shade200),
       ),
       child: Row(
         children: [
            // Date Icon
-           Icon(Icons.calendar_today_rounded, size: 14, color: Colors.grey[400]),
-           const SizedBox(width: 6),
+           Container(
+             padding: const EdgeInsets.all(8),
+             decoration: BoxDecoration(
+               color: Colors.grey.shade100,
+               borderRadius: BorderRadius.circular(8)
+             ),
+             child: Icon(Icons.calendar_today_rounded, size: 16, color: Colors.grey.shade600),
+           ),
+           const SizedBox(width: 12),
            
            // Date & Hours
-           Text(
-             "${item.date} (${item.lessonTheme.isEmpty ? 'Mavzu' : item.lessonTheme} • ${item.hours} soat)",
-             style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: AppTheme.textBlack),
+           Expanded(
+             child: Column(
+               crossAxisAlignment: CrossAxisAlignment.start,
+               children: [
+                 Text(
+                   item.date,
+                   style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14, color: AppTheme.textBlack),
+                 ),
+                 const SizedBox(height: 2),
+                 Text(
+                   "${item.lessonTheme.isEmpty ? 'Mavzu' : item.lessonTheme} • ${item.hours} soat",
+                   style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                 ),
+               ]
+             ),
            ),
            
-           const Spacer(),
-           
-           // Status
+           // Status Badge
            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
-                color: (item.isExcused ? Colors.green : Colors.red).withOpacity(0.1),
-                borderRadius: BorderRadius.circular(6),
+                color: item.isExcused ? Colors.green.withOpacity(0.12) : Colors.red.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
                 item.isExcused ? "Sababli" : "Sababsiz",
                 style: TextStyle(
-                  color: item.isExcused ? Colors.green : Colors.red,
-                  fontWeight: FontWeight.w600,
+                  color: item.isExcused ? Colors.green[700] : Colors.red[700],
+                  fontWeight: FontWeight.w700,
                   fontSize: 12,
                 ),
               ),

@@ -359,26 +359,36 @@ async def get_attendance(
         _, _, _, data = await HemisService.get_student_absence(
             token, semester_code=sem_code, student_id=student.id, force_refresh=refresh, base_url=base_url
         )
-        schedule = await HemisService.get_student_schedule_cached(
+        
+        # New approach: Use subject-list for accurate hours instead of schedule
+        subjects = await HemisService.get_student_subject_list(
             token, semester_code=sem_code, student_id=student.id, force_refresh=refresh, base_url=base_url
         )
         
-        # Pre-calculate active hours per subject id
         subject_active_hours = {}
         subject_training_hours = {}
-        for item in schedule:
-             s_id = str(item.get("subject", {}).get("id"))
-             t_type = item.get("trainingType", {}).get("name")
-             if s_id and t_type:
-                  if s_id not in subject_active_hours:
-                       subject_active_hours[s_id] = 0
-                       subject_training_hours[s_id] = {}
-                  if t_type not in subject_training_hours[s_id]:
-                       subject_training_hours[s_id][t_type] = 0
-                       
-                  # Typically 2 hours per schedule entry (1 Juftlik)
-                  subject_active_hours[s_id] += 2
-                  subject_training_hours[s_id][t_type] += 2
+        
+        for subj_item in subjects:
+            s_id = str(subj_item.get("subject", {}).get("id") or subj_item.get("curriculumSubject", {}).get("subject", {}).get("id"))
+            if not s_id: continue
+            
+            cs = subj_item.get("curriculumSubject", {})
+            lecture = int(cs.get("lecture_hour") or 0)
+            practice = int(cs.get("practice_hour") or 0)
+            seminar = int(cs.get("seminar_hour") or 0)
+            laboratory = int(cs.get("laboratory_hour") or 0)
+            
+            # The exact total hours strictly for these 4 physical class types
+            total = lecture + practice + seminar + laboratory
+            
+            # Skip if none found
+            if total > 0:
+                subject_active_hours[s_id] = total
+                subject_training_hours[s_id] = {}
+                if lecture > 0: subject_training_hours[s_id]["Ma'ruza"] = lecture
+                if practice > 0: subject_training_hours[s_id]["Amaliy"] = practice
+                if seminar > 0: subject_training_hours[s_id]["Seminar"] = seminar
+                if laboratory > 0: subject_training_hours[s_id]["Laboratoriya"] = laboratory
         
         parsed = []
         for item in (data or []):
@@ -454,24 +464,28 @@ async def get_subject_details_endpoint(subject_id: str, semester: str = None, st
     
     subject_absence = [{"date": datetime.fromtimestamp(item.get("lesson_date")).strftime("%d.%m.%Y") if item.get("lesson_date") else "", "hours": item.get("absent_on", 0) + item.get("absent_off", 0) or item.get("hour", 2)} for item in absence_items if str(item.get("subject", {}).get("id")) == str(subject_id)]
     
-    # Calculate real classroom hours from schedule
+    # Clean exactly how attendance does it over the target subject curriculum
     training_hours = {}
-    for item in schedule:
-        s_id = str(item.get("subject", {}).get("id"))
-        if s_id == str(subject_id):
-            t_type = item.get("trainingType", {}).get("name")
-            if t_type:
-                # E.g., Ma'ruza, Seminar, Amaliy
-                if t_type not in training_hours:
-                    training_hours[t_type] = 0
-                training_hours[t_type] += 2 # Typically 2 hours per schedule entry
-                
-    # Primary source for total hours: curriculum total_acload
-    total_active_hours = int(target_subject.get("curriculumSubject", {}).get("total_acload") or sum(training_hours.values()))
-    if total_active_hours == 0:
-        total_active_hours = sum(training_hours.values())
+    total_active_hours = 0
+    
+    cs = target_subject.get("curriculumSubject", {})
+    lecture = int(cs.get("lecture_hour") or 0)
+    practice = int(cs.get("practice_hour") or 0)
+    seminar = int(cs.get("seminar_hour") or 0)
+    laboratory = int(cs.get("laboratory_hour") or 0)
+    
+    total_active_hours = lecture + practice + seminar + laboratory
+    
+    if lecture > 0: training_hours["Ma'ruza"] = lecture
+    if practice > 0: training_hours["Amaliy"] = practice
+    if seminar > 0: training_hours["Seminar"] = seminar
+    if laboratory > 0: training_hours["Laboratoriya"] = laboratory
         
     total_missed = sum(a['hours'] for a in subject_absence)
     percent = round((total_missed / total_active_hours) * 100, 1) if total_active_hours > 0 else 0.0
     
-    return {"success": True, "data": {"subject": {"name": target_subject.get("subject", {}).get("name") or target_subject.get("curriculumSubject", {}).get("subject", {}).get("name"), "total_hours": total_active_hours, "training_hours": training_hours, "grades": {"overall": target_subject.get("overallScore", {}).get("grade", 0), "detailed": detailed_list}}, "teachers": list(teachers), "attendance": {"total_missed": total_missed, "percent": percent, "details": subject_absence}}}
+    # Optional: fallback to total_acload if absolutely 0 active structural hours
+    if total_active_hours == 0:
+        total_active_hours = int(cs.get("total_acload") or 0)
+    
+    return {"success": True, "data": {"subject": {"name": target_subject.get("subject", {}).get("name") or cs.get("subject", {}).get("name"), "total_hours": total_active_hours, "training_hours": training_hours, "grades": {"overall": target_subject.get("overallScore", {}).get("grade", 0), "detailed": detailed_list}}, "teachers": list(teachers), "attendance": {"total_missed": total_missed, "percent": percent, "details": subject_absence}}}
