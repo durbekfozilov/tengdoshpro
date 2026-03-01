@@ -453,7 +453,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
             // 3. Module Grid (Dashboard)
             Text(
-              AppDictionary.tr(context, 'module_study'), // Mapping general services
+              AppDictionary.tr(context, 'lbl_services'), // Mapping general services
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
             ),
             const SizedBox(height: 16),
@@ -491,7 +491,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => DocumentsScreen())),
                 ),
                 DashboardCard(
-                  title: AppDictionary.tr(context, 'home_tab_main'), // placeholder
+                  title: AppDictionary.tr(context, 'module_certificates'),
                   icon: Icons.workspace_premium_rounded,
                   color: Colors.orange,
                   onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => CertificatesScreen())),

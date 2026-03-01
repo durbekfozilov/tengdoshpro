@@ -88,28 +88,36 @@ class AppDictionary {
       'ru': 'Текущий баланс',
     },
     'module_study': {
-      'uz': 'O\'quv jarayoni',
-      'ru': 'Учебный процесс',
+      'uz': 'Akademik bo\'lim',
+      'ru': 'Академический отдел',
     },
     'module_social': {
-      'uz': 'Ijtimoiy faollik',
-      'ru': 'Соц. активность',
+      'uz': 'Ijtimoiy Faollik',
+      'ru': 'Социальная активность',
     },
     'module_clubs': {
-      'uz': 'To\'garaklar va Ishtirok',
-      'ru': 'Кружки и Участие',
+      'uz': 'Klublar',
+      'ru': 'Клубы',
     },
     'module_community': {
-      'uz': 'Kasaba - Jamiyat',
-      'ru': 'Профсоюз - Общество',
+      'uz': 'Kutubxona',
+      'ru': 'Библиотека',
     },
     'module_requests': {
-      'uz': 'Murojatnoma',
+      'uz': 'Murojaatlar',
       'ru': 'Обращения',
     },
     'module_documents': {
-      'uz': 'Elektron hujjatlar',
-      'ru': 'Электронные документы',
+      'uz': 'Hujjatlar',
+      'ru': 'Документы',
+    },
+    'module_certificates': {
+      'uz': 'Sertifikatlar',
+      'ru': 'Сертификаты',
+    },
+    'lbl_services': {
+      'uz': 'Xizmatlar',
+      'ru': 'Услуги',
     },
 
     // --- PROFILE SCREEN ---
