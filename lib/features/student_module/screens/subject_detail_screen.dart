@@ -45,12 +45,20 @@ class _SubjectDetailScreenState extends State<SubjectDetailScreen> {
     final subj = _details?['subject'] ?? {};
     final teachers = (_details?['teachers'] as List?)?.join(", ") ?? "Biriktirilmagan";
     final totalHours = subj['total_hours'] ?? 0;
+    final Map<String, dynamic> trainingHours = subj['training_hours'] ?? {}; 
     final type = subj['type'] ?? "Majburiy";
+    
+    // Formatting Training Hours (e.g. "Ma'ruza: 30, Seminar: 30")
+    String hoursDetailStr = "";
+    if (trainingHours.isNotEmpty) {
+      final parts = trainingHours.entries.map((e) => "${e.key}: ${e.value}").join(", ");
+      hoursDetailStr = " ($parts)";
+    }
     
     // Attendance
     final attData = _details?['attendance'] ?? {};
     final missed = attData['total_missed'] ?? 0;
-    final percent = attData['percent'] ?? 0.0;
+    final percent = attData['percent']?.toDouble() ?? 0.0;
     final list = attData['details'] as List? ?? [];
 
     return Scaffold(
@@ -70,7 +78,7 @@ class _SubjectDetailScreenState extends State<SubjectDetailScreen> {
                   child: Column(
                     children: [
                       // 1. Info Card
-                      _buildInfoCard(teachers, totalHours, type),
+                      _buildInfoCard(teachers, "$totalHours soat$hoursDetailStr", type),
                       const SizedBox(height: 20),
                       
                       // 2. Grades Card (NEW)
@@ -78,7 +86,7 @@ class _SubjectDetailScreenState extends State<SubjectDetailScreen> {
                       const SizedBox(height: 20),
                       
                       // 3. Attendance Stat Card
-                      _buildAttendanceCard(missed, percent, totalHours),
+                      _buildAttendanceCard(missed, percent, "$totalHours soat$hoursDetailStr"),
                       const SizedBox(height: 20),
                       
                       // 3. Attendance List
@@ -99,7 +107,7 @@ class _SubjectDetailScreenState extends State<SubjectDetailScreen> {
     );
   }
 
-  Widget _buildInfoCard(String teachers, int totalHours, String type) {
+  Widget _buildInfoCard(String teachers, String hoursFormatted, String type) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -111,7 +119,7 @@ class _SubjectDetailScreenState extends State<SubjectDetailScreen> {
         children: [
           _buildInfoRow(Icons.person, "O'qituvchi", teachers),
           const Divider(height: 24),
-          _buildInfoRow(Icons.access_time_filled, "Umumiy yuklama", "$totalHours soat"),
+          _buildInfoRow(Icons.access_time_filled, "Umumiy yuklama", hoursFormatted),
           const Divider(height: 24),
           _buildInfoRow(Icons.category, "Fan turi", type),
         ],
@@ -134,7 +142,7 @@ class _SubjectDetailScreenState extends State<SubjectDetailScreen> {
             children: [
               Text(label, style: TextStyle(color: Colors.grey[600], fontSize: 13)),
               const SizedBox(height: 2),
-              Text(value, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
+              Text(value, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)), // slightly smaller to fit
             ],
           ),
         ),
@@ -186,7 +194,7 @@ class _SubjectDetailScreenState extends State<SubjectDetailScreen> {
     );
   }
 
-  Widget _buildAttendanceCard(dynamic missed, dynamic percent, int totalHours) {
+  Widget _buildAttendanceCard(dynamic missed, dynamic percent, String totalHoursTxt) {
     // Color logic
     Color color = Colors.green;
     if (percent > 20) color = Colors.red;
@@ -224,7 +232,7 @@ class _SubjectDetailScreenState extends State<SubjectDetailScreen> {
                 Text("Davomat", style: TextStyle(color: Colors.grey[600], fontSize: 14)),
                 const SizedBox(height: 6),
                 Text("$missed soat qoldirilgan", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-                Text("Jami $totalHours soatdan", style: const TextStyle(color: Colors.grey, fontSize: 12)),
+                Text("Jami $totalHoursTxtdan", style: const TextStyle(color: Colors.grey, fontSize: 12)),
               ],
             ),
           ),

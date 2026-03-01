@@ -187,6 +187,16 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
         String subject = grouped.keys.elementAt(idx);
         List<Attendance> items = grouped[subject]!;
         
+        // Calculate stats for this subject
+        int totalSubjectHours = items.isNotEmpty ? items.first.totalSubjectHours : 0;
+        int missedHours = items.fold(0, (sum, item) => sum + item.hours);
+        
+        String percentStr = "";
+        if (totalSubjectHours > 0) {
+          double percent = (missedHours / totalSubjectHours) * 100;
+          percentStr = " • $missedHours/$totalSubjectHours soat (${percent.toStringAsFixed(1)}% qoldirilgan)";
+        }
+        
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -194,7 +204,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
              Padding(
                 padding: const EdgeInsets.only(top: 12, bottom: 8, left: 4),
                 child: Text(
-                  subject, 
+                  "$subject$percentStr", 
                   style: const TextStyle(
                     fontWeight: FontWeight.bold, 
                     fontSize: 15,
@@ -230,7 +240,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
            
            // Date & Hours
            Text(
-             "${item.date} (${item.hours} soat)",
+             "${item.date} (${item.type} • ${item.hours} soat)",
              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: AppTheme.textBlack),
            ),
            

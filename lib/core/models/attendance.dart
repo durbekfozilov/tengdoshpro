@@ -5,6 +5,7 @@ class Attendance {
   final String lessonTheme;
   final int hours;
   final bool isExcused; // true = sababli (11), false = sababsiz (12)
+  final int totalSubjectHours;
 
   Attendance({
     required this.id,
@@ -13,6 +14,7 @@ class Attendance {
     required this.lessonTheme,
     required this.hours,
     required this.isExcused,
+    this.totalSubjectHours = 0,
   });
 
   factory Attendance.fromJson(Map<String, dynamic> json) {
@@ -58,6 +60,7 @@ class Attendance {
       lessonTheme: lesson,
       hours: hourVal,
       isExcused: excused,
+      totalSubjectHours: json['total_subject_hours'] ?? 0,
     );
   }
 }

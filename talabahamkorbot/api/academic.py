@@ -359,16 +359,34 @@ async def get_attendance(
         _, _, _, data = await HemisService.get_student_absence(
             token, semester_code=sem_code, student_id=student.id, force_refresh=refresh, base_url=base_url
         )
-
+        schedule = await HemisService.get_student_schedule_cached(
+            token, semester_code=sem_code, student_id=student.id, force_refresh=refresh, base_url=base_url
+        )
+        
+        # Pre-calculate active hours per subject name
+        subject_active_hours = {}
+        for item in schedule:
+             s_name = item.get("subject", {}).get("name")
+             t_type = item.get("trainingType", {}).get("name")
+             if s_name and t_type:
+                  if s_name not in subject_active_hours:
+                       subject_active_hours[s_name] = 0
+                  # Typically 2 hours per schedule entry (1 Juftlik)
+                  subject_active_hours[s_name] += 2
         
         parsed = []
         for item in (data or []):
             hours = item.get("absent_on", 0) + item.get("absent_off", 0)
             if hours == 0: hours = item.get("hour", 2)
+            
+            s_name = item.get("subject", {}).get("name", "Fan")
             parsed.append({
-                "subject": item.get("subject", {}).get("name", "Fan"),
+                "subject": s_name,
                 "date": datetime.fromtimestamp(item.get("lesson_date")).strftime("%Y-%m-%d") if item.get("lesson_date") else "",
-                "theme": item.get("trainingType", {}).get("name", ""), "hours": hours, "is_excused": item.get("explicable", False)
+                "theme": item.get("trainingType", {}).get("name", ""), 
+                "hours": hours, 
+                "is_excused": item.get("explicable", False),
+                "total_subject_hours": subject_active_hours.get(s_name, 0)
             })
 
         total = sum(p['hours'] for p in parsed)
@@ -427,4 +445,20 @@ async def get_subject_details_endpoint(subject_id: str, semester: str = None, st
     
     subject_absence = [{"date": datetime.fromtimestamp(item.get("lesson_date")).strftime("%d.%m.%Y") if item.get("lesson_date") else "", "hours": item.get("absent_on", 0) + item.get("absent_off", 0) or item.get("hour", 2)} for item in absence_items if str(item.get("subject", {}).get("id")) == str(subject_id)]
     
-    return {"success": True, "data": {"subject": {"name": target_subject.get("subject", {}).get("name"), "grades": {"overall": target_subject.get("overallScore", {}).get("grade", 0), "detailed": detailed_list}}, "teachers": list(teachers), "attendance": {"total_missed": sum(a['hours'] for a in subject_absence), "details": subject_absence}}}
+    # Calculate real classroom hours from schedule
+    training_hours = {}
+    for item in schedule:
+        s_id = str(item.get("subject", {}).get("id"))
+        if s_id == str(subject_id):
+            t_type = item.get("trainingType", {}).get("name")
+            if t_type:
+                # E.g., Ma'ruza, Seminar, Amaliy
+                if t_type not in training_hours:
+                    training_hours[t_type] = 0
+                training_hours[t_type] += 2 # Typically 2 hours per schedule entry
+                
+    total_active_hours = sum(training_hours.values())
+    total_missed = sum(a['hours'] for a in subject_absence)
+    percent = round((total_missed / total_active_hours) * 100, 1) if total_active_hours > 0 else 0.0
+    
+    return {"success": True, "data": {"subject": {"name": target_subject.get("subject", {}).get("name"), "total_hours": total_active_hours, "training_hours": training_hours, "grades": {"overall": target_subject.get("overallScore", {}).get("grade", 0), "detailed": detailed_list}}, "teachers": list(teachers), "attendance": {"total_missed": total_missed, "percent": percent, "details": subject_absence}}}
