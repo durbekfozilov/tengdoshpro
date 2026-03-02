@@ -395,18 +395,34 @@ async def get_attendance(
                     if t_type: types_in_schedule.add(t_type)
             
             cs = subj_item.get("curriculumSubject", {})
-            total_acload = int(cs.get("total_acload") or 0)
-            
-            # Standard Oliy Ta'lim formula: 50% is Mustaqil ta'lim, 50% is Auditorium (active class)
-            auditorium_hours = total_acload // 2
-            
-            if len(types_in_schedule) > 0 and auditorium_hours > 0:
-                per_type = auditorium_hours // len(types_in_schedule)
+            training_info = cs.get("training_hours", [])
+            if not isinstance(training_info, list):
+                # Sometime Hemis returns None or empty dicts
+                training_info = []
                 
-                subject_active_hours[s_id] = auditorium_hours
-                subject_training_hours[s_id] = {}
-                for tt in types_in_schedule:
-                    subject_training_hours[s_id][tt] = per_type
+            subject_training_hours[s_id] = {}
+            total_active = 0
+            
+            # Map the exact official hours returned by Hemis per class type
+            for item in training_info:
+                t_name = item.get("trainingType", {}).get("name")
+                hrs = item.get("hour", 0)
+                if t_name and hrs > 0:
+                    subject_training_hours[s_id][t_name] = hrs
+                    total_active += hrs
+            
+            # Fallback if training_hours array is empty but we have acload
+            if total_active == 0:
+                total_acload = int(cs.get("total_acload") or 0)
+                auditorium_hours = total_acload // 2
+                
+                if len(types_in_schedule) > 0 and auditorium_hours > 0:
+                    per_type = auditorium_hours // len(types_in_schedule)
+                    total_active = auditorium_hours
+                    for tt in types_in_schedule:
+                        subject_training_hours[s_id][tt] = per_type
+                        
+            subject_active_hours[s_id] = total_active
         
         parsed = []
         for item in (data or []):
@@ -493,16 +509,59 @@ async def get_subject_details_endpoint(subject_id: str, semester: str = None, st
             if t_type: types_in_schedule.add(t_type)
             
     cs = target_subject.get("curriculumSubject", {})
-    total_acload = int(cs.get("total_acload") or 0)
-    total_active_hours = total_acload // 2
     
+    # Use exact training hours offical mapper
+    training_info = cs.get("training_hours", [])
+    if not isinstance(training_info, list):
+        training_info = []
+
     training_hours = {}
-    if len(types_in_schedule) > 0 and total_active_hours > 0:
-        per_type = total_active_hours // len(types_in_schedule)
-        for tt in types_in_schedule:
-            training_hours[tt] = per_type
+    total_active_hours = 0
+    
+    for item in training_info:
+        t_name = item.get("trainingType", {}).get("name")
+        hrs = item.get("hour", 0)
+        if t_name and hrs > 0:
+            training_hours[t_name] = hrs
+            total_active_hours += hrs
+            
+    # Fallback to math if empty
+    if total_active_hours == 0:
+        total_acload = int(cs.get("total_acload") or 0)
+        total_active_hours = total_acload // 2
         
+        if len(types_in_schedule) > 0 and total_active_hours > 0:
+            per_type = total_active_hours // len(types_in_schedule)
+            for tt in types_in_schedule:
+                training_hours[tt] = per_type
+                
     total_missed = sum(a['hours'] for a in subject_absence)
     percent = round((total_missed / total_active_hours) * 100, 1) if total_active_hours > 0 else 0.0
+    
+    return {
+        "success": True, 
+        "data": {
+            "subject": {
+                "id": subject_id,
+                "name": target_subject.get("subject", {}).get("name") or cs.get("subject", {}).get("name", ""),
+                "total_hours": total_active_hours,
+                "training_hours": training_hours,
+                "type": cs.get("subjectType", {}).get("name", "Noma'lum")
+            },
+            "teachers": list(teachers),
+            "attendance": {
+                "total_missed": total_missed,
+                "percent": percent,
+                "details": subject_absence
+            },
+            "grades": {
+                "ON": detailed_dict.get("ON", {"val_5": 0, "raw": 0}),
+                "YN": detailed_dict.get("YN", {"val_5": 0, "raw": 0}),
+                "JN": detailed_dict.get("JN", {"val_5": 0, "raw": 0}),
+                "detailed": detailed_list,
+                "overall": target_subject.get("overallScore", {}).get("grade", 0)
+            }
+        }
+    }
     
 
