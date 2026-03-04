@@ -15,6 +15,7 @@ class _ClubCreateScreenState extends State<ClubCreateScreen> {
   final DataService _dataService = DataService();
   
   String _name = '';
+  String _department = '';
   String _description = '';
   String _channelLink = '';
   String _leaderLogin = '';
@@ -28,6 +29,7 @@ class _ClubCreateScreenState extends State<ClubCreateScreen> {
 
     final data = {
       'name': _name,
+      'department': _department.isEmpty ? 'Student Council' : _department,
       'description': _description,
       'channel_link': _channelLink,
       'icon': 'groups_rounded',
@@ -82,6 +84,14 @@ class _ClubCreateScreenState extends State<ClubCreateScreen> {
                 icon: Icons.groups,
                 onSaved: (val) => _name = val ?? '',
                 validator: (val) => val != null && val.isEmpty ? "Nom kiritish majburiy" : null,
+              ),
+
+              _buildTextField(
+                label: "Qaysi bo'lim qoshida",
+                hint: "Masalan: Student Council",
+                icon: Icons.account_balance,
+                onSaved: (val) => _department = val ?? '',
+                validator: (val) => val != null && val.isEmpty ? "Bo'lim nomi kiritish majburiy" : null,
               ),
               
               _buildTextField(

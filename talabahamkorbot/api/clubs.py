@@ -64,6 +64,7 @@ async def create_club(
     club = Club(
         name=req.name,
         description=req.description,
+        department=req.department or "Student Council",
         icon=req.icon or "groups_rounded",
         color=req.color or "#4A90E2",
         statute_link=req.statute_link,
@@ -723,6 +724,8 @@ async def update_club(
         
     if req.name is not None:
         club.name = req.name
+    if req.department is not None:
+        club.department = req.department
     if req.description is not None:
         club.description = req.description
     if req.channel_link is not None:

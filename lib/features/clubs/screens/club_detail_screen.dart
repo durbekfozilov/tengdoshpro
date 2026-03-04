@@ -85,7 +85,7 @@ class _ClubDetailScreenState extends State<ClubDetailScreen> {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      "${widget.club['members_count'] ?? 0} ta a'zo • 2024 yilda tashkil topgan", 
+                      "${widget.club['members_count'] ?? 0} ta a'zo • ${widget.club['department'] ?? 'Student Council'}", 
                       style: const TextStyle(
                         color: Color(0xFF8E8E93), 
                         fontSize: 14,

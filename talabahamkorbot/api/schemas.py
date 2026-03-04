@@ -96,6 +96,7 @@ class StudentDashboardSchema(BaseModel):
 class ClubSchema(BaseModel):
     id: int
     name: str
+    department: Optional[str] = "Student Council"
     description: Optional[str]
     icon: Optional[str] = None
     color: Optional[str] = None
@@ -112,6 +113,7 @@ class ClubSchema(BaseModel):
 
 class ClubCreateSchema(BaseModel):
     name: str
+    department: Optional[str] = "Student Council"
     description: Optional[str] = None
     icon: Optional[str] = None
     color: Optional[str] = None
@@ -121,6 +123,7 @@ class ClubCreateSchema(BaseModel):
 
 class ClubUpdateSchema(BaseModel):
     name: Optional[str] = None
+    department: Optional[str] = None
     description: Optional[str] = None # NEW
     channel_link: Optional[str] = None
     leader_login: Optional[str] = None
