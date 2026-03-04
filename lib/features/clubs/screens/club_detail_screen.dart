@@ -831,35 +831,38 @@ class _EventsTabState extends State<_EventsTab> {
                      child: Column(
                        crossAxisAlignment: CrossAxisAlignment.stretch,
                        children: [
-                         // Media rendering on top
+                         // Media rendering on top with PageView
                          if (a['images'] != null && (a['images'] as List).isNotEmpty)
                            Container(
-                             height: 120,
+                             height: 180,
                              margin: const EdgeInsets.only(bottom: 12),
-                             child: ListView.builder(
-                               scrollDirection: Axis.horizontal,
+                             child: PageView.builder(
                                itemCount: (a['images'] as List).length,
                                itemBuilder: (ctx, idx) {
                                   final img = a['images'][idx];
-                                  // For telegram file_id, normally we'd need an actual bot URL to load it. 
-                                  // As a fallback/placeholder if we only have file_id:
+                                  final fileId = img['file_id'];
+                                  final imageUrl = fileId != null 
+                                      ? '${ApiConstants.backendUrl}/files/$fileId' 
+                                      : '';
+                                  
                                   return Container(
-                                    width: 100, 
-                                    margin: const EdgeInsets.only(right: 8),
+                                    margin: const EdgeInsets.symmetric(horizontal: 4),
                                     decoration: BoxDecoration(
                                       color: Colors.grey[200],
-                                      borderRadius: BorderRadius.circular(8),
-                                      image: DecorationImage(
-                                        image: NetworkImage("https://api.telegram.org/bot/file/..."), // We actually don't have absolute URL without bot token. We'll just show an icon if we only have file_id.
+                                      borderRadius: BorderRadius.circular(12),
+                                      image: imageUrl.isNotEmpty ? DecorationImage(
+                                        image: NetworkImage(imageUrl),
                                         fit: BoxFit.cover,
                                         onError: (_, __) {}
-                                      )
+                                      ) : null,
                                     ),
-                                    child: const Center(child: Icon(Icons.image, color: Colors.grey)),
+                                    child: imageUrl.isEmpty ? const Center(child: Icon(Icons.image, color: Colors.grey)) : null,
                                   );
                                }
                              )
                            ),
+                         
+                         // Event Info & Date
                          Row(
                            crossAxisAlignment: CrossAxisAlignment.start,
                            children: [
@@ -903,14 +906,14 @@ class _EventsTabState extends State<_EventsTab> {
                                  Text(a['description'], style: const TextStyle(fontSize: 13, color: Colors.black87), maxLines: 2, overflow: TextOverflow.ellipsis),
                                  const SizedBox(height: 8),
                                ],
-                               Row(
+                                Row(
                                   children: [
-                                     const Icon(Icons.location_on, size: 14, color: Colors.grey),
+                                     const Icon(Icons.people, size: 14, color: Colors.grey),
                                      const SizedBox(width: 4),
-                                     Text(AppDictionary.tr(context, 'msg_event_loc_time_not_entered'), style: TextStyle(color: Colors.grey, fontSize: 12)),
+                                     Text("${a['participants_count'] ?? 0} kishi qatnashdi", style: const TextStyle(color: Colors.grey, fontSize: 12)),
                                   ]
-                               ),
-                               
+                                ),
+                                
                                if (widget.isLeader && a['status'] == "O'tkazildi" && a['is_processed'] != true) ...[
                                  const SizedBox(height: 12),
                                  Align(
