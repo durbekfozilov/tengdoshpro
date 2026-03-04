@@ -412,7 +412,7 @@ class _MembersTabState extends State<_MembersTab> {
                     Builder(builder: (context) {
                       String? profileUrl = m['image_url'];
                       if (profileUrl != null && !profileUrl.startsWith('http')) {
-                         profileUrl = '${ApiConstants.backendUrl}/files/$profileUrl';
+                        profileUrl = '${ApiConstants.backendUrl}/api/v1/files/${m['image_url']}';
                       }
                       return profileUrl != null
                         ? CircleAvatar(
@@ -848,7 +848,7 @@ class _EventsTabState extends State<_EventsTab> {
                                   final img = a['images'][idx];
                                   final fileId = img['file_id'];
                                   final imageUrl = fileId != null 
-                                      ? '${ApiConstants.backendUrl}/files/$fileId' 
+                                      ? '${ApiConstants.backendUrl}/api/v1/files/$fileId' 
                                       : '';
                                   
                                   return Container(
