@@ -45,21 +45,58 @@ class _ClubsScreenState extends State<ClubsScreen> {
   }
 
   IconData _getIconData(String? iconName, String clubName) {
-    if (iconName != null && iconName != 'groups_rounded' && iconName.isNotEmpty) {
+    if (iconName != null && iconName != 'groups_rounded' && iconName.isNotEmpty && iconName != 'psychology') {
       // You can add more mapping here if needed in the future
-      return Icons.groups_rounded;
+      // return Icons.groups_rounded;
     }
-    final icons = [
-      Icons.groups_rounded, Icons.sports_esports, Icons.language, Icons.science,
-      Icons.menu_book, Icons.music_note, Icons.palette, Icons.computer,
-      Icons.business, Icons.gavel, Icons.camera_alt, Icons.public,
-      Icons.favorite, Icons.emoji_events, Icons.theater_comedy, Icons.code
-    ];
-    int hash = 0;
-    for (int i = 0; i < clubName.length; i++) {
-       hash = clubName.codeUnitAt(i) + ((hash << 5) - hash);
-    }
-    return icons[(hash.abs() ^ 0x1234) % icons.length];
+    
+    final lowerName = clubName.toLowerCase();
+    
+    // Books & Reading
+    if (lowerName.contains('book') || lowerName.contains('kitob') || lowerName.contains('mutolaa') || lowerName.contains('read') || lowerName.contains('kutubxona')) return Icons.menu_book;
+    
+    // Language & International
+    if (lowerName.contains('language') || lowerName.contains('til') || lowerName.contains('english') || lowerName.contains('xorijiy') || lowerName.contains('international')) return Icons.language;
+    
+    // Art, Painting, Creativity, Vision
+    if (lowerName.contains('art') || lowerName.contains("san'at") || lowerName.contains('vision') || lowerName.contains('rassom') || lowerName.contains('dizayn') || lowerName.contains('creative')) return Icons.palette;
+    
+    // Career, Business, Academy
+    if (lowerName.contains('karyera') || lowerName.contains('career') || lowerName.contains('academy') || lowerName.contains('pragmatic') || lowerName.contains('biznes') || lowerName.contains('business') || lowerName.contains('tadbirkor') || lowerName.contains('maktabi') || lowerName.contains('lider')) return Icons.business_center;
+    
+    // E-sports & Gaming
+    if (lowerName.contains('esport') || lowerName.contains('cyber') || lowerName.contains('kiber') || lowerName.contains('cybersport')) return Icons.sports_esports;
+    
+    // Specific Sports
+    if (lowerName.contains('shaxmat') || lowerName.contains('chess') || lowerName.contains('shashka')) return Icons.extension;
+    if (lowerName.contains('tennis') || lowerName.contains('badminton') || lowerName.contains('stol')) return Icons.sports_tennis;
+    if (lowerName.contains('sport') || lowerName.contains('futbol') || lowerName.contains('football') || lowerName.contains('volleyball') || lowerName.contains('voleybol')) return Icons.sports_soccer;
+    
+    // Theater, Comedy, Shows
+    if (lowerName.contains('teatr') || lowerName.contains('theater') || lowerName.contains('drama') || lowerName.contains('shou') || lowerName.contains('show') || lowerName.contains('quvnoq')) return Icons.theater_comedy;
+    
+    // Music & Dance
+    if (lowerName.contains('dance') || lowerName.contains('raqs') || lowerName.contains('music') || lowerName.contains('musiqa')) return Icons.music_note;
+    
+    // Media, Photography, Video, Journalism, Radio
+    if (lowerName.contains('radio') || lowerName.contains('mic') || lowerName.contains('ovoz')) return Icons.mic;
+    if (lowerName.contains('photo') || lowerName.contains('kamera') || lowerName.contains('kino') || lowerName.contains('video')) return Icons.camera_alt;
+    if (lowerName.contains('media') || lowerName.contains('jurnalistika') || lowerName.contains('pressa')) return Icons.article;
+    
+    // IT, Tech, Code
+    if (lowerName.contains('dastur') || lowerName.contains('it') || lowerName.contains('kompyuter') || lowerName.contains('computer') || lowerName.contains('code') || lowerName.contains('tech')) return Icons.computer;
+    
+    // Science, Debate, Intellect
+    if (lowerName.contains('fan') || lowerName.contains('olim') || lowerName.contains('ilmiy') || lowerName.contains('science') || lowerName.contains('zakovat') || lowerName.contains('debate') || lowerName.contains('munozara')) return Icons.science;
+
+    // Eco, Nature
+    if (lowerName.contains('eco') || lowerName.contains('eko') || lowerName.contains('tabiat') || lowerName.contains('hayot')) return Icons.eco;
+    
+    // Girls, Ladies
+    if (lowerName.contains('qizlar') || lowerName.contains('ayollar') || lowerName.contains('ladies') || lowerName.contains('women')) return Icons.face_3;
+    
+    // Default missing
+    return Icons.groups_rounded;
   }
 
   Color _getColor(String? colorHex, String clubName) {
