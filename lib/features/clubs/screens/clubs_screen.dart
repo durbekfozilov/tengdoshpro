@@ -44,13 +44,37 @@ class _ClubsScreenState extends State<ClubsScreen> {
     }
   }
 
-  IconData _getIconData(String? iconName) {
-    // Basic mapping or default
-    return Icons.groups_rounded;
+  IconData _getIconData(String? iconName, String clubName) {
+    if (iconName != null && iconName != 'groups_rounded' && iconName.isNotEmpty) {
+      // You can add more mapping here if needed in the future
+      return Icons.groups_rounded;
+    }
+    final icons = [
+      Icons.groups_rounded, Icons.sports_esports, Icons.language, Icons.science,
+      Icons.menu_book, Icons.music_note, Icons.palette, Icons.computer,
+      Icons.business, Icons.gavel, Icons.camera_alt, Icons.public,
+      Icons.favorite, Icons.emoji_events, Icons.theater_comedy, Icons.code
+    ];
+    int hash = 0;
+    for (int i = 0; i < clubName.length; i++) {
+       hash = clubName.codeUnitAt(i) + ((hash << 5) - hash);
+    }
+    return icons[(hash.abs() ^ 0x1234) % icons.length];
   }
 
-  Color _getColor(String? colorHex) {
-    if (colorHex == null || colorHex.isEmpty) return AppTheme.primaryBlue;
+  Color _getColor(String? colorHex, String clubName) {
+    if (colorHex == null || colorHex.isEmpty || colorHex.toUpperCase() == '#4A90E2') {
+      final colors = [
+        Colors.blue, Colors.red, Colors.green, Colors.orange,
+        Colors.purple, Colors.teal, Colors.pink, Colors.indigo,
+        Colors.amber, Colors.cyan, Colors.deepOrange, Colors.brown
+      ];
+      int hash = 0;
+      for (int i = 0; i < clubName.length; i++) {
+         hash = clubName.codeUnitAt(i) + ((hash << 5) - hash);
+      }
+      return colors[hash.abs() % colors.length];
+    }
     try {
       return Color(int.parse(colorHex.replaceFirst('#', '0xFF')));
     } catch (e) {
@@ -120,8 +144,9 @@ class _ClubsScreenState extends State<ClubsScreen> {
 
   Widget _buildClubCard(Map<String, dynamic> club) {
     final bool isJoined = club['is_joined'] ?? false;
-    final Color clubColor = _getColor(club['color']);
-    final IconData clubIcon = _getIconData(club['icon']);
+    final String clubName = club['name'] ?? 'Klub';
+    final Color clubColor = _getColor(club['color'], clubName);
+    final IconData clubIcon = _getIconData(club['icon'], clubName);
     
     return Container(
       decoration: BoxDecoration(

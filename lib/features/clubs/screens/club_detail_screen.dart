@@ -27,8 +27,19 @@ class _ClubDetailScreenState extends State<ClubDetailScreen> {
     isJoined = widget.club['is_joined'] == true;
   }
 
-  Color _getColor(String? colorHex) {
-    if (colorHex == null || colorHex.isEmpty) return AppTheme.primaryBlue;
+  Color _getColor(String? colorHex, String clubName) {
+    if (colorHex == null || colorHex.isEmpty || colorHex.toUpperCase() == '#4A90E2') {
+      final colors = [
+        Colors.blue, Colors.red, Colors.green, Colors.orange,
+        Colors.purple, Colors.teal, Colors.pink, Colors.indigo,
+        Colors.amber, Colors.cyan, Colors.deepOrange, Colors.brown
+      ];
+      int hash = 0;
+      for (int i = 0; i < clubName.length; i++) {
+         hash = clubName.codeUnitAt(i) + ((hash << 5) - hash);
+      }
+      return colors[hash.abs() % colors.length];
+    }
     try {
       return Color(int.parse(colorHex.replaceFirst('#', '0xFF')));
     } catch (_) {
