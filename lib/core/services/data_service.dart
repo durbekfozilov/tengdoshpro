@@ -726,6 +726,18 @@ class DataService {
     }
   }
 
+  Future<bool> deleteClub(int clubId) async {
+    try {
+      final response = await http.delete(
+        Uri.parse('${ApiConstants.backendUrl}/student/clubs/$clubId'),
+        headers: await _getHeaders(),
+      ).timeout(const Duration(seconds: 15));
+      return response.statusCode == 200;
+    } catch (_) {
+      return false;
+    }
+  }
+
   Future<List<dynamic>> getClubs() async {
     try {
       final response = await http.get(

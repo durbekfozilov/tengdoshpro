@@ -727,3 +727,21 @@ async def update_club(
     await db.commit()
     await db.refresh(club)
     return {"message": "Muvaffaqiyatli saqlandi"}
+
+@router.delete("/{club_id}")
+async def delete_club(
+    club_id: int,
+    student: Student = Depends(get_current_student),
+    db: AsyncSession = Depends(get_db)
+):
+    """(Yetakchi) Delete a club permanently."""
+    if student.hemis_role != 'yetakchi':
+        raise HTTPException(status_code=403, detail="Sizga ruxsat yo'q (Faqat yetakchilar uchun)")
+        
+    club = await db.get(Club, club_id)
+    if not club:
+        raise HTTPException(status_code=404, detail="Klub topilmadi")
+        
+    await db.delete(club)
+    await db.commit()
+    return {"message": "Klub o'chirildi", "status": "success"}

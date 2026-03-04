@@ -225,6 +225,8 @@ class _ClubsScreenState extends State<ClubsScreen> {
                      onSelected: (val) {
                        if (val == 'edit') {
                          _showEditClubSheet(club);
+                       } else if (val == 'delete') {
+                         _showDeleteConfirmation(club);
                        }
                      },
                      itemBuilder: (ctx) => [
@@ -235,6 +237,16 @@ class _ClubsScreenState extends State<ClubsScreen> {
                              Icon(Icons.edit, size: 20, color: Colors.blue),
                              SizedBox(width: 8),
                              Text(AppDictionary.tr(context, 'btn_edit')),
+                           ],
+                         ),
+                       ),
+                       const PopupMenuItem(
+                         value: 'delete',
+                         child: Row(
+                           children: [
+                             Icon(Icons.delete, size: 20, color: Colors.red),
+                             SizedBox(width: 8),
+                             Text("O'chirish", style: TextStyle(color: Colors.red)),
                            ],
                          ),
                        ),
@@ -354,6 +366,43 @@ class _ClubsScreenState extends State<ClubsScreen> {
           }
         );
       }
+    );
+  }
+
+  void _showDeleteConfirmation(Map<String, dynamic> club) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text("Klubni o'chirish"),
+        content: Text("${club['name'] ?? 'Klub'}ni o'chirishni xohlaysizmi? Bu amalni ortga qaytarib bo'lmaydi."),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text("Bekor qilish", style: TextStyle(color: Colors.grey)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () async {
+              Navigator.pop(ctx); // close dialog
+              setState(() => _isLoading = true);
+              final success = await _dataService.deleteClub(club['id']);
+              if (!mounted) return;
+              if (success) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Klub muvaffaqiyatli o'chirildi"), backgroundColor: Colors.green),
+                );
+                _loadClubs();
+              } else {
+                setState(() => _isLoading = false);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Xatolik yuz berdi"), backgroundColor: Colors.red),
+                );
+              }
+            },
+            child: const Text("O'chirish", style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
     );
   }
 }
