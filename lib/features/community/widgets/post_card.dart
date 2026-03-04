@@ -413,7 +413,8 @@ class _PostCardState extends State<PostCard> {
                     if (val == 'delete') _showDeleteDialog();
                   },
                   itemBuilder: (context) => [
-                    PopupMenuItem(value: 'edit', child: Row(children: [Icon(Icons.edit, size: 20), SizedBox(width: 8), Text(AppDictionary.tr(context, 'btn_edit'))])),
+                    if (widget.post.isMine)
+                      PopupMenuItem(value: 'edit', child: Row(children: [Icon(Icons.edit, size: 20), SizedBox(width: 8), Text(AppDictionary.tr(context, 'btn_edit'))])),
                     const PopupMenuItem(value: 'delete', child: Row(children: [Icon(Icons.delete, color: Colors.red, size: 20), SizedBox(width: 8), Text("O'chirish", style: TextStyle(color: Colors.red))])),
                   ],
                 )

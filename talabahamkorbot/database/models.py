@@ -1697,3 +1697,13 @@ class ClickTransaction(Base):
     
     created_at: Mapped[datetime] = mapped_column(DateTime(), default=datetime.utcnow)
     updated_at: Mapped[datetime | None] = mapped_column(DateTime(), nullable=True, onupdate=datetime.utcnow)
+
+class AppConfig(Base):
+    __tablename__ = "app_config"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    min_version: Mapped[str] = mapped_column(String, default="1.0.0")
+    latest_version: Mapped[str] = mapped_column(String, default="1.0.0")
+    force_update: Mapped[bool] = mapped_column(Boolean, default=False)
+    update_url_android: Mapped[str] = mapped_column(String, nullable=True)
+    update_url_ios: Mapped[str] = mapped_column(String, nullable=True)
+    maintenance_mode: Mapped[bool] = mapped_column(Boolean, default=False)

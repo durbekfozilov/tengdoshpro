@@ -429,9 +429,7 @@ def _map_post_optimized(post: ChoyxonaPost, current_user, is_liked: bool, is_rep
     is_moderator = is_global_moderator(login) or (current_user_id == 730)
 
     is_mine = False
-    if is_moderator:
-        is_mine = True
-    elif post.staff_id and is_staff_user and post.staff_id == current_user_id:
+    if post.staff_id and is_staff_user and post.staff_id == current_user_id:
         is_mine = True
     elif post.student_id and not is_staff_user and post.student_id == current_user_id:
         is_mine = True
@@ -568,7 +566,7 @@ async def update_post(
     login = str(login_raw or '').strip()
     is_moderator = is_global_moderator(login) or (getattr(student, 'id', 0) == 730)
 
-    if not is_moderator and post.student_id != student.id and post.staff_id != student.id:
+    if post.student_id != student.id and post.staff_id != student.id:
         raise HTTPException(status_code=403, detail="Siz faqat o'zingizning postingizni o'zgartira olasiz")
         
     post.content = data.content
@@ -1121,13 +1119,8 @@ async def edit_comment(
         raise HTTPException(status_code=404, detail="Komment topilmadi")
         
     # MODERATOR CHECK
-    from utils.moderators import is_global_moderator
-    login_raw = getattr(student, 'hemis_login', None) or getattr(student, 'hemis_id', None)
-    login = str(login_raw or '').strip()
-    is_moderator = is_global_moderator(login) or (getattr(student, 'id', 0) == 730)
-
-    if not is_moderator and comment.student_id != student.id and comment.staff_id != student.id:
-        raise HTTPException(status_code=403, detail="Siz faqat o'zingizning kommentingizni o'zgartira olasiz")
+    if comment.student_id != student.id and comment.staff_id != student.id:
+        raise HTTPException(status_code=403, detail="Siz faqat o'zingizning izohingizni o'zgartira olasiz")
         
     comment.content = data.content
     await db.commit()
@@ -1179,9 +1172,7 @@ def _map_comment_optimized(comment: "ChoyxonaComment", current_user, is_liked: b
     is_moderator = is_global_moderator(login) or (current_user_id == 730)
 
     is_mine = False
-    if is_moderator:
-        is_mine = True
-    elif comment.staff_id and is_staff_user and comment.staff_id == current_user_id:
+    if comment.staff_id and is_staff_user and comment.staff_id == current_user_id:
         is_mine = True
     elif comment.student_id and not is_staff_user and comment.student_id == current_user_id:
         is_mine = True

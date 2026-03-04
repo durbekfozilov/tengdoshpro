@@ -57,8 +57,8 @@ async def buy_plan(
         student.is_premium = True
         student.premium_expiry = now + timedelta(days=plan.duration_days)
         
-    # Reset AI Usage & Set Paid Limit
-    student.ai_limit = 25
+    # Reset AI Usage & Set Paid Limit (Unlimited)
+    student.ai_limit = 9999
     if not student.ai_usage_count: student.ai_usage_count = 0
     
     await db.commit()

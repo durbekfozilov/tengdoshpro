@@ -114,14 +114,15 @@ class CommentItem extends StatelessWidget {
                   context: context,
                   builder: (ctx) => Wrap(
                     children: [
-                      ListTile(
-                        leading: const Icon(Icons.edit, color: Colors.blue),
-                        title: Text(AppDictionary.tr(context, 'btn_edit')),
-                        onTap: () {
-                          Navigator.pop(ctx);
-                          _showEditDialog(context);
-                        },
-                      ),
+                      if (comment.isMine)
+                        ListTile(
+                          leading: const Icon(Icons.edit, color: Colors.blue),
+                          title: Text(AppDictionary.tr(context, 'btn_edit')),
+                          onTap: () {
+                            Navigator.pop(ctx);
+                            _showEditDialog(context);
+                          },
+                        ),
                       ListTile(
                         leading: const Icon(Icons.delete, color: Colors.red),
                         title: const Text("O'chirish"),

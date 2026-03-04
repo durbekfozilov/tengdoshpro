@@ -128,6 +128,14 @@ async def get_my_profile(
              else:
                   effective_image = "https://ui-avatars.com/api/?name=" + student.full_name.replace(" ", "+")
         
+        from datetime import datetime, timedelta
+        now = datetime.utcnow()
+        is_premium_active = getattr(student, 'is_premium', False)
+        # Check grace period (3 days)
+        if is_premium_active and student.premium_expiry:
+             if student.premium_expiry + timedelta(days=3) < now:
+                  is_premium_active = False
+
         return {
              "id": student.id,
              "full_name": display_name,
@@ -149,13 +157,24 @@ async def get_my_profile(
              "student_status": "active" if student.is_active else "inactive",
              "hemis_id": staff_id,
              "hemis_login": staff_id,
-             "is_premium": getattr(student, 'is_premium', False),
+             "is_premium": is_premium_active,
              "premium_expiry": student.premium_expiry.isoformat() if student.premium_expiry else None,
-             "custom_badge": getattr(student, 'custom_badge', None),
+             "custom_badge": getattr(student, 'custom_badge', None) if is_premium_active else None,
              "is_registered_bot": False # Simplification
         }
 
     data = StudentProfileSchema.model_validate(student).model_dump()
+    
+    from datetime import datetime, timedelta
+    now = datetime.utcnow()
+    is_premium_active = student.is_premium
+    if is_premium_active and student.premium_expiry:
+         if student.premium_expiry + timedelta(days=3) < now:
+              is_premium_active = False
+              
+    data['is_premium'] = is_premium_active
+    if not is_premium_active:
+         data['custom_badge'] = None
     
     # Parse first/last names from full_name if available
     fn = (student.full_name or "").strip()
@@ -643,6 +662,17 @@ async def get_student_public_profile(
         
     # Validation logic similar to /me but limited
     data = StudentProfileSchema.model_validate(s).model_dump()
+    
+    from datetime import datetime, timedelta
+    now = datetime.utcnow()
+    is_premium_active = s.is_premium
+    if is_premium_active and s.premium_expiry:
+         if s.premium_expiry + timedelta(days=3) < now:
+              is_premium_active = False
+              
+    data['is_premium'] = is_premium_active
+    if not is_premium_active:
+         data['custom_badge'] = None
     
     # Format Name 
     from utils.student_utils import format_name

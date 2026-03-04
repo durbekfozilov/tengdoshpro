@@ -24,6 +24,8 @@ async def cmd_start_deep_link(message: Message, command: CommandObject, session:
     
     if not args:
         return
+        
+    token = args
 
     # --- 1. LEGACY AUTH FLOW ---
     if args.startswith("auth_"):

@@ -33,7 +33,7 @@ class _ManagementAppealsScreenState extends State<ManagementAppealsScreen> with 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
     _loadData();
   }
   
@@ -111,7 +111,8 @@ class _ManagementAppealsScreenState extends State<ManagementAppealsScreen> with 
           indicatorColor: AppTheme.primaryBlue,
           tabs: [
             Tab(text: "Statistika"),
-            Tab(text: "Ro'yxat"),
+            Tab(text: "Bizga kelgan"),
+            Tab(text: "Barcha murojaatlar"),
           ],
         ),
       ),
@@ -126,7 +127,8 @@ class _ManagementAppealsScreenState extends State<ManagementAppealsScreen> with 
                         controller: _tabController,
                         children: [
                           _buildStatsTab(),
-                          _buildListTab(),
+                          _buildListTab(isAddressedToMe: true),
+                          _buildListTab(isAddressedToMe: false),
                         ],
                       ),
                     ),
@@ -255,7 +257,34 @@ class _ManagementAppealsScreenState extends State<ManagementAppealsScreen> with 
     );
   }
 
-  Widget _buildListTab() {
+  Widget _buildListTab({required bool isAddressedToMe}) {
+    // 1. Determine user scope to filter "Bizga kelgan"
+    final currentUserRole = Provider.of<AuthProvider>(context, listen: false).currentUser?.role?.toLowerCase() ?? "";
+    final isManagement = Provider.of<AuthProvider>(context, listen: false).isManagement;
+    
+    // Default roles to filter by if isAddressedToMe == true
+    List<String> myRoles = [];
+    if (currentUserRole.contains('rahbariyat') || currentUserRole.contains('rektor') || currentUserRole.contains('prorektor')) {
+        myRoles = ['rahbariyat', 'rektor', 'prorektor', 'yoshlar_prorektor'];
+    } else if (currentUserRole.contains('dekan')) {
+        myRoles = ['dekanat', 'dekan', 'dekan_orinbosari', 'dekan_yoshlar'];
+    }
+    
+    // 2. Filter appeals
+    final filteredAppeals = _appeals.where((a) {
+        if (isAddressedToMe) {
+            final aRole = a.assignedRole?.toLowerCase() ?? "";
+            // If we have specific roles mapped to this user, check if appeal role is in it
+            if (myRoles.isNotEmpty) {
+                if (!myRoles.contains(aRole)) return false;
+            } else {
+                // strict fallback, just show their exact role
+                if (aRole != currentUserRole) return false;
+            }
+        }
+        return true;
+    }).toList();
+
     return Column(
       children: [
         // Modern Filters Scroll
@@ -293,12 +322,26 @@ class _ManagementAppealsScreenState extends State<ManagementAppealsScreen> with 
         ),
         
         Expanded(
-          child: ListView.builder(
+          child: filteredAppeals.isEmpty 
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.inbox_rounded, size: 64, color: Colors.grey[300]),
+                  const SizedBox(height: 16),
+                  Text(
+                    isAddressedToMe ? "Sizga murojaatlar kelib tushmagan" : "Murojaatlar ro'yxati bo'sh",
+                    style: TextStyle(color: Colors.grey[600], fontSize: 16),
+                  )
+                ],
+              ),
+            )
+          : ListView.builder(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
             physics: const BouncingScrollPhysics(),
-            itemCount: _appeals.length,
+            itemCount: filteredAppeals.length,
             itemBuilder: (context, index) {
-              return _buildAppealCard(_appeals[index]);
+              return _buildAppealCard(filteredAppeals[index]);
             },
           ),
         ),

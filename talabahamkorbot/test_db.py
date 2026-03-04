@@ -1,32 +1,32 @@
 import asyncio
+from talabahamkorbot.database.db_connect import AsyncSessionLocal
+from talabahamkorbot.database.models import Student, ChoyxonaPost
 from sqlalchemy import select
-from database.db_connect import engine
-from database.models import Staff, TutorGroup, Student
+from talabahamkorbot.api.community import get_posts
 
 async def main():
-    async with engine.begin() as conn:
-        # Find a tutor
-        res = await conn.execute(select(Staff).where(Staff.role == 'tutor').limit(1))
-        tutor = res.first()
-        if not tutor:
-            print("No tutors found")
-            return
+    async with AsyncSessionLocal() as session:
+        result = await session.execute(select(Student).where(Student.hemis_login == '395241100325'))
+        stu = result.scalars().first()
+        
+        # Find the post with content "Hello Uzjoku"
+        post_result = await session.execute(select(ChoyxonaPost).where(ChoyxonaPost.content.like('%Hello Uzjoku%')))
+        post = post_result.scalars().first()
+        if post:
+            print(f"Found post {post.id} by student {post.student_id}")
             
-        print(f"Tutor: {tutor.full_name}")
-        
-        # Get groups
-        res2 = await conn.execute(select(TutorGroup).where(TutorGroup.tutor_id == tutor.id))
-        groups = res2.all()
-        print(f"Groups: {[g.group_number for g in groups]}")
-        
-        if groups:
-            g = groups[0].group_number
-            res3 = await conn.execute(select(Student).where(Student.group_number == g))
-            students = res3.all()
-            print(f"Students in {g}: {len(students)}")
-            if students:
-                s = students[0]
-                print(f"First student: {s.full_name}, limit keys: id, image_url, group_number")
-
+        # Call get_posts and print exactly what it returns for this post
+        posts = await get_posts(
+            category=None, faculty_id=None, specialty_name=None, author_id=None, 
+            skip=0, limit=20, student=stu, db=session
+        )
+        for p in posts:
+            if p.content and "Hello Uzjoku" in p.content:
+                print(f"API Returned is_mine: {p.is_mine}")
+                print(f"API Returned author_id: {p.author_id}")
+                
 if __name__ == "__main__":
+    import sys
+    sys.path.append("/home/user/talabahamkor/")
+    sys.path.append("/home/user/talabahamkor/talabahamkorbot/")
     asyncio.run(main())

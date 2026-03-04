@@ -36,7 +36,7 @@ class AuthProvider with ChangeNotifier {
   }
 
   bool get isModerator {
-    return _currentUser?.hemisLogin == '395251101397' || _currentUser?.hemisLogin == '395251101412';
+    return _currentUser?.hemisLogin == '395251101397' || _currentUser?.hemisLogin == '395241100325';
   }
 
   AuthProvider() {

@@ -35,6 +35,7 @@ from .management_appeals import router as management_appeals_router
 from .management_appeals import router as management_appeals_router
 from .banner import router as banner_router
 from .announcements import router as announcements_router
+from .app_config import router as app_config_router
 
 
 # 1. CORE & AUTH
@@ -72,6 +73,7 @@ router.include_router(announcements_router, tags=["Announcements"])
 
 
 # 5. OTHER SERVICES
+router.include_router(app_config_router, prefix="/app-config", tags=["App Config"])
 router.include_router(ai_router, prefix="/ai", tags=["AI"])
 router.include_router(market_router, prefix="/market", tags=["Market"])
 router.include_router(payment_router, prefix="/payment", tags=["Payment"])

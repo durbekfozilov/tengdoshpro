@@ -16,7 +16,7 @@ click_router = APIRouter(tags=["Payment Click"])
 # In production, these should be loaded from ENV
 CLICK_SECRET_KEY = os.getenv("CLICK_SECRET_KEY", "TEST_SECRET_KEY")
 
-def generate_sign_string(trans_id, service_id, secret, merchant_trans_id, amount, action, sign_time, merchant_prepare_id=None):
+def generate_sign_string(trans_id, service_id, secret, merchant_trans_id, amount, action, sign_time, merchant_prepare_id=None, click_paydoc_id=None):
     # Ensure amount matches exactly what Click expects (no .0 if it's an integer)
     try:
         f_amount = float(amount)
@@ -24,8 +24,8 @@ def generate_sign_string(trans_id, service_id, secret, merchant_trans_id, amount
     except Exception:
         amount_str = str(amount)
         
-    if merchant_prepare_id is not None:
-        raw = f"{trans_id}{service_id}{secret}{merchant_trans_id}{merchant_prepare_id}{amount_str}{action}{sign_time}"
+    if merchant_prepare_id is not None and click_paydoc_id is not None:
+        raw = f"{trans_id}{service_id}{click_paydoc_id}{secret}{merchant_trans_id}{merchant_prepare_id}{amount_str}{action}{sign_time}"
     else:
         raw = f"{trans_id}{service_id}{secret}{merchant_trans_id}{amount_str}{action}{sign_time}"
     return hashlib.md5(raw.encode('utf-8')).hexdigest()
@@ -55,11 +55,11 @@ async def click_webhook_main(
             # 1. Signature check
             calculated_sign = generate_sign_string(
                 click_trans_id, service_id, CLICK_SECRET_KEY, 
-                merchant_trans_id, amount, action, sign_time
+                merchant_trans_id, amount, action, sign_time, None, click_paydoc_id
             )
             if calculated_sign != sign_string:
                 res = {
-                    "click_trans_id": click_trans_id,
+                    "click_trans_id": str(click_trans_id),
                     "merchant_trans_id": merchant_trans_id,
                     "merchant_prepare_id": None,
                     "error": -1,
@@ -72,7 +72,7 @@ async def click_webhook_main(
             except ValueError:
                 logger.error(f"CLICK PREPARE ERROR: ValueError parsing click_trans_id='{click_trans_id}'")
                 res = {
-                    "click_trans_id": click_trans_id,
+                    "click_trans_id": str(click_trans_id),
                     "merchant_trans_id": merchant_trans_id,
                     "merchant_prepare_id": None,
                     "error": -8,
@@ -83,7 +83,7 @@ async def click_webhook_main(
             if existing_tx:
                 if existing_tx.status == "completed":
                     res = {
-                        "click_trans_id": click_trans_id,
+                        "click_trans_id": str(click_trans_id),
                         "merchant_trans_id": merchant_trans_id,
                         "merchant_prepare_id": existing_tx.id,
                         "error": -4,
@@ -91,7 +91,7 @@ async def click_webhook_main(
                     }; logger.info(f"CLICK RESPONSE: {res}"); return res
                 elif existing_tx.status == "cancelled":
                     res = {
-                        "click_trans_id": click_trans_id,
+                        "click_trans_id": str(click_trans_id),
                         "merchant_trans_id": merchant_trans_id,
                         "merchant_prepare_id": existing_tx.id,
                         "error": -9,
@@ -99,7 +99,7 @@ async def click_webhook_main(
                     }; logger.info(f"CLICK RESPONSE: {res}"); return res
                 else:
                     res = {
-                        "click_trans_id": click_trans_id,
+                        "click_trans_id": str(click_trans_id),
                         "merchant_trans_id": merchant_trans_id,
                         "merchant_prepare_id": existing_tx.id,
                         "error": 0,
@@ -140,7 +140,7 @@ async def click_webhook_main(
                          
                 if not user_obj:
                      res = {
-                        "click_trans_id": click_trans_id,
+                        "click_trans_id": str(click_trans_id),
                         "merchant_trans_id": merchant_trans_id,
                         "merchant_prepare_id": None,
                         "error": -5,
@@ -148,7 +148,7 @@ async def click_webhook_main(
                      }; logger.info(f"CLICK RESPONSE: {res}"); return res
             except ValueError:
                  res = {
-                    "click_trans_id": click_trans_id,
+                    "click_trans_id": str(click_trans_id),
                     "merchant_trans_id": merchant_trans_id,
                     "merchant_prepare_id": None,
                     "error": -5,
@@ -178,7 +178,7 @@ async def click_webhook_main(
             await db.refresh(new_tx)
 
             res = {
-                "click_trans_id": click_trans_id,
+                "click_trans_id": str(click_trans_id),
                 "merchant_trans_id": merchant_trans_id,
                 "merchant_prepare_id": new_tx.id,
                 "error": 0,
@@ -188,7 +188,7 @@ async def click_webhook_main(
         except Exception as e:
             logger.error(f"Click Prepare Error: {e}")
             res = {
-                "click_trans_id": click_trans_id,
+                "click_trans_id": str(click_trans_id),
                 "merchant_trans_id": merchant_trans_id,
                 "merchant_prepare_id": None,
                 "error": -8,
@@ -201,12 +201,12 @@ async def click_webhook_main(
             # 1. Signature check (Needs merchant_prepare_id)
             calculated_sign = generate_sign_string(
                 click_trans_id, service_id, CLICK_SECRET_KEY, 
-                merchant_trans_id, amount, action, sign_time, merchant_prepare_id
+                merchant_trans_id, amount, action, sign_time, merchant_prepare_id, click_paydoc_id
             )
             
             if calculated_sign != sign_string:
                 res = {
-                    "click_trans_id": click_trans_id,
+                    "click_trans_id": str(click_trans_id),
                     "merchant_trans_id": merchant_trans_id,
                     "merchant_confirm_id": None,
                     "error": -1,
@@ -218,7 +218,7 @@ async def click_webhook_main(
             tx = result.scalar_one_or_none()
             if not tx:
                 res = {
-                    "click_trans_id": click_trans_id,
+                    "click_trans_id": str(click_trans_id),
                     "merchant_trans_id": merchant_trans_id,
                     "merchant_confirm_id": None,
                     "error": -6,
@@ -227,7 +227,7 @@ async def click_webhook_main(
                 
             if tx.status == "completed":
                 res = {
-                    "click_trans_id": click_trans_id,
+                    "click_trans_id": str(click_trans_id),
                     "merchant_trans_id": merchant_trans_id,
                     "merchant_confirm_id": tx.id,
                     "error": -4,
@@ -235,7 +235,7 @@ async def click_webhook_main(
                 }; logger.info(f"CLICK RESPONSE: {res}"); return res
             elif tx.status == "cancelled":
                 res = {
-                    "click_trans_id": click_trans_id,
+                    "click_trans_id": str(click_trans_id),
                     "merchant_trans_id": merchant_trans_id,
                     "merchant_confirm_id": tx.id,
                     "error": -9,
@@ -245,7 +245,7 @@ async def click_webhook_main(
             # Check amounts match
             if int(float(amount)) != tx.amount:
                  res = {
-                    "click_trans_id": click_trans_id,
+                    "click_trans_id": str(click_trans_id),
                     "merchant_trans_id": merchant_trans_id,
                     "merchant_confirm_id": None,
                     "error": -2,
@@ -325,7 +325,7 @@ async def click_webhook_main(
             await db.commit()
             
             res = {
-                "click_trans_id": click_trans_id,
+                "click_trans_id": str(click_trans_id),
                 "merchant_trans_id": merchant_trans_id,
                 "merchant_confirm_id": tx.id,
                 "error": 0,
@@ -335,7 +335,7 @@ async def click_webhook_main(
         except Exception as e:
             logger.error(f"Click Complete Error: {e}")
             res = {
-                "click_trans_id": click_trans_id,
+                "click_trans_id": str(click_trans_id),
                 "merchant_trans_id": merchant_trans_id,
                 "merchant_confirm_id": None,
                 "error": -8,

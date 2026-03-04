@@ -56,8 +56,10 @@ class PremiumService:
             day7_students = day7_res.scalars().all()
             
             for s in day7_students:
-                logger.info(f"Removing premium and username for student {s.id}")
+                logger.info(f"Removing premium, username, and badge for student {s.id}")
                 s.is_premium = False
+                s.custom_badge = None
+                s.ai_limit = 25
                 
                 if s.username:
                     username_entry = await session.scalar(select(TakenUsername).where(TakenUsername.student_id == s.id))
