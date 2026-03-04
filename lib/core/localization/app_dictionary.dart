@@ -175,6 +175,162 @@ class AppDictionary {
       'uz': 'Faollik qo\'shish',
       'ru': 'Добавить активность',
     },
+    'social_form_edit_title': {
+      'uz': 'Faollikni tahrirlash',
+      'ru': 'Редактировать активность',
+    },
+    'social_form_step1_title': {
+      'uz': 'Faollik turini tanlang',
+      'ru': 'Выберите тип активности',
+    },
+    'social_form_step2_title': {
+      'uz': 'Faollik tafsilotlari',
+      'ru': 'Детали активности',
+    },
+    'social_base_name': {
+      'uz': 'Faollik nomi',
+      'ru': 'Название активности',
+    },
+    'social_base_hint': {
+      'uz': 'Faollik nomini kiriting...',
+      'ru': 'Введите название активности...',
+    },
+    'social_base_desc': {
+      'uz': 'Qisqacha ma\'lumot',
+      'ru': 'Краткая информация',
+    },
+    'social_base_desc_hint': {
+      'uz': 'Batafsil ma\'lumot bering...',
+      'ru': 'Опишите подробно...',
+    },
+    'social_marifat_name': {
+      'uz': 'Ma\'rifat darsi mavzusi',
+      'ru': 'Тема урока просвещения',
+    },
+    'social_marifat_hint': {
+      'uz': 'Mavzuni kiriting...',
+      'ru': 'Введите тему...',
+    },
+    'social_marifat_desc': {
+      'uz': 'Dars tafsilotlari',
+      'ru': 'Детали урока',
+    },
+    'social_marifat_desc_hint': {
+      'uz': 'Dars haqida batafsil ma\'lumot bering...',
+      'ru': 'Опишите подробно об уроке...',
+    },
+    'social_togarak_name': {
+      'uz': 'To\'garak nomi',
+      'ru': 'Название кружка',
+    },
+    'social_togarak_hint': {
+      'uz': 'To\'garak nomini yozing...',
+      'ru': 'Напишите название кружка...',
+    },
+    'social_togarak_desc': {
+      'uz': 'To\'garak haqida',
+      'ru': 'О кружке',
+    },
+    'social_togarak_desc_hint': {
+      'uz': 'To\'garak faoliyati haqida yozing...',
+      'ru': 'Опишите деятельность кружка...',
+    },
+    'social_yutuq_name': {
+      'uz': 'Yutuq nomi',
+      'ru': 'Название достижения',
+    },
+    'social_yutuq_hint': {
+      'uz': 'Masalan: Respublika bosqichi g\'olibi...',
+      'ru': 'Например: Победитель республиканского этапа...',
+    },
+    'social_yutuq_desc': {
+      'uz': 'Yutuq tafsilotlari',
+      'ru': 'Детали достижения',
+    },
+    'social_yutuq_desc_hint': {
+      'uz': 'Qanday yutuqqa erishildi?',
+      'ru': 'Какое достижение получено?',
+    },
+    'social_volont_name': {
+      'uz': 'Volontyorlik nomi',
+      'ru': 'Название волонтерства',
+    },
+    'social_volont_hint': {
+      'uz': 'Loyihani yozing...',
+      'ru': 'Напишите название проекта...',
+    },
+    'social_volont_desc': {
+      'uz': 'Volontyorlik ishlari',
+      'ru': 'Волонтерская работа',
+    },
+    'social_volont_desc_hint': {
+      'uz': 'Nima ishlar amalga oshirildi...',
+      'ru': 'Какая работа была выполнена...',
+    },
+    'social_madaniy_name': {
+      'uz': 'Tashrif joyi',
+      'ru': 'Место посещения',
+    },
+    'social_madaniy_hint': {
+      'uz': 'Masalan: Teatr, Muzey...',
+      'ru': 'Например: Театр, Музей...',
+    },
+    'social_madaniy_desc': {
+      'uz': 'Tashrif maqsadi',
+      'ru': 'Цель посещения',
+    },
+    'social_madaniy_desc_hint': {
+      'uz': 'Tashrif borasida qisqacha ma\'lumot...',
+      'ru': 'Краткая информация о посещении...',
+    },
+    'social_sport_name': {
+      'uz': 'Sport turi',
+      'ru': 'Вид спорта',
+    },
+    'social_sport_hint': {
+      'uz': 'Masalan: Futbol, Shaxmat...',
+      'ru': 'Например: Футбол, Шахматы...',
+    },
+    'social_sport_desc': {
+      'uz': 'Sport musobaqasi',
+      'ru': 'Спортивное соревнование',
+    },
+    'social_sport_desc_hint': {
+      'uz': 'Musobaqa haqida ma\'lumot...',
+      'ru': 'Информация о соревновании...',
+    },
+    'social_select_date': {
+      'uz': 'Sanani tanlang',
+      'ru': 'Выберите дату',
+    },
+    'social_btn_update': {
+      'uz': 'Yangilash',
+      'ru': 'Обновить',
+    },
+    'save': {
+      'uz': 'Saqlash',
+      'ru': 'Сохранить',
+    },
+    'lbl_social_activity': {
+      'uz': 'Ijtimoiy Faollik',
+      'ru': 'Социальная активность',
+    },
+    'social_msg_success_submit': {
+      'uz': 'Faollik muvaffaqiyatli tarzda yuborildi',
+      'ru': 'Активность успешно отправлена',
+    },
+    'social_msg_updated': {
+      'uz': 'Faollik yangilandi',
+      'ru': 'Активность обновлена',
+    },
+    'social_btn_edit': {
+      'uz': 'Tahrirlash',
+      'ru': 'Редактировать',
+    },
+    'social_btn_delete': {
+      'uz': 'O\'chirish',
+      'ru': 'Удалить',
+    },
     'social_filter_all': {
       'uz': 'Barchasi',
       'ru': 'Все',
@@ -1377,6 +1533,10 @@ class AppDictionary {
     'success': {
       'uz': 'Muvaffaqiyatli',
       'ru': 'Успешно',
+    },
+    'error_prefix': {
+      'uz': 'Xatolik',
+      'ru': 'Ошибка',
     },
   };
 

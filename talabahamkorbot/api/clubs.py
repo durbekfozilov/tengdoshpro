@@ -64,7 +64,7 @@ async def create_club(
     club = Club(
         name=req.name,
         description=req.description,
-        department=req.department or "Student Council",
+        department=req.department,
         icon=req.icon or "groups_rounded",
         color=req.color or "#4A90E2",
         statute_link=req.statute_link,

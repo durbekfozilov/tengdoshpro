@@ -108,89 +108,35 @@ async def cb_topup_start(call: CallbackQuery, state: FSMContext):
 async def msg_process_user_id(message: Message, state: FSMContext, session: AsyncSession):
     raw_id = message.text.strip()
     
-    # Search logic
-    user = await session.scalar(select(User).where(User.hemis_id == raw_id))
-    if not user:
-        user = await session.scalar(select(User).where(User.hemis_login == raw_id))
-    if not user and raw_id.isdigit():
-        user = await session.scalar(select(User).where(User.id == int(raw_id)))
+    student = await session.scalar(select(Student).where(Student.hemis_id == raw_id))
+    if not student and raw_id.isdigit():
+        student = await session.scalar(select(Student).where(Student.id == int(raw_id)))
         
-    if not user:
-        await message.answer(
-            "❌ Foydalanuvchi topilmadi.\n"
-            "Iltimos, to'g'ri ID yoki Login kiriting.",
-            reply_markup=get_back_inline_kb("owner_gifts_menu"),
-            parse_mode="HTML"
-        )
+    staff = None
+    if not student:
+        staff = await session.scalar(select(Staff).where(Staff.employee_id_number == raw_id))
+        if not staff and raw_id.isdigit():
+             staff = await session.scalar(select(Staff).where(Staff.id == int(raw_id)))
+             
+    if not student and not staff:
+        await message.answer("❌ Foydalanuvchi topilmadi.\nIltimos, to'g'ri ID kiriting.", reply_markup=get_back_inline_kb("owner_gifts_menu"), parse_mode="HTML")
         return
 
-    student = await session.scalar(select(Student).where(Student.hemis_login == user.hemis_login))
-    student_id = student.id if student else None
+    target_name = student.full_name if student else staff.full_name
+    current_balance = student.balance if student else staff.balance
     
     await state.update_data(
-        target_user_id=user.id, 
-        target_student_id=student_id,
-        target_name=user.full_name
+        target_student_id=student.id if student else None,
+        target_staff_id=staff.id if staff else None,
+        target_name=target_name,
+        current_balance=current_balance
     )
-    await state.set_state(OwnerGifts.selecting_duration)
     
-    kb = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="📅 3 kun", callback_data="gift_dur_3d")],
-        [InlineKeyboardButton(text="📅 Bir hafta", callback_data="gift_dur_7d")],
-        [InlineKeyboardButton(text="📅 10 kun", callback_data="gift_dur_10d")],
-        [InlineKeyboardButton(text="📅 Bir oy", callback_data="gift_dur_1m"), InlineKeyboardButton(text="📅 Uch oy", callback_data="gift_dur_3m")],
-        [InlineKeyboardButton(text="📅 Olti oy", callback_data="gift_dur_6m"), InlineKeyboardButton(text="📅 Bir yil", callback_data="gift_dur_1y")],
-        [InlineKeyboardButton(text="♾ Doimiy (Lifetime)", callback_data="gift_dur_life")],
-        [InlineKeyboardButton(text="⬅️ Bekor qilish", callback_data="owner_gifts_menu")]
-    ])
-    
+    await state.set_state(OwnerGifts.waiting_topup_amount)
     await message.answer(
-        f"✅ <b>Foydalanuvchi topildi:</b> {user.full_name}\n\n"
-        f"⏳ premium muddatini tanlang:",
-        reply_markup=kb,
-        parse_mode="HTML"
-    )
-
-# -------------------------------------------------------------
-# 3.1 PROCESS USER ID (FOR REVOKING)
-# -------------------------------------------------------------
-@router.message(OwnerGifts.waiting_revoke_id)
-async def msg_process_revoke_id(message: Message, state: FSMContext, session: AsyncSession):
-    raw_id = message.text.strip()
-    
-    # Search logic
-    user = await session.scalar(select(User).where(User.hemis_id == raw_id))
-    if not user:
-        user = await session.scalar(select(User).where(User.hemis_login == raw_id))
-    if not user and raw_id.isdigit():
-        user = await session.scalar(select(User).where(User.id == int(raw_id)))
-        
-    if not user:
-        await message.answer("❌ Foydalanuvchi topilmadi.", reply_markup=get_back_inline_kb("owner_gifts_menu"))
-        return
-
-    student = await session.scalar(select(Student).where(Student.hemis_login == user.hemis_login))
-    
-    # Revoke Prem
-    user.is_premium = False
-    user.premium_expiry = None
-    if student:
-        student.is_premium = False
-        student.premium_expiry = None
-        
-        from database.models import StudentNotification
-        notification = StudentNotification(
-            student_id=student.id,
-            title="⚠️ Premium muddati tugadi",
-            body="Sizning Premium obunangiz to'xtatildi yoki muddati tugadi. Imkoniyatlarni qayta tiklash uchun hisobingizni to'ldiring.",
-            type="alert"
-        )
-        session.add(notification)
-        
-    await session.commit()
-    
-    await message.answer(
-        f"✅ <b>{user.full_name}</b> dan Premium olib tashlandi.",
+        f"✅ <b>Foydalanuvchi topildi:</b> {target_name}\n"
+        f"💰 Hozirgi balans: {current_balance} so'm\n\n"
+        "Qancha summa qo'shmoqchisiz? (faqat raqam, masalan: 50000)",
         reply_markup=get_back_inline_kb("owner_gifts_menu"),
         parse_mode="HTML"
     )
@@ -204,63 +150,34 @@ async def cb_process_duration(call: CallbackQuery, state: FSMContext, session: A
     duration_code = call.data.split("_")[2] # 1m, 3m, 6m, 1y, life
     
     data = await state.get_data()
-    user_id = data.get("target_user_id")
     student_id = data.get("target_student_id")
+    staff_id = data.get("target_staff_id")
     name = data.get("target_name")
     
-    user = await session.get(User, user_id)
-    if not user:
-         await call.message.edit_text("❌ Xatolik: User topilmadi.", reply_markup=get_back_inline_kb("owner_gifts_menu"))
-         return
-
-    now = datetime.utcnow()
-    expiry_date = None
-    duration_text = ""
-    
-    if duration_code == "3d":
-        expiry_date = now + timedelta(days=3)
-        duration_text = "3 kun"
-    elif duration_code == "7d":
-        expiry_date = now + timedelta(days=7)
-        duration_text = "Bir hafta"
-    elif duration_code == "10d":
-        expiry_date = now + timedelta(days=10)
-        duration_text = "10 kun"
-    elif duration_code == "1m":
-        expiry_date = now + timedelta(days=30)
-        duration_text = "Bir oy"
-    elif duration_code == "3m":
-        expiry_date = now + timedelta(days=90)
-        duration_text = "Uch oy"
-    elif duration_code == "6m":
-        expiry_date = now + timedelta(days=180)
-        duration_text = "Olti oy"
-    elif duration_code == "1y":
-        expiry_date = now + timedelta(days=365)
-        duration_text = "Bir yil"
-    elif duration_code == "life":
-        expiry_date = now + timedelta(days=365*100)
-        duration_text = "Doimiy"
-        
-    user.is_premium = True
-    user.premium_expiry = expiry_date
-    
     student = None
+    staff = None
+    
     if student_id:
         student = await session.get(Student, student_id)
-        if student:
-            student.is_premium = True
-            student.premium_expiry = expiry_date
-            
-            from database.models import StudentNotification
-            notification = StudentNotification(
-                student_id=student.id,
-                title="🎁 Premium sovg'a qilindi!",
-                body=f"Tabriklaymiz! Sizga {duration_text} muddatga Premium obuna sovg'a qilindi.",
-                type="success"
-            )
-            session.add(notification)
+    if staff_id:
+        staff = await session.get(Staff, staff_id)
+        
+    if not student and not staff:
+        await message.answer("❌ Foydalanuvchi topilmadi.")
+        await state.clear()
+        return
+
+    from database.models import StudentNotification, TgAccount
     
+    if student:
+        student.balance += amount
+        notification = StudentNotification(student_id=student.id, title="💰 Balansingiz to'ldirildi", body=f"Hisobingizga {amount} so'm muvaffaqiyatli o'tkazildi.\nJoriy balans: {student.balance} so'm.", type="success")
+        session.add(notification)
+        current_balance = student.balance
+    if staff:
+        staff.balance += amount
+        current_balance = staff.balance
+        
     await session.commit()
     
     await call.message.edit_text(
@@ -271,12 +188,15 @@ async def cb_process_duration(call: CallbackQuery, state: FSMContext, session: A
     
     # Notification logic
     try:
+        tg_acc = None
         if student:
-            from database.models import TgAccount
             tg_acc = await session.scalar(select(TgAccount).where(TgAccount.student_id == student.id))
-            if tg_acc:
-                msg = f"🎉 <b>Sizga {duration_text} muddatga Premium sovg'a qilindi!</b>"
-                await call.bot.send_message(tg_acc.telegram_id, msg, parse_mode="HTML")
+        elif staff:
+            tg_acc = await session.scalar(select(TgAccount).where(TgAccount.staff_id == staff.id))
+            
+        if tg_acc:
+            msg = f"🎉 <b>Sizga {duration_text} muddatga Premium sovg'a qilindi!</b>"
+            await call.bot.send_message(tg_acc.telegram_id, msg, parse_mode="HTML")
     except Exception as e:
         logger.warning(f"Could not notify user: {e}")
         
@@ -480,15 +400,15 @@ async def msg_process_topup_amount(message: Message, state: FSMContext, session:
     session.add(notification)
     await session.commit()
 
-    # Try Telegram Notify
     try:
-        tg_acc = await session.scalar(select(TgAccount).where(TgAccount.student_id == student.id))
+        tg_acc = None
+        if student:
+            tg_acc = await session.scalar(select(TgAccount).where(TgAccount.student_id == student.id))
+        elif staff:
+            tg_acc = await session.scalar(select(TgAccount).where(TgAccount.staff_id == staff.id))
+            
         if tg_acc:
-            msg = (
-                f"💰 <b>Balans to'ldirildi!</b>\n\n"
-                f"Sizning hisobingizga {amount} so'm qo'shildi.\n"
-                f"Joriy balans: {student.balance} so'm."
-            )
+            msg = f"💰 <b>Balans to'ldirildi!</b>\n\nSizning hisobingizga {amount} so'm qo'shildi.\nJoriy balans: {current_balance} so'm."
             await message.bot.send_message(tg_acc.telegram_id, msg, parse_mode="HTML")
     except Exception as e:
         logger.warning(f"Could not notify user via TG: {e}")
@@ -497,7 +417,7 @@ async def msg_process_topup_amount(message: Message, state: FSMContext, session:
         f"✅ <b>Balans yangilandi!</b>\n\n"
         f"👤 {name}\n"
         f"➕ Qo'shildi: {amount} so'm\n"
-        f"💰 Yangi balans: {student.balance} so'm",
+        f"💰 Yangi balans: {current_balance} so'm",
         reply_markup=get_back_inline_kb("owner_gifts_menu"),
         parse_mode="HTML"
     )

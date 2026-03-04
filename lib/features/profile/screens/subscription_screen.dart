@@ -316,7 +316,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
               const SizedBox(height: 20),
 
               // 6. Trial Section (Hide if Premium)
-              if (_student?.isPremium == false && _student?.trialUsed == false) _buildTrialSection(),
+              if (_student?.hasActivePremium == false && _student?.trialUsed == false) _buildTrialSection(),
               
               const SizedBox(height: 40),
             ],
@@ -327,7 +327,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
   }
 
   Widget _buildPremiumBanner() {
-    bool isPremium = _student?.isPremium ?? false;
+    bool isPremium = _student?.hasActivePremium ?? false;
     String expiryText = "";
     
     if (isPremium && _student?.premiumExpiry != null) {

@@ -2543,11 +2543,13 @@ class DataService {
       final response = await _post("${ApiConstants.managementActivities}/$activityId/approve");
       if (response.statusCode == 200) {
         final body = json.decode(response.body);
+        debugPrint("DataService: Approve Response: $body");
         return body['success'] == true;
       }
-    } catch (e) {
-      debugPrint("DataService: Error approving activity: $e");
+    } catch (e, stacktrace) {
+      debugPrint("DataService: Error approving activity: $e ($stacktrace)");
     }
+    debugPrint("DataService: Approve returning false");
     return false;
   }
 

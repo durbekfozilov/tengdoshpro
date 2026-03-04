@@ -135,7 +135,7 @@ class _ActivityReviewScreenState extends State<ActivityReviewScreen> {
     if (success && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppDictionary.tr(context, 'msg_activity_approved'))));
       setState(() {
-        final index = _activities.indexWhere((a) => a['id'] == id);
+        final index = _activities.indexWhere((a) => a['id'].toString() == id.toString());
         if (index != -1) {
           if (_selectedStatus != null && _selectedStatus != "Barchasi" && _selectedStatus != "approved") {
             _activities.removeAt(index);
@@ -179,7 +179,7 @@ class _ActivityReviewScreenState extends State<ActivityReviewScreen> {
       if (success && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(AppDictionary.tr(context, 'msg_activity_rejected'))));
         setState(() {
-          final index = _activities.indexWhere((a) => a['id'] == id);
+          final index = _activities.indexWhere((a) => a['id'].toString() == id.toString());
           if (index != -1) {
             if (_selectedStatus != null && _selectedStatus != "Barchasi" && _selectedStatus != "rejected") {
               _activities.removeAt(index);

@@ -206,13 +206,15 @@ class _ClubsScreenState extends State<ClubsScreen> {
                           ]
                         ],
                       ),
-                      const SizedBox(height: 2),
-                      Text(
-                        club['department'] ?? 'Student Council',
-                        style: TextStyle(color: Colors.blueGrey[400], fontSize: 13, fontWeight: FontWeight.w500),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                      if (club['department'] != null && club['department'].toString().trim().isNotEmpty) ...[
+                        const SizedBox(height: 2),
+                        Text(
+                          club['department'],
+                          style: TextStyle(color: Colors.blueGrey[400], fontSize: 13, fontWeight: FontWeight.w500),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
                       const SizedBox(height: 4),
                       Text(
                         "${club['members_count'] ?? 0} a'zo",

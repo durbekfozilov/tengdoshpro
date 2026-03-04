@@ -162,7 +162,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     TextSpan(
                       children: [
                         TextSpan(text: student.fullName),
-                        if (student.isPremium) ...[
+                        if (student.hasActivePremium) ...[
                           WidgetSpan(
                             alignment: PlaceholderAlignment.middle,
                             child: Padding(
@@ -289,11 +289,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 else
                   GestureDetector(
                     onTap: () {
-                      final now = DateTime.now();
-                      final expiry = student.premiumExpiry != null ? DateTime.tryParse(student.premiumExpiry!) : null;
-                      
-                      if (!student.isPremium || (expiry != null && expiry.isBefore(now))) {
-                        // Not premium or expired (grace period)
+                      if (!student.hasActivePremium) {
+                        // Not premium or expired
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(content: Text("Username o'rnatish uchun Premium obuna faol bo'lishi kerak"))
                         );
@@ -394,13 +391,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                gradient: student.isPremium 
+                gradient: student.hasActivePremium 
                     ? const LinearGradient(colors: [Color(0xFFFFD700), Color(0xFFFFA500)]) // Gold Gradient
                     : const LinearGradient(colors: [Color(0xFF6A11CB), Color(0xFF2575FC)]), // Blue Gradient
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: (student.isPremium ? Colors.orange : const Color(0xFF2575FC)).withOpacity(0.3), 
+                    color: (student.hasActivePremium ? Colors.orange : const Color(0xFF2575FC)).withOpacity(0.3), 
                     blurRadius: 10, 
                     offset: const Offset(0, 5)
                   )
@@ -412,8 +409,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     padding: const EdgeInsets.all(8),
                     decoration: const BoxDecoration(color: Colors.white24, shape: BoxShape.circle),
                     child: Icon(
-                      student.isPremium ? Icons.verified_rounded : Icons.workspace_premium, 
-                      color: student.isPremium ? Colors.white : Colors.amber, 
+                      student.hasActivePremium ? Icons.verified_rounded : Icons.workspace_premium, 
+                      color: student.hasActivePremium ? Colors.white : Colors.amber, 
                       size: 24
                     ),
                   ),
@@ -424,11 +421,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       // Full Name
                       children: [
                          Text(
-                           student.isPremium ? "Premium foydalanuvchi" : "Premium Obuna", 
+                           student.hasActivePremium ? "Premium foydalanuvchi" : "Premium Obuna", 
                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)
                          ),
                          Text(
-                           student.isPremium ? "Sizda barcha imkoniyatlar ochiq" : "Barcha imkoniyatlarni oching", 
+                           student.hasActivePremium ? "Sizda barcha imkoniyatlar ochiq" : "Barcha imkoniyatlarni oching", 
                            style: const TextStyle(color: Colors.white70, fontSize: 12)
                          ),
                       ],

@@ -29,7 +29,7 @@ class _ClubCreateScreenState extends State<ClubCreateScreen> {
 
     final data = {
       'name': _name,
-      'department': _department.isEmpty ? 'Student Council' : _department,
+      'department': _department,
       'description': _description,
       'channel_link': _channelLink,
       'icon': 'groups_rounded',

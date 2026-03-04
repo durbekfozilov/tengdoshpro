@@ -105,7 +105,9 @@ from services.payment_service import ClickHandler
 @router.get("/click-url")
 def get_click_url(amount: int = 10000, current_student = Depends(get_student_or_staff)):
     import time
-    order_id = f"click_{current_student.id}_{int(time.time())}"
+    # Format: 88800 (prefix) + 5 digit user ID + 5 digit timestamp
+    # Format: 80000 (prefix) + 5 digit user ID + 3 digit timestamp
+    order_id = f"80000{current_student.id:05d}{(int(time.time()) % 1000):03d}"
     
     url = ClickHandler.generate_url(amount, order_id)
     return {
@@ -114,56 +116,7 @@ def get_click_url(amount: int = 10000, current_student = Depends(get_student_or_
         "order_id": order_id
     }
 
-@router.post("/click")
-async def click_webhook(
-    click_trans_id: str = Form(...),
-    service_id: str = Form(...),
-    click_paydoc_id: str = Form(...),
-    merchant_trans_id: str = Form(...),
-    amount: str = Form(...),
-    action: int = Form(...),
-    error: int = Form(...),
-    error_note: str = Form(""),
-    sign_time: str = Form(...),
-    sign_string: str = Form(...),
-    merchant_prepare_id: str = Form(None),
-    session: AsyncSession = Depends(get_db)
-):
-    params = {
-       "click_trans_id": click_trans_id,
-       "service_id": service_id,
-       "click_paydoc_id": click_paydoc_id,
-       "merchant_trans_id": merchant_trans_id,
-       "amount": amount,
-       "action": action,
-       "error": error,
-       "error_note": error_note,
-       "sign_time": sign_time,
-       "sign_string": sign_string,
-       "merchant_prepare_id": merchant_prepare_id
-    }
-    import logging
-    logger = logging.getLogger(__name__)
-    logger.warning(f"CLICK INCOMING PARAMS: {params}")
-    
-    handler = ClickHandler(session)
-    result = await handler.handle(params)
-    
-    # Ensure required fields in response
-    # Click expects click_trans_id as a string in standard implementations (paytechuz)
-    result["click_trans_id"] = str(click_trans_id)
-    result["merchant_trans_id"] = str(merchant_trans_id)
-    result["error"] = int(result.get("error", 0))
-    result["error_note"] = str(result.get("error_note", "Success"))
-    
-    if "merchant_prepare_id" in result and result["merchant_prepare_id"] is not None:
-        result["merchant_prepare_id"] = int(result["merchant_prepare_id"])
-    if "merchant_confirm_id" in result and result["merchant_confirm_id"] is not None:
-        result["merchant_confirm_id"] = int(result["merchant_confirm_id"])
-        
-    logger.warning(f"CLICK OUTGOING RESULT: {result}")
-    
-    return result
+# (Removed legacy /click POST webhook, now handled by payment_click.py)
 
 # --- UZUM ---
 from services.payment_service import UzumHandler

@@ -152,7 +152,7 @@ class UserSearchDelegate extends SearchDelegate {
       title: Row(
        children: [
          Text(UzbekNameFormatter.format(student.fullName), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-         if (student.isPremium) ...[
+         if (student.hasActivePremium) ...[
            const SizedBox(width: 4),
            student.customBadge != null 
                ? Text(student.customBadge!, style: const TextStyle(fontSize: 16))
@@ -179,7 +179,7 @@ class UserSearchDelegate extends SearchDelegate {
           authorUsername: student.username ?? "",
           authorAvatar: student.imageUrl ?? "",
           authorRole: student.role ?? "student", 
-          authorIsPremium: student.isPremium,
+          authorIsPremium: student.hasActivePremium,
           authorCustomBadge: student.customBadge,
         )));
       },

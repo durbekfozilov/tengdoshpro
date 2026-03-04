@@ -10,6 +10,7 @@ from pydantic import BaseModel
 from fastapi.responses import StreamingResponse
 import httpx
 import logging
+import re
 
 logger = logging.getLogger(__name__)
 
@@ -85,7 +86,7 @@ async def get_management_dashboard(
             
             logger.info(f"Tutor {staff.id} dashboard for groups: {group_numbers}")
             if group_numbers:
-                base_filters.append(or_(*[Student.group_number.ilike(f"{g.strip()}%") for g in group_numbers]))
+                base_filters.append(or_(*[Student.group_number.op('~*')(f"^{re.escape(g.strip())}( |$)") for g in group_numbers]))
             else:
                 base_filters.append(Student.id == -1) # No groups = No students
 
@@ -265,7 +266,7 @@ async def get_mgmt_faculties(
             select(Student.faculty_id, Student.faculty_name)
             .where(
                 Student.university_id == uni_id, 
-                or_(*[Student.group_number.ilike(f"{g.strip()}%") for g in group_numbers]) if group_numbers else False,
+                or_(*[Student.group_number.op('~*')(f"^{re.escape(g.strip())}( |$)") for g in group_numbers]) if group_numbers else False,
                 Student.faculty_id != None
             )
             .distinct()
@@ -310,7 +311,7 @@ async def get_mgmt_education_types(
     if s_role == 'tyutor':
         tg_stmt = select(TutorGroup.group_number).where(TutorGroup.tutor_id == staff.id)
         group_numbers = (await db.execute(tg_stmt)).scalars().all()
-        filters.append(or_(*[Student.group_number.ilike(f"{g.strip()}%") for g in group_numbers]) if group_numbers else False)
+        filters.append(or_(*[Student.group_number.op('~*')(f"^{re.escape(g.strip())}( |$)") for g in group_numbers]) if group_numbers else False)
 
     stmt = (
         select(Student.education_type)
@@ -350,7 +351,7 @@ async def get_mgmt_levels(
     if s_role == 'tyutor':
         tg_stmt = select(TutorGroup.group_number).where(TutorGroup.tutor_id == staff.id)
         group_numbers = (await db.execute(tg_stmt)).scalars().all()
-        filters.append(or_(*[Student.group_number.ilike(f"{g.strip()}%") for g in group_numbers]) if group_numbers else False)
+        filters.append(or_(*[Student.group_number.op('~*')(f"^{re.escape(g.strip())}( |$)") for g in group_numbers]) if group_numbers else False)
 
     stmt = (
         select(Student.level_name)
@@ -392,7 +393,7 @@ async def get_mgmt_education_forms(
     if s_role == 'tyutor':
         tg_stmt = select(TutorGroup.group_number).where(TutorGroup.tutor_id == staff.id)
         group_numbers = (await db.execute(tg_stmt)).scalars().all()
-        filters.append(or_(*[Student.group_number.ilike(f"{g.strip()}%") for g in group_numbers]) if group_numbers else False)
+        filters.append(or_(*[Student.group_number.op('~*')(f"^{re.escape(g.strip())}( |$)") for g in group_numbers]) if group_numbers else False)
 
     stmt = (
         select(Student.education_form)
@@ -433,7 +434,7 @@ async def get_mgmt_groups_list(
     if s_role == 'tyutor':
         tg_stmt = select(TutorGroup.group_number).where(TutorGroup.tutor_id == staff.id)
         group_numbers = (await db.execute(tg_stmt)).scalars().all()
-        filters.append(or_(*[Student.group_number.ilike(f"{g.strip()}%") for g in group_numbers]) if group_numbers else False)
+        filters.append(or_(*[Student.group_number.op('~*')(f"^{re.escape(g.strip())}( |$)") for g in group_numbers]) if group_numbers else False)
 
     stmt = (
         select(Student.group_number)
@@ -472,7 +473,7 @@ async def get_mgmt_specialties(
     if s_role == 'tyutor':
         tg_stmt = select(TutorGroup.group_number).where(TutorGroup.tutor_id == staff.id)
         group_numbers = (await db.execute(tg_stmt)).scalars().all()
-        filters.append(or_(*[Student.group_number.ilike(f"{g.strip()}%") for g in group_numbers]) if group_numbers else False)
+        filters.append(or_(*[Student.group_number.op('~*')(f"^{re.escape(g.strip())}( |$)") for g in group_numbers]) if group_numbers else False)
 
     stmt = (
         select(Student.specialty_name)
@@ -641,7 +642,7 @@ async def search_mgmt_students(
         if not group_numbers:
             return {"success": True, "total_count": 0, "app_users_count": 0, "data": []}
             
-        db_filters.append(or_(*[Student.group_number.ilike(f"{g.strip()}%") for g in group_numbers]))
+        db_filters.append(or_(*[Student.group_number.op('~*')(f"^{re.escape(g.strip())}( |$)") for g in group_numbers]))
 
     
     search_filters = list(db_filters)
@@ -920,7 +921,7 @@ async def get_mgmt_groups_simple(
         from database.models import TutorGroup
         tg_stmt = select(TutorGroup.group_number).where(TutorGroup.tutor_id == staff.id)
         group_numbers = (await db.execute(tg_stmt)).scalars().all()
-        stmt = stmt.where(or_(*[Student.group_number.ilike(f"{g.strip()}%") for g in group_numbers]) if group_numbers else False)
+        stmt = stmt.where(or_(*[Student.group_number.op('~*')(f"^{re.escape(g.strip())}( |$)") for g in group_numbers]) if group_numbers else False)
         
     if db_fac_id:
         stmt = stmt.where(Student.faculty_id == db_fac_id)
@@ -1800,7 +1801,7 @@ async def approve_mgmt_activity(
     if staff_role == StaffRole.TYUTOR:
         groups_result = await db.scalars(select(TutorGroup.group_number).where(TutorGroup.staff_id == staff.id))
         group_numbers = [g for g in groups_result.all() if g]
-        stmt = stmt.where(or_(*[Student.group_number.ilike(f"{g.strip()}%") for g in group_numbers]) if group_numbers else False)
+        stmt = stmt.where(or_(*[Student.group_number.op('~*')(f"^{re.escape(g.strip())}( |$)") for g in group_numbers]) if group_numbers else False)
     elif f_id and staff_role not in global_roles:
         stmt = stmt.where(Student.faculty_id == f_id)
 
@@ -1837,7 +1838,7 @@ async def reject_mgmt_activity(
     if staff_role == StaffRole.TYUTOR:
         groups_result = await db.scalars(select(TutorGroup.group_number).where(TutorGroup.staff_id == staff.id))
         group_numbers = [g for g in groups_result.all() if g]
-        stmt = stmt.where(or_(*[Student.group_number.ilike(f"{g.strip()}%") for g in group_numbers]) if group_numbers else False)
+        stmt = stmt.where(or_(*[Student.group_number.op('~*')(f"^{re.escape(g.strip())}( |$)") for g in group_numbers]) if group_numbers else False)
     elif f_id and staff_role not in global_roles:
         stmt = stmt.where(Student.faculty_id == f_id)
 

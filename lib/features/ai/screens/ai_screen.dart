@@ -22,7 +22,7 @@ class AiScreen extends StatelessWidget {
       ),
       body: Consumer<AuthProvider>(
         builder: (context, auth, _) {
-          final isPremium = auth.currentUser?.isPremium ?? false;
+          final isPremium = auth.currentUser?.hasActivePremium ?? false;
 
           if (!isPremium) {
             return _buildLockedUI(context);

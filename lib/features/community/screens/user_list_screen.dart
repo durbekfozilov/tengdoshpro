@@ -94,7 +94,7 @@ class _UserListScreenState extends State<UserListScreen> {
                       title: Row(
                         children: [
                           Text(UzbekNameFormatter.format(student.fullName), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                          if (student.isPremium) ...[
+                          if (student.hasActivePremium) ...[
                             const SizedBox(width: 4),
                             // Simple verify icon or custom badge logic
                             student.customBadge != null 
@@ -112,7 +112,7 @@ class _UserListScreenState extends State<UserListScreen> {
                           authorUsername: student.username ?? "",
                           authorAvatar: student.imageUrl ?? "",
                           authorRole: student.role ?? "student",
-                          authorIsPremium: student.isPremium,
+                          authorIsPremium: student.hasActivePremium,
                         )));
                       },
                     );

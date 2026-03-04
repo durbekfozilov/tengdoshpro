@@ -85,7 +85,9 @@ class _ClubDetailScreenState extends State<ClubDetailScreen> {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      "${widget.club['members_count'] ?? 0} ta a'zo • ${widget.club['department'] ?? 'Student Council'}", 
+                      widget.club['department'] != null && widget.club['department'].toString().trim().isNotEmpty 
+                        ? "${widget.club['members_count'] ?? 0} ta a'zo • ${widget.club['department']}"
+                        : "${widget.club['members_count'] ?? 0} ta a'zo",
                       style: const TextStyle(
                         color: Color(0xFF8E8E93), 
                         fontSize: 14,

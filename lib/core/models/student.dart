@@ -43,9 +43,19 @@ class Student {
     this.staffRole,
     this.facultyId,
     this.universityId,
-    this.firstName,
     this.lastName,
   });
+
+  bool get hasActivePremium {
+    if (!isPremium) return false;
+    if (premiumExpiry == null) return true;
+    try {
+      final expiry = DateTime.parse(premiumExpiry!);
+      return expiry.isAfter(DateTime.now());
+    } catch (_) {
+      return true;
+    }
+  }
 
   factory Student.fromJson(Map<String, dynamic> json) {
     // Helper to get nested name safely

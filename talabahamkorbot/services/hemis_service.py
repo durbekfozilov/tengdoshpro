@@ -559,7 +559,7 @@ class HemisService:
             "role": assigned_role,
             "full_name": full_name,
             "hemis_id": hemis_id,
-            "tutor_groups": [], # Handled separately via subject tasks or manual assignment
+            "tutor_groups": tutor_groups_data,
             "department": department,
             "position": staff_position,
             "phone": phone,

@@ -191,7 +191,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   backgroundColor: Colors.white,
                   elevation: 0,
                   onTap: (index) {
-                    final isPremium = auth.currentUser?.isPremium ?? false;
+                    final isPremium = auth.currentUser?.hasActivePremium ?? false;
                     
                     // Guard Market (1)
                     if (index == 1) {
@@ -207,7 +207,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     }
 
                     // Guard AI (2)
-                    if (index == 2 && !auth.isManagement && !isPremium) {
+                    if (index == 2 && !auth.isManagement && !(auth.currentUser?.hasActivePremium ?? false)) {
                       _showPremiumDialog();
                       return;
                     }
@@ -309,7 +309,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               maxLines: 1,
                             ),
                           ),
-                          if (student?.isPremium == true) ...[
+                          if (student?.hasActivePremium == true) ...[
                             const SizedBox(width: 6),
                             GestureDetector(
                               onTap: () {
@@ -480,8 +480,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   icon: Icons.star_rounded,
                   color: Colors.orange,
                   onTap: () {
-                    final isPremium = Provider.of<AuthProvider>(context, listen: false).currentUser?.isPremium ?? false;
-                    if (!isPremium) {
+                    final hasPremium = Provider.of<AuthProvider>(context, listen: false).currentUser?.hasActivePremium ?? false;
+                    if (!hasPremium) {
                        _showPremiumDialog();
                        return;
                     }

@@ -947,7 +947,7 @@ class Club(Base):
     
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
-    department: Mapped[str | None] = mapped_column(String(255), nullable=True, default="Student Council")
+    department: Mapped[str | None] = mapped_column(String(255), nullable=True)
     description: Mapped[str | None] = mapped_column(String(1000), nullable=True)
     icon: Mapped[str | None] = mapped_column(String(64), nullable=True) # Icon name (e.g. 'psychology')
     color: Mapped[str | None] = mapped_column(String(16), nullable=True) # Hex color (e.g. '#FF5733')

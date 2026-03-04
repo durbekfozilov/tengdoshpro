@@ -4,6 +4,7 @@ from sqlalchemy import select, func, case, desc
 from sqlalchemy.orm import joinedload
 from typing import List, Optional
 from datetime import datetime
+import re
 
 from fastapi_cache.decorator import cache
 from database.db_connect import get_session
@@ -88,7 +89,7 @@ async def get_tutor_group_students(
     # Fetch students
     stmt = (
         select(Student)
-        .where(Student.group_number.ilike(f"{group_number.strip()}%"))
+        .where(Student.group_number.op('~*')(f"^{re.escape(group_number.strip())}( |$)"))
         .order_by(Student.full_name)
     )
     
@@ -129,7 +130,7 @@ async def get_group_document_details(
     stmt = (
         select(Student)
         .options(joinedload(Student.all_documents))
-        .where(Student.group_number.ilike(f"{group_number.strip()}%"))
+        .where(Student.group_number.op('~*')(f"^{re.escape(group_number.strip())}( |$)"))
         .order_by(Student.full_name)
     )
     
@@ -300,7 +301,7 @@ async def get_tutor_dashboard(
     
     # We use ILIKE to ensure we catch strings like '16-24 JURNALISTIKA ' when the tutor group is '16-24 JURNALISTIKA'
     from sqlalchemy import or_
-    conditions = [Student.group_number.ilike(f"{g.strip()}%") for g in group_numbers]
+    conditions = [Student.group_number.op('~*')(f"^{re.escape(g.strip())}( |$)") for g in group_numbers]
 
     # Fallback to DB if HEMIS returns 0 (maybe network error or empty)
     if hemis_student_count > 0:
@@ -375,7 +376,7 @@ async def get_tutor_students(
     from sqlalchemy import or_
     from database.models import User
     # 2. Build Query
-    conditions = [Student.group_number.ilike(f"{g.strip()}%") for g in my_groups]
+    conditions = [Student.group_number.op('~*')(f"^{re.escape(g.strip())}( |$)") for g in my_groups]
     stmt = (
         select(Student, User.id.is_not(None).label('is_registered'))
         .outerjoin(User, User.hemis_login == Student.hemis_login)
@@ -386,7 +387,7 @@ async def get_tutor_students(
         stmt = (
             select(Student, User.id.is_not(None).label('is_registered'))
             .outerjoin(User, User.hemis_login == Student.hemis_login)
-            .where(Student.group_number.ilike(f"{group.strip()}%"))
+            .where(Student.group_number.op('~*')(f"^{re.escape(group.strip())}( |$)"))
         )
         
     if search:
@@ -699,7 +700,7 @@ async def get_tutor_activity_stats(
     today_start = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
     from sqlalchemy import or_
 
-    conditions = [Student.group_number.ilike(f"{g.strip()}%") for g in group_numbers]
+    conditions = [Student.group_number.op('~*')(f"^{re.escape(g.strip())}( |$)") for g in group_numbers]
     
     stmt = (
         select(
@@ -751,7 +752,7 @@ async def get_tutor_recent_activities(
     today_start = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
     from sqlalchemy import or_
 
-    conditions = [Student.group_number.ilike(f"{g.strip()}%") for g in group_numbers]
+    conditions = [Student.group_number.op('~*')(f"^{re.escape(g.strip())}( |$)") for g in group_numbers]
     
     stmt_stats = (
         select(
@@ -835,7 +836,7 @@ async def get_group_activities(
 
     # Fetch activities
     stmt = select(UserActivity).join(Student).where(
-        Student.group_number.ilike(f"{group_number.strip()}%")
+        Student.group_number.op('~*')(f"^{re.escape(group_number.strip())}( |$)")
     ).order_by(
         case(
             (UserActivity.status == 'pending', 0),
@@ -863,7 +864,7 @@ async def get_group_activities(
         joinedload(UserActivity.student),
         selectinload(UserActivity.images)
     ).join(Student).where(
-        Student.group_number.ilike(f"{group_number.strip()}%")
+        Student.group_number.op('~*')(f"^{re.escape(group_number.strip())}( |$)")
     ).order_by(
         case(
             (UserActivity.status == 'pending', 0),
