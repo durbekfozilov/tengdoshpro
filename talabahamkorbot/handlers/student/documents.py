@@ -71,8 +71,18 @@ async def handle_app_file_upload(message: types.Message, state):
                  await state.clear()
                  return
                  
-             # 3. Update Pending Upload
-             pending.file_ids = file_id
+             # 3. Handle Multiple Files (Up to 5)
+             current_files = []
+             if pending.file_ids:
+                 current_files = [f for f in pending.file_ids.split(",") if f]
+                 
+             if len(current_files) >= 5:
+                 await message.answer("⚠️ Maksimal 5 ta hujjat/rasm yuklash mumkin. Ilovaga qaytib <b>'Saqlash'</b> tugmasini bosing.", parse_mode="HTML")
+                 return
+                 
+             current_files.append(file_id)
+             pending.file_ids = ",".join(current_files)
+             
              pending.file_unique_id = file_unique_id
              pending.file_size = file_size
              pending.mime_type = mime_type
@@ -80,14 +90,22 @@ async def handle_app_file_upload(message: types.Message, state):
              await db.commit()
              
              # 4. Notify User
-             await message.answer(
-                 f"✅ <b>{pending.title or 'Hujjat'}</b> qabul qilindi!\n\n"
-                 "Endi ilovaga qaytib, <b>'Saqlash'</b> tugmasini bosing.",
-                 parse_mode="HTML"
-             )
+             count = len(current_files)
+             title = pending.title or 'Hujjat'
              
-             # 5. Clear State
-             await state.clear()
+             if count >= 5:
+                 await message.answer(
+                     f"✅ <b>{title}</b> ({count}-fayl) qabul qilindi. Limit tugadi!\n\n"
+                     "Endi ilovaga qaytib, <b>'Saqlash'</b> tugmasini bosing.",
+                     parse_mode="HTML"
+                 )
+                 await state.clear()
+             else:
+                 await message.answer(
+                     f"✅ <b>{title}</b> ({count}-fayl) qabul qilindi.\n\n"
+                     f"Yana {5-count} ta fayl/rasm yuklashingiz mumkin yoki ilovaga qaytib <b>'Saqlash'</b> tugmasini bosing.",
+                     parse_mode="HTML"
+                 )
              return
 
     except Exception as e:

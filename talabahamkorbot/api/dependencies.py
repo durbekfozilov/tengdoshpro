@@ -300,7 +300,7 @@ async def get_club_leader(club_id: int, student: Student = Depends(get_current_s
     is_direct_leader = getattr(club, 'leader_student_id', None) == student.id
     is_student_council_admin = (
         getattr(club, 'department', '') == 'Student Council' and 
-        (getattr(student, 'role', '') == 'student_council' or getattr(student, 'hemis_role', '') == 'student_council')
+        (getattr(student, 'role', '') in ('student_council', 'yetakchi') or getattr(student, 'hemis_role', '') in ('student_council', 'yetakchi'))
     )
         
     if not (is_direct_leader or is_student_council_admin):
