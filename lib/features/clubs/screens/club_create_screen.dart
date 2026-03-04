@@ -95,9 +95,21 @@ class _ClubCreateScreenState extends State<ClubCreateScreen> {
 
               _buildTextField(
                 label: "Telegram Kanal (Ixtiyoriy)",
-                hint: "https://t.me/kanal_nomi",
+                hint: "kanal_nomi",
                 icon: Icons.telegram,
-                onSaved: (val) => _channelLink = val ?? '',
+                prefixText: 'https://t.me/',
+                onSaved: (val) {
+                  if (val != null && val.isNotEmpty) {
+                    var chLink = val.trim();
+                    if (chLink.startsWith('https://t.me/')) chLink = chLink.substring('https://t.me/'.length);
+                    else if (chLink.startsWith('http://t.me/')) chLink = chLink.substring('http://t.me/'.length);
+                    else if (chLink.startsWith('t.me/')) chLink = chLink.substring('t.me/'.length);
+                    if (chLink.startsWith('@')) chLink = chLink.substring(1);
+                    _channelLink = 'https://t.me/$chLink';
+                  } else {
+                    _channelLink = '';
+                  }
+                },
               ),
               
               const SizedBox(height: 8),
@@ -140,6 +152,7 @@ class _ClubCreateScreenState extends State<ClubCreateScreen> {
     int maxLines = 1,
     required void Function(String?) onSaved,
     String? Function(String?)? validator,
+    String? prefixText,
   }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 20),
@@ -153,6 +166,7 @@ class _ClubCreateScreenState extends State<ClubCreateScreen> {
             decoration: InputDecoration(
               hintText: hint,
               hintStyle: TextStyle(color: Colors.grey[400]),
+              prefixText: prefixText,
               prefixIcon: maxLines == 1 ? Icon(icon, color: Colors.grey) : null,
               filled: true,
               fillColor: Colors.white,
