@@ -200,9 +200,11 @@ class _ClubDetailScreenState extends State<ClubDetailScreen> {
                 onPressed: () async {
                    if (channelLink != null) {
                        final uri = Uri.parse(channelLink);
-                       if (await canLaunchUrl(uri)) {
-                           await launchUrl(uri, mode: LaunchMode.externalApplication);
-                       }
+                        try {
+                          await launchUrl(uri, mode: LaunchMode.externalApplication);
+                        } catch (e) {
+                          debugPrint('Could not launch $uri: $e');
+                        }
                    }
                 }
               ),
@@ -456,7 +458,7 @@ class _MembersTabState extends State<_MembersTab> {
                         constraints: const BoxConstraints(),
                         onPressed: () async {
                           final url = Uri.parse("https://t.me/${m['telegram_username']}");
-                          if (await canLaunchUrl(url)) await launchUrl(url, mode: LaunchMode.externalApplication);
+                          try { await launchUrl(url, mode: LaunchMode.externalApplication); } catch (e) { debugPrint("Could not launch $url: $e"); }
                         },
                       ),
                     const SizedBox(width: 8),
