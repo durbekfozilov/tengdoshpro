@@ -150,8 +150,8 @@ async def click_webhook(
     result = await handler.handle(params)
     
     # Ensure required fields in response
-    # Click expects click_trans_id as integer in some docs, but large numbers might need string
-    result["click_trans_id"] = int(click_trans_id)
+    # Click expects click_trans_id as a string in standard implementations (paytechuz)
+    result["click_trans_id"] = str(click_trans_id)
     result["merchant_trans_id"] = str(merchant_trans_id)
     result["error"] = int(result.get("error", 0))
     result["error_note"] = str(result.get("error_note", "Success"))
