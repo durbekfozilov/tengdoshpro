@@ -17,7 +17,13 @@ click_router = APIRouter(tags=["Payment Click"])
 CLICK_SECRET_KEY = os.getenv("CLICK_SECRET_KEY", "TEST_SECRET_KEY")
 
 def generate_sign_string(trans_id, service_id, secret, merchant_trans_id, amount, action, sign_time, merchant_prepare_id=None):
-    amount_str = str(amount)
+    # Ensure amount matches exactly what Click expects (no .0 if it's an integer)
+    try:
+        f_amount = float(amount)
+        amount_str = str(int(f_amount)) if f_amount.is_integer() else str(amount)
+    except Exception:
+        amount_str = str(amount)
+        
     if merchant_prepare_id is not None:
         raw = f"{trans_id}{service_id}{secret}{merchant_trans_id}{merchant_prepare_id}{amount_str}{action}{sign_time}"
     else:

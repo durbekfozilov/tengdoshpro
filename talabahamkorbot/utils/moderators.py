@@ -6,7 +6,7 @@
 # postlarini ko'rish imkoniyatiga ega (Global View).
 
 MODERATOR_LOGINS = [
-    '395251101412',
+    '395241100325',
     '395251101397'
 ]
 
