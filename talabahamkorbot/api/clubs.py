@@ -68,7 +68,6 @@ async def create_club(
         color=req.color or "#4A90E2",
         statute_link=req.statute_link,
         channel_link=req.channel_link,
-        university_id=student.university_id,
         leader_student_id=leader_id
     )
     db.add(club)
