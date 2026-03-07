@@ -279,6 +279,21 @@ async def predict_grant_analysis(
             name = cat_names.get(cat_key, cat_key.capitalize())
             prompt += f"- {name}: {detail['count']} ta tasdiqlangan. Berilgan ball: {round(detail['earned'], 1)} (Max {detail['max_points']})\n"
             
+        # 2.5 Fetch Available Clubs for Recommendations
+        from database.models import Club
+        clubs_stmt = select(Club.name, Club.department, Club.description)
+        clubs_res = await db.execute(clubs_stmt)
+        clubs_list = clubs_res.all()
+        
+        clubs_text = ""
+        if clubs_list:
+            clubs_text = "\n\nUNIVERSITETDAGI TAVSIYA QILINISHI MUMKIN BO'LGAN KLUBLAR RO'YXATI (Talabaning past balli kategoriyasiga qarab bularni taklif qil):\n"
+            for c_name, c_dep, c_desc in clubs_list:
+                desc = c_desc[:60] + "..." if c_desc and len(c_desc) > 60 else (c_desc or "")
+                clubs_text += f"- [{c_dep or 'Umumiy'}] {c_name} - {desc}\n"
+        
+        prompt += clubs_text
+            
         prompt += f"""
         
         SENING VAZIFANG:
@@ -292,8 +307,8 @@ async def predict_grant_analysis(
            - 🎯 Taxminiy ball (Jami xx / 100)
            - 📘 Akademik (GPA) hissasi
            - 🤝 Ijtimoiy faollik hissasi
-           - 🔥 Motivatsiya va Harakatga chaqiruv (Qisqa tushuntirish O'RNIGA): Talabaning kuchli tomonini maqtab, kuchsiz tomonini to'g'irlash uchun aniq harakatga unda. "Sizda imkon bor, faqat mana bu narsani qiling" degan ma'noda.
-           - 💡 Aniq Reja (Action Plan): Ballni oshirish uchun bajarilishi shart bo'lgan 2-3 ta aniq qadam (masalan: "Ertadan boshlab 'Zakovat' to'garagiga yoziling").
+           - 🔥 Motivatsiya va Harakatga chaqiruv: Talabaning kuchli tomonini maqtab, kuchsiz tomonini to'g'irlash uchun aniq harakatga unda.
+           - 💡 Aniq Reja (Action Plan): Ballni oshirish uchun 2-3 ta aniq qadam. AGAR ijtimoiy faolligi past bo'lsa va yuqoridagi KLUBLAR RO'YXATIda mos klublar bo'lsa, Ilovaning 'Klublar' bo'limiga kirib o'sha aniq nomli klub yoki to'garaklarga a'zo bo'lishni taklif qil. (Masalan: "To'garaklar bo'yicha balingiz past ekan, ilovadagi 'Zakovat' klubiga qo'shiling").
         
         Javobni O'zbek tilida, chiroyli va tushunarli formatda yoz.
         
