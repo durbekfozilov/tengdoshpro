@@ -63,6 +63,18 @@ class AppealService {
     }
   }
 
+  Future<void> forwardAppeal(int id, String targetRole) async {
+    final url = '${ApiConstants.managementAppealsResolve}/$id/forward';
+    final response = await _dataService.authPost(
+      url,
+      body: {'role': targetRole},
+    );
+    
+    if (response.statusCode != 200) {
+       throw Exception('Murojaatni yo\'naltirib bo\'lmadi');
+    }
+  }
+
   Future<void> replyAppeal(int id, String text) async {
     final url = '${ApiConstants.managementAppealsResolve}/$id/reply';
     final response = await _dataService.authPost(

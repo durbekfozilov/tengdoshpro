@@ -448,18 +448,78 @@ class _ManagementAppealsScreenState extends State<ManagementAppealsScreen> with 
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text("Kimga: ${appeal.assignedRole}", style: TextStyle(fontSize: 12, color: Colors.grey[600], fontStyle: FontStyle.italic)),
-              if (appeal.status == 'pending' || appeal.status == 'processing')
-                TextButton(
-                  onPressed: () => _showReplyDialog(appeal.id),
-                  child: Text(AppDictionary.tr(context, 'btn_reply')),
-                )
+              Row(
+                children: [
+                  if (appeal.status == 'pending' || appeal.status == 'processing')
+                    IconButton(
+                      icon: const Icon(Icons.forward, size: 20, color: AppTheme.primaryBlue),
+                      tooltip: "Yo'naltirish",
+                      onPressed: () => _showForwardDialog(appeal.id),
+                    ),
+                  if (appeal.status == 'pending' || appeal.status == 'processing')
+                    TextButton(
+                      onPressed: () => _showReplyDialog(appeal.id),
+                      child: Text(AppDictionary.tr(context, 'btn_reply')),
+                    ),
+                ],
+              )
             ],
           ),
         ],
       ),
     ),
   );
+  );
 }
+
+  void _showForwardDialog(int id) {
+    final List<Map<String, String>> targets = [
+      {'val': 'tyutor', 'label': 'Tyutorga'},
+      {'val': 'dekanat', 'label': 'Dekanatga'},
+      {'val': 'rahbariyat', 'label': 'Rahbariyatga'},
+      {'val': 'psixolog', 'label': 'Psixologga'},
+      {'val': 'inspektor', 'label': 'Inspektor profilaktikaga'},
+      {'val': 'kutubxona', 'label': 'Kutubxonaga'},
+      {'val': 'buxgalter', 'label': 'Buxgalteriyaga'},
+    ];
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Murojaatni yo'naltirish", style: TextStyle(fontSize: 18)),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: ListView.builder(
+            shrinkWrap: true,
+            itemCount: targets.length,
+            itemBuilder: (context, index) {
+              return ListTile(
+                title: Text(targets[index]['label']!),
+                trailing: const Icon(Icons.arrow_forward_ios, size: 14),
+                onTap: () async {
+                  Navigator.pop(context);
+                  try {
+                     await _service.forwardAppeal(id, targets[index]['val']!);
+                     if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Muvaqqaiyatli yo'naltirildi", style: TextStyle(color: Colors.white)), backgroundColor: Colors.green));
+                        _loadData();
+                     }
+                  } catch (e) {
+                     if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Xatolik: $e", style: const TextStyle(color: Colors.white)), backgroundColor: Colors.red));
+                     }
+                  }
+                },
+              );
+            },
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: Text(AppDictionary.tr(context, 'btn_cancel'))),
+        ],
+      ),
+    );
+  }
 
   void _showReplyDialog(int id) {
     final controller = TextEditingController();

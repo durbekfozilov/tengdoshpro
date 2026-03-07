@@ -492,3 +492,53 @@ async def reply_to_appeal(
     await db.commit()
     
     return {"success": True, "message": "Javob yuborildi"}
+
+@router.post("/{id}/forward")
+async def forward_appeal(
+    id: int,
+    role: str = Body(..., embed=True),
+    staff: Staff = Depends(get_current_staff),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Forward an appeal to another department/role.
+    """
+    dean_level_roles = [StaffRole.DEKAN, StaffRole.DEKAN_ORINBOSARI, StaffRole.DEKAN_YOSHLAR, StaffRole.DEKANAT]
+    global_mgmt_roles = [StaffRole.RAHBARIYAT, StaffRole.REKTOR, StaffRole.PROREKTOR, StaffRole.YOSHLAR_PROREKTOR, StaffRole.OWNER, StaffRole.DEVELOPER]
+    
+    current_role = getattr(staff, 'role', None) or ""
+    f_id = getattr(staff, 'faculty_id', None)
+    uni_id = getattr(staff, 'university_id', None)
+    is_global = current_role in global_mgmt_roles and f_id is None
+    is_mgmt = current_role in global_mgmt_roles or current_role in dean_level_roles
+    
+    if not is_mgmt:
+        raise HTTPException(status_code=403, detail="Faqat rahbariyat yoki dekanat uchun")
+
+    stmt = select(StudentFeedback).join(Student).where(StudentFeedback.id == id)
+    if uni_id:
+        stmt = stmt.where(Student.university_id == uni_id)
+        
+    if current_role in [StaffRole.OWNER, StaffRole.DEVELOPER]:
+        pass
+    elif current_role in dean_level_roles:
+        stmt = stmt.where(StudentFeedback.assigned_role == "dekanat")
+    elif current_role in [StaffRole.RAHBARIYAT, StaffRole.REKTOR, StaffRole.PROREKTOR, StaffRole.YOSHLAR_PROREKTOR]:
+        stmt = stmt.where(StudentFeedback.assigned_role == "rahbariyat")
+        
+    if not is_global and f_id:
+        stmt = stmt.where(Student.faculty_id == f_id)
+        
+    appeal = (await db.execute(stmt)).scalar_one_or_none()
+    
+    if not appeal:
+        raise HTTPException(status_code=404, detail="Murojaat topilmadi")
+
+    valid_targets = ["tyutor", "dekanat", "rahbariyat", "inspektor", "psixolog", "kutubxona", "buxgalter"]
+    
+    appeal.assigned_role = role
+    appeal.updated_at = datetime.utcnow()
+    
+    await db.commit()
+    
+    return {"success": True, "message": f"Murojaat yo'naltirildi"}
