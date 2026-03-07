@@ -444,31 +444,43 @@ class _ManagementAppealsScreenState extends State<ManagementAppealsScreen> with 
           const SizedBox(height: 8),
           Text(appeal.text, style: const TextStyle(fontSize: 14), maxLines: 4, overflow: TextOverflow.ellipsis),
           const SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text("Kimga: ${appeal.assignedRole}", style: TextStyle(fontSize: 12, color: Colors.grey[600], fontStyle: FontStyle.italic)),
-              Row(
-                children: [
-                  if (appeal.status == 'pending' || appeal.status == 'processing')
-                    TextButton.icon(
-                      icon: const Icon(Icons.forward, size: 16),
-                      label: const Text("Yo'naltirish", style: TextStyle(fontSize: 13)),
-                      style: TextButton.styleFrom(
-                        foregroundColor: AppTheme.primaryBlue,
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                      ),
-                      onPressed: () => _showForwardDialog(appeal.id),
+          const SizedBox(height: 12),
+          Text("Kimga: ${appeal.assignedRole}", style: TextStyle(fontSize: 12, color: Colors.grey[600], fontStyle: FontStyle.italic)),
+          if (appeal.status == 'pending' || appeal.status == 'processing') ...[
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () => _showForwardDialog(appeal.id),
+                    icon: const Icon(Icons.forward, size: 16),
+                    label: const Text("Yo'naltirish", style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orange[50],
+                      foregroundColor: Colors.orange[800],
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      padding: const EdgeInsets.symmetric(vertical: 10),
                     ),
-                  if (appeal.status == 'pending' || appeal.status == 'processing')
-                    TextButton(
-                      onPressed: () => _showReplyDialog(appeal.id),
-                      child: Text(AppDictionary.tr(context, 'btn_reply')),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () => _showReplyDialog(appeal.id),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.primaryBlue.withOpacity(0.1),
+                      foregroundColor: AppTheme.primaryBlue,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      padding: const EdgeInsets.symmetric(vertical: 10),
                     ),
-                ],
-              )
-            ],
-          ),
+                    child: Text(AppDictionary.tr(context, 'btn_reply'), style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                  ),
+                ),
+              ],
+            ),
+          ]
         ],
       ),
     ),
