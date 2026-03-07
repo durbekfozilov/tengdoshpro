@@ -327,6 +327,7 @@ class _AiChatScreenState extends State<AiChatScreen> {
             height: 1.4
           ),
         ),
+        ),
       ),
     );
   }
