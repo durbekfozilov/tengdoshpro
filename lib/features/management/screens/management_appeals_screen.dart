@@ -171,26 +171,7 @@ class _ManagementAppealsScreenState extends State<ManagementAppealsScreen> with 
             },
           ),
           
-          const SizedBox(height: 24),
-          
-          // 3. Top Targets
-          const Text("Murojaat Yo'nalishlari", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 12),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: _stats!.topTargets.map((t) => ActionChip(
-              label: Text("${t.role}: ${t.count}"),
-              backgroundColor: _selectedRole == t.role ? AppTheme.primaryBlue.withOpacity(0.1) : Colors.grey[200],
-              onPressed: () {
-                setState(() {
-                  _selectedRole = t.role;
-                });
-                _tabController.animateTo(1);
-                _loadData();
-              },
-            )).toList(),
-          ),
+
           const SizedBox(height: 16),
         ],
       ),
