@@ -211,17 +211,6 @@ class _TutorHomeScreenState extends State<TutorHomeScreen> {
                       },
                     ),
                     const SizedBox(height: 12),
-                    _buildMenuTile(
-                      "Sertifikatlar",
-                      Icons.workspace_premium_rounded,
-                      Colors.amber,
-                      () {
-                         Navigator.push(
-                           context,
-                           MaterialPageRoute(builder: (_) => const TutorCertificatesGroupsScreen()),
-                         );
-                      },
-                    ),
                   ],
                 ),
               ),

@@ -26,6 +26,7 @@ class _GroupDocumentsScreenState extends State<GroupDocumentsScreen> {
     {"id": "diplom", "name": "Diplom"},
     {"id": "rezyume", "name": "Rezyume"},
     {"id": "obyektivka", "name": "Obyektivka"},
+    {"id": "sertifikat", "name": "Sertifikatlar"},
     {"id": "boshqa", "name": "Boshqa"},
   ];
 

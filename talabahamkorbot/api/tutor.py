@@ -129,6 +129,15 @@ async def get_group_document_details(
     result = await db.execute(stmt)
     students = result.unique().scalars().all()
     
+    def get_cat(d):
+        if d.file_type == 'certificate': return 'sertifikat'
+        n = getattr(d, 'category', '') or d.file_name.lower()
+        if 'passport' in n or 'pasport' in n: return 'passport'
+        if 'diplom' in n: return 'diplom'
+        if 'rezyume' in n or 'cv' in n or 'rezume' in n: return 'rezyume'
+        if 'obyektivka' in n or 'obektivka' in n: return 'obyektivka'
+        return 'boshqa'
+
     data = []
     for s in students:
         data.append({
@@ -136,17 +145,18 @@ async def get_group_document_details(
             "full_name": s.full_name,
             "image": s.image_url,
             "hemis_id": s.hemis_id,
-            "has_document": any(d.file_type == "document" for d in s.all_documents),
+            "has_document": any(d.file_type in ["document", "certificate"] for d in s.all_documents),
             "documents": [
                 {
                     "id": d.id,
                     "title": d.file_name,
                     "type": d.file_type,
+                    "category": get_cat(d),
                     "created_at": d.uploaded_at.isoformat(),
                     "file_id": d.telegram_file_id,
-                    "file_url": f"/api/v1/management/documents/{d.id}/download",
+                    "file_url": f"/api/v1/management/documents/{d.id}/download" if d.file_type == "document" else f"/api/v1/management/certificates/{d.id}/download",
                     "status": "approved"
-                } for d in s.all_documents if d.file_type == "document"
+                } for d in s.all_documents if d.file_type in ["document", "certificate"]
             ]
         })
         
@@ -202,10 +212,16 @@ async def request_documents(
         stmt = select(TgAccount).join(Student, TgAccount.student_id == Student.id).where(Student.group_number == group_number)
         
         # Subquery for checking existence of documents
-        doc_exists = exists().where(
-            StudentDocument.student_id == Student.id,
-            StudentDocument.file_type == "document"
-        )
+        if category == "sertifikat":
+            doc_exists = exists().where(
+                StudentDocument.student_id == Student.id,
+                StudentDocument.file_type == "certificate"
+            )
+        else:
+            doc_exists = exists().where(
+                StudentDocument.student_id == Student.id,
+                StudentDocument.file_type == "document"
+            )
             
         stmt = stmt.where(~doc_exists)
         
