@@ -469,7 +469,6 @@ class _ManagementAppealsScreenState extends State<ManagementAppealsScreen> with 
       ),
     ),
   );
-  );
 }
 
   void _showForwardDialog(int id) {
