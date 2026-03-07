@@ -51,6 +51,14 @@ async def get_appeals_stats(
         # Base Query
         base_query = select(StudentFeedback).join(Student).where(Student.university_id == uni_id)
         
+        # Filter strictly by Role destination
+        if current_role in [StaffRole.OWNER, StaffRole.DEVELOPER]:
+            pass # Can see all
+        elif current_role in dean_level_roles:
+            base_query = base_query.where(StudentFeedback.assigned_role == "dekanat")
+        elif current_role in [StaffRole.RAHBARIYAT, StaffRole.REKTOR, StaffRole.PROREKTOR, StaffRole.YOSHLAR_PROREKTOR]:
+            base_query = base_query.where(StudentFeedback.assigned_role == "rahbariyat")
+        
         if not is_global and f_id:
             base_query = base_query.where(Student.faculty_id == f_id)
             
@@ -201,6 +209,14 @@ async def get_appeals_list(
         
         query = select(StudentFeedback).join(Student).where(Student.university_id == uni_id)
         
+        # Filter strictly by Role destination for the List
+        if current_role in [StaffRole.OWNER, StaffRole.DEVELOPER]:
+            pass # Can see all
+        elif current_role in dean_level_roles:
+            query = query.where(StudentFeedback.assigned_role == "dekanat")
+        elif current_role in [StaffRole.RAHBARIYAT, StaffRole.REKTOR, StaffRole.PROREKTOR, StaffRole.YOSHLAR_PROREKTOR]:
+            query = query.where(StudentFeedback.assigned_role == "rahbariyat")
+        
         # [NEW] Mandatory Faculty Scoping for Deans/Scoped Mgmt
         if not is_global and f_id:
             query = query.where(Student.faculty_id == f_id)
@@ -304,6 +320,13 @@ async def get_appeal_detail(
     if uni_id:
         stmt = stmt.where(Student.university_id == uni_id)
         
+    if current_role in [StaffRole.OWNER, StaffRole.DEVELOPER]:
+        pass
+    elif current_role in dean_level_roles:
+        stmt = stmt.where(StudentFeedback.assigned_role == "dekanat")
+    elif current_role in [StaffRole.RAHBARIYAT, StaffRole.REKTOR, StaffRole.PROREKTOR, StaffRole.YOSHLAR_PROREKTOR]:
+        stmt = stmt.where(StudentFeedback.assigned_role == "rahbariyat")
+        
     if not is_global and f_id:
         stmt = stmt.where(Student.faculty_id == f_id)
         
@@ -384,6 +407,14 @@ async def resolve_appeal(
     stmt = select(StudentFeedback).join(Student).where(StudentFeedback.id == id)
     if uni_id:
         stmt = stmt.where(Student.university_id == uni_id)
+        
+    if current_role in [StaffRole.OWNER, StaffRole.DEVELOPER]:
+        pass
+    elif current_role in dean_level_roles:
+        stmt = stmt.where(StudentFeedback.assigned_role == "dekanat")
+    elif current_role in [StaffRole.RAHBARIYAT, StaffRole.REKTOR, StaffRole.PROREKTOR, StaffRole.YOSHLAR_PROREKTOR]:
+        stmt = stmt.where(StudentFeedback.assigned_role == "rahbariyat")
+        
     if not is_global and f_id:
         stmt = stmt.where(Student.faculty_id == f_id)
         
@@ -437,6 +468,14 @@ async def reply_to_appeal(
     stmt = select(StudentFeedback).join(Student).where(StudentFeedback.id == id)
     if uni_id:
         stmt = stmt.where(Student.university_id == uni_id)
+        
+    if current_role in [StaffRole.OWNER, StaffRole.DEVELOPER]:
+        pass
+    elif current_role in dean_level_roles:
+        stmt = stmt.where(StudentFeedback.assigned_role == "dekanat")
+    elif current_role in [StaffRole.RAHBARIYAT, StaffRole.REKTOR, StaffRole.PROREKTOR, StaffRole.YOSHLAR_PROREKTOR]:
+        stmt = stmt.where(StudentFeedback.assigned_role == "rahbariyat")
+        
     if not is_global and f_id:
         stmt = stmt.where(Student.faculty_id == f_id)
         
