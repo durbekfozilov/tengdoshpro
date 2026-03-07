@@ -29,21 +29,16 @@ async def get_tutor_document_stats(
     if not group_numbers:
         return {"success": True, "data": []}
 
-    # 2. Optimized Aggregate Query
+    # 2. Optimized Aggregate Query from Local Data
     from sqlalchemy import distinct
-    from config import HEMIS_ADMIN_TOKEN
-    from services.hemis_service import HemisService
     
-    # Fetch accurate totals from HEMIS
-    hemis_counts = await HemisService.get_group_student_counts(group_numbers, HEMIS_ADMIN_TOKEN)
-    
-    # Fetch uploaded counts from DB
     stmt = (
         select(
             Student.group_number,
+            func.count(distinct(Student.id)).label("total_count"),
             func.count(distinct(StudentDocument.student_id)).label("uploaded_count")
         )
-        .join(StudentDocument, Student.id == StudentDocument.student_id)
+        .outerjoin(StudentDocument, Student.id == StudentDocument.student_id)
         .where(Student.group_number.in_(group_numbers))
         .group_by(Student.group_number)
     )
@@ -51,18 +46,15 @@ async def get_tutor_document_stats(
     result = await db.execute(stmt)
     rows = result.all()
     
-    uploaded_map = {r.group_number: r.uploaded_count for r in rows}
+    stats_map = {r.group_number: {"total": r.total_count, "uploaded": r.uploaded_count} for r in rows}
     
     data = []
     for gn in group_numbers:
-        total = hemis_counts.get(gn, 0)
-        # Fallback if HEMIS failed for this group (e.g. 0) - maybe check DB?
-        # But we trust HEMIS more now.
-        
+        stats = stats_map.get(gn, {"total": 0, "uploaded": 0})
         data.append({
             "group_number": gn,
-            "total_students": total,
-            "uploaded_students": uploaded_map.get(gn, 0)
+            "total_students": stats["total"],
+            "uploaded_students": stats["uploaded"]
         })
         
     return {"success": True, "data": data}
@@ -291,29 +283,18 @@ async def get_tutor_dashboard(
     if not group_numbers:
         return {"success": True, "data": {"student_count": 0, "group_count": 0, "kpi": 0}}
         
-    # 2. Count Total Students (FROM HEMIS API)
-    from config import HEMIS_ADMIN_TOKEN
-    from services.hemis_service import HemisService
-    
-    # We pass the group numbers (names) to the service
-    # Use Admin Token to ensure we can see all groups (pagination + scope)
-    hemis_student_count = await HemisService.get_total_students_for_groups(group_numbers, HEMIS_ADMIN_TOKEN)
-    
-    # We use ILIKE to ensure we catch strings like '16-24 JURNALISTIKA ' when the tutor group is '16-24 JURNALISTIKA'
+    # 2. Count Total Students (From DB)
     from sqlalchemy import or_
+    import re
+    
     conditions = [Student.group_number.op('~*')(f"^{re.escape(g.strip())}( |$)") for g in group_numbers]
 
-    # Fallback to DB if HEMIS returns 0 (maybe network error or empty)
-    if hemis_student_count > 0:
-        student_count = hemis_student_count
+    if conditions:
+        student_count = await db.scalar(
+            select(func.count(Student.id)).where(or_(*conditions))
+        )
     else:
-        # Fallback to local DB count
-        if conditions:
-            student_count = await db.scalar(
-                select(func.count(Student.id)).where(or_(*conditions))
-            )
-        else:
-            student_count = 0
+        student_count = 0
 
     # 2.1 Count Active Students (Logged into App - Has HEMIS Token)
     from database.models import User
