@@ -57,16 +57,17 @@ async def handle_app_file_upload(message: types.Message, state):
                  await message.answer("❌ Sizning Telegram hisobingiz talaba profiliga ulanmagan.")
                  return
                  
-             # Find latest PendingUpload for this student
-             # NOTE:Ideally we should have session_id in state data, but init-upload only sets state string.
-             # We assume the Last Created Pending Upload is the target. 
-             # Or we can check if there is *any* pending upload for this student.
+             data = await state.get_data()
+             session_id = data.get("app_upload_session")
              
-             # Find latest pending upload for this student
-             stmt = select(PendingUpload).where(
-                 PendingUpload.student_id == tg_account.student_id
-             ).order_by(PendingUpload.created_at.desc()).with_for_update()
-             
+             if session_id:
+                 stmt = select(PendingUpload).where(PendingUpload.session_id == session_id).with_for_update()
+             else:
+                 # Fallback for older flows if they missed context
+                 stmt = select(PendingUpload).where(
+                     PendingUpload.student_id == tg_account.student_id
+                 ).order_by(PendingUpload.created_at.desc()).with_for_update()
+                 
              result = await db.execute(stmt)
              pending = result.scalars().first()
              
