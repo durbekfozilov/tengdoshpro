@@ -27,7 +27,7 @@ class _TutorDocumentsGroupsScreenState extends State<TutorDocumentsGroupsScreen>
   // Filters
   String _searchQuery = '';
   String? _selectedGroup;
-  String? _selectedStatus; // "All", "Hujjat yuklagan", "Sertifikat yuklagan", "Yuklamagan"
+  String? _selectedType; // e.g. "Barchasi", "Passport", "Sertifikat", "Diplom", "Rezyume", "Obyektivka"
 
   final TextEditingController _searchController = TextEditingController();
 
@@ -92,19 +92,18 @@ class _TutorDocumentsGroupsScreenState extends State<TutorDocumentsGroupsScreen>
           if (student['group'] != _selectedGroup) return false;
         }
         
-        // Status filter
-        if (_selectedStatus != null && _selectedStatus != "Barchasi") {
+        // Type filter (Shows students who DO NOT have the selected document)
+        if (_selectedType != null && _selectedType != "Barchasi") {
            final docs = student['documents'] as List<dynamic>? ?? [];
+           String cat = _selectedType!.toLowerCase();
            
-           if (_selectedStatus == "Hujjat yuklagan") {
-              bool hasDoc = docs.any((d) => d['type'] == 'document');
-              if (!hasDoc) return false;
-           } else if (_selectedStatus == "Sertifikat yuklagan") {
-              bool hasCert = docs.any((d) => d['type'] == 'certificate');
-              if (!hasCert) return false;
-           } else if (_selectedStatus == "Yuklamagan") {
-              if (docs.isNotEmpty) return false;
-           }
+           bool hasDoc = docs.any((d) {
+              String docCat = (d['category'] ?? '').toString().toLowerCase();
+              return docCat == cat;
+           });
+           
+           // IF they already have it, filter them out so we only see those missing it
+           if (hasDoc) return false;
         }
 
         return true;
@@ -205,14 +204,14 @@ class _TutorDocumentsGroupsScreenState extends State<TutorDocumentsGroupsScreen>
                         child: DropdownButtonHideUnderline(
                           child: DropdownButton<String>(
                             isExpanded: true,
-                            hint: const Text("Navi", style: TextStyle(fontSize: 14)),
-                            value: _selectedStatus,
+                            hint: const Text("Turi", style: TextStyle(fontSize: 14)),
+                            value: _selectedType,
                             icon: const Icon(Icons.arrow_drop_down, color: Colors.teal),
-                            items: ["Barchasi", "Hujjat yuklagan", "Sertifikat yuklagan", "Yuklamagan"].map((s) {
+                            items: ["Barchasi", "Passport", "Sertifikat", "Diplom", "Rezyume", "Obyektivka"].map((s) {
                                return DropdownMenuItem(value: s, child: Text(s, style: const TextStyle(fontSize: 14), overflow: TextOverflow.ellipsis));
                             }).toList(),
                             onChanged: (val) {
-                               setState(() => _selectedStatus = val);
+                               setState(() => _selectedType = val);
                                _applyFilters();
                             },
                           ),
@@ -364,7 +363,22 @@ class _TutorDocumentsGroupsScreenState extends State<TutorDocumentsGroupsScreen>
                                      Text("Hujjatlar yuklanmagan", style: TextStyle(fontSize: 13, color: Colors.grey[600], fontStyle: FontStyle.italic)),
                                    ],
                                  ),
-                               )
+                                 ),
+                               ),
+                            const SizedBox(height: 8),
+                            Align(
+                               alignment: Alignment.centerRight,
+                               child: TextButton.icon(
+                                 onPressed: () => _sendRequestMessage(student['id']),
+                                 icon: const Icon(Icons.send_rounded, size: 16, color: Colors.indigo),
+                                 label: const Text("Xabar yuborish", style: TextStyle(color: Colors.indigo, fontSize: 13, fontWeight: FontWeight.bold)),
+                                 style: TextButton.styleFrom(
+                                     backgroundColor: Colors.indigo.withOpacity(0.05),
+                                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8)
+                                 ),
+                               ),
+                            )
                           ],
                         ),
                       ),
@@ -386,6 +400,30 @@ class _TutorDocumentsGroupsScreenState extends State<TutorDocumentsGroupsScreen>
      if (await canLaunchUrl(url)) {
         await launchUrl(url, mode: LaunchMode.externalApplication);
      }
+  }
+
+  Future<void> _sendRequestMessage(int studentId) async {
+      String? category = (_selectedType != null && _selectedType != "Barchasi") 
+          ? _selectedType!.toLowerCase() 
+          : "all";
+      
+      showDialog(
+          context: context, 
+          barrierDismissible: false,
+          builder: (_) => const Center(child: CircularProgressIndicator())
+      );
+      
+      bool success = await _dataService.sendDocumentRequest(studentId, category);
+      
+      if (mounted) {
+         Navigator.pop(context); // Close loading dialog
+         ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+               content: Text(success ? "Xabar muvaffaqiyatli yuborildi!" : "Xabar yuborishda xatolik yuz berdi."),
+               backgroundColor: success ? Colors.green : Colors.red,
+            )
+         );
+      }
   }
 
   Widget _buildGroupsTab() {

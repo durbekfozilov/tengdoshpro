@@ -2318,6 +2318,30 @@ class DataService {
     return [];
   }
 
+  // 39. Send Document Request Notification
+  Future<bool> sendDocumentRequest(int studentId, String? category) async {
+    try {
+      final token = await _authService.getToken();
+      String url = "${ApiConstants.backendUrl}/tutor/documents/request?student_id=$studentId";
+      
+      final response = await http.post(
+        Uri.parse(url),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: json.encode({"category": category ?? "all"}),
+      ).timeout(const Duration(seconds: 15));
+
+      if (response.statusCode == 200) {
+        return true;
+      }
+    } catch (e) {
+      debugPrint("DataService: Error sending document request: $e");
+    }
+    return false;
+  }
+
   // 37.1 Get Group Students
   Future<List<dynamic>?> getTutorGroupStudents(String groupNumber) async {
     try {

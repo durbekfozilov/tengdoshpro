@@ -259,19 +259,39 @@ async def request_documents(
     
     if student_id:
         tg_acc = await db.scalar(select(TgAccount).where(TgAccount.student_id == student_id))
-        if tg_acc:
-            try:
-                msg = (
-                    f"🔔 <b>Hujjat topshirish eslatmasi</b>\n\n"
-                    f"Hurmatli talaba, tyutoringiz <b>{tutor.full_name}</b> sizdan <b>{cat_name}</b> "
-                    f"yuklashingizni so'ramoqda.\n\n"
-                    f"Iltimos, ilovaning 'Hujjatlar' bo'limiga kiring."
-                )
+        student = await db.scalar(select(Student).where(Student.id == student_id))
+        
+        sent = False
+        try:
+            msg = (
+                f"🔔 <b>Hujjat topshirish eslatmasi</b>\n\n"
+                f"Hurmatli talaba, tyutoringiz <b>{tutor.full_name}</b> sizdan <b>{cat_name}</b> "
+                f"yuklashingizni so'ramoqda.\n\n"
+                f"Iltimos, ilovaning 'Hujjatlar' bo'limiga kiring."
+            )
+            if tg_acc:
                 await bot.send_message(tg_acc.telegram_id, msg, parse_mode="HTML")
-                return {"success": True, "message": "Xabar yuborildi"}
-            except Exception as e:
-                 return {"success": False, "message": f"Xabar yuborishda xato: {str(e)}"}
-        return {"success": False, "message": "Talabaning telegrami ulanmagan"}
+                sent = True
+        except Exception as e:
+            logger.error(f"TG notification error: {e}")
+
+        try:
+            if student and student.fcm_token:
+                from services.notification_service import NotificationService
+                await NotificationService.send_push(
+                    token=student.fcm_token,
+                    title="Hujjat topshirish eslatmasi",
+                    body=f"Tyutoringiz sizdan {cat_name} yuklashingizni so'ramoqda.",
+                    data={"route": "/main?tab=2"}
+                )
+                sent = True
+        except Exception as e:
+             logger.error(f"FCM notification error: {e}")
+             
+        if sent:
+            return {"success": True, "message": "Xabar yuborildi"}
+        else:
+            return {"success": False, "message": "Xabar yuborishda xato yoki talaba ulanmagan"}
         
     elif group_number:
         # Verify access
