@@ -7,7 +7,6 @@ import 'package:talabahamkor_mobile/features/student_module/widgets/student_dash
 import 'package:talabahamkor_mobile/features/tutor/screens/tutor_groups_screen.dart'; 
 import 'package:talabahamkor_mobile/features/tutor/screens/tutor_activity_groups_screen.dart';
 import 'package:talabahamkor_mobile/features/tutor/screens/tutor_documents_groups_screen.dart';
-import 'package:talabahamkor_mobile/features/tutor/screens/tutor_certificates_groups_screen.dart';
 import 'package:talabahamkor_mobile/features/tutor/screens/tutor_appeals_main_screen.dart';
 import '../../library/screens/library_screen.dart';
 import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
@@ -112,14 +111,6 @@ class TutorDashboardScreen extends StatelessWidget {
                       color: Colors.blueGrey,
                       onTap: () {
                         Navigator.push(context, MaterialPageRoute(builder: (_) => const TutorDocumentsGroupsScreen()));
-                      },
-                    ),
-                    DashboardCard(
-                      title: AppDictionary.tr(context, 'lbl_certs_2'),
-                      icon: Icons.workspace_premium_rounded,
-                      color: Colors.amber,
-                      onTap: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (_) => const TutorCertificatesGroupsScreen()));
                       },
                     ),
                     DashboardCard(

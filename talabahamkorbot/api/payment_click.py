@@ -115,10 +115,11 @@ async def click_webhook_main(
                     user_id = int(str(merchant_trans_id)[5:10])
                     user_result = await db.execute(select(Student).where(Student.id == user_id))
                     user_obj = user_result.scalar_one_or_none()
-                    if not user_obj:
-                        user_result = await db.execute(select(Staff).where(Staff.id == user_id))
-                        user_obj = user_result.scalar_one_or_none()
-                        if user_obj: is_staff = True
+                elif merchant_trans_id.startswith("88800"):
+                    user_id = int(str(merchant_trans_id)[5:10])
+                    user_result = await db.execute(select(Staff).where(Staff.id == user_id))
+                    user_obj = user_result.scalar_one_or_none()
+                    if user_obj: is_staff = True
                 else:
                     from sqlalchemy import or_
                     target_id = str(merchant_trans_id)
@@ -268,10 +269,11 @@ async def click_webhook_main(
                     user_id = int(str(merchant_trans_id)[5:10])
                     user_result = await db.execute(select(Student).where(Student.id == user_id))
                     user_obj = user_result.scalar_one_or_none()
-                    if not user_obj:
-                        user_result = await db.execute(select(Staff).where(Staff.id == user_id))
-                        user_obj = user_result.scalar_one_or_none()
-                        if user_obj: is_staff = True
+                elif merchant_trans_id.startswith("88800"):
+                    user_id = int(str(merchant_trans_id)[5:10])
+                    user_result = await db.execute(select(Staff).where(Staff.id == user_id))
+                    user_obj = user_result.scalar_one_or_none()
+                    if user_obj: is_staff = True
                 else:
                     from sqlalchemy import or_
                     target_id = str(merchant_trans_id)
@@ -384,10 +386,11 @@ async def getinfo_payment(
                 user_id = int(str(target_id)[5:10])
                 result = await db.execute(select(Student).where(Student.id == user_id))
                 user_obj = result.scalar_one_or_none()
-                if not user_obj:
-                    result = await db.execute(select(Staff).where(Staff.id == user_id))
-                    user_obj = result.scalar_one_or_none()
-                    if user_obj: is_staff = True
+            elif target_id.startswith("88800"):
+                user_id = int(str(target_id)[5:10])
+                result = await db.execute(select(Staff).where(Staff.id == user_id))
+                user_obj = result.scalar_one_or_none()
+                if user_obj: is_staff = True
             else:
                 from sqlalchemy import or_
                 # 1. Try finding Student by hemis_id, hemis_login or telegram_id

@@ -105,9 +105,14 @@ from services.payment_service import ClickHandler
 @router.get("/click-url")
 def get_click_url(amount: int = 10000, current_student = Depends(get_student_or_staff)):
     import time
-    # Format: 88800 (prefix) + 5 digit user ID + 5 digit timestamp
-    # Format: 80000 (prefix) + 5 digit user ID + 3 digit timestamp
-    order_id = f"80000{current_student.id:05d}{(int(time.time()) % 1000):03d}"
+    from database.models import Staff
+    
+    # Format: 88800 (prefix) + 5 digit user ID + 3 digit timestamp (for staff)
+    # Format: 80000 (prefix) + 5 digit user ID + 3 digit timestamp (for student)
+    if isinstance(current_student, Staff):
+        order_id = f"88800{current_student.id:05d}{(int(time.time()) % 1000):03d}"
+    else:
+        order_id = f"80000{current_student.id:05d}{(int(time.time()) % 1000):03d}"
     
     url = ClickHandler.generate_url(amount, order_id)
     return {

@@ -275,14 +275,21 @@ class ClickHandler:
         # Create Transaction (State 1: Created) if not exists
         if not existing:
              try:
-                 parts = order_id.split("_")
-                 student_id = int(parts[1])
+                 if order_id.startswith("80000"):
+                     student_id = int(order_id[5:10])
+                     student = await self.session.get(Student, student_id)
+                 elif order_id.startswith("88800"):
+                     student_id = int(order_id[5:10])
+                     student = await self.session.get(Staff, student_id)
+                 else:
+                     parts = order_id.split("_")
+                     student_id = int(parts[1])
+                     student = await self.session.get(Student, student_id)
              except:
                  return {"error": -5, "error_note": "Invalid order_id"}
                  
-             student = await self.session.get(Student, student_id)
              if not student:
-                 return {"error": -5, "error_note": "Faqat talabalar to'lov qila oladi (Xodimlar uchun to'lov yopilgan)."}
+                 return {"error": -5, "error_note": "Bunday foydalanuvchi topilmadi."}
                  
              # Check amount minimum
              if amount < 1000:
@@ -333,7 +340,12 @@ class ClickHandler:
         tx.perform_time = int(datetime.utcnow().timestamp() * 1000)
         
         # Credit Balance
-        student = await self.session.get(Student, tx.student_id)
+        if order_id.startswith("88800"):
+             from database.models import Staff
+             student = await self.session.get(Staff, tx.student_id)
+        else:
+             student = await self.session.get(Student, tx.student_id)
+             
         if student:
              student.balance += int(amount)
              
