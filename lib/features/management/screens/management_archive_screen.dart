@@ -619,10 +619,12 @@ class _ManagementArchiveScreenState extends State<ManagementArchiveScreen> {
     final bool isCert = doc['is_certificate'] == true;
     
     String? result;
+    int docId = int.tryParse(doc['id'].toString()) ?? 0;
+    
     if (isCert) {
-      result = await _dataService.downloadStudentCertificateForManagement(doc['id']);
+      result = await _dataService.downloadStudentCertificateForManagement(docId);
     } else {
-      result = await _dataService.downloadStudentDocumentForManagement(doc['id'], type: doc['file_type']);
+      result = await _dataService.downloadStudentDocumentForManagement(docId, type: doc['file_type']);
     }
     
     if (mounted) {
