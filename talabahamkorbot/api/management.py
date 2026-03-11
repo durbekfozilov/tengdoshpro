@@ -1560,6 +1560,7 @@ async def _process_and_send_zip_bg(export_items: list, tg_id: int, title: str):
                 zip_file.writestr("DIQQAT_XABARNOMA.txt", warning_msg.encode("utf-8"))
                 break
 
+    # Outside the zip `with` block to ensure the zip directory is properly written!
     if count == 0:
         try:
             await bot.send_message(tg_id, "Hech qanday fayl yuklab olinmadi")
