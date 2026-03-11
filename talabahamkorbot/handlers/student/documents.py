@@ -75,42 +75,65 @@ async def handle_app_file_upload(message: types.Message, state):
                  await state.clear()
                  return
                  
-             # 3. Handle Multiple Files (Up to 5)
+             # 3. Process File Upload Limit and Appends based on Category
              current_files = []
              if pending.file_ids:
                  current_files = [f for f in pending.file_ids.split(",") if f]
                  
-             if len(current_files) >= 5:
-                 await message.answer("⚠️ Maksimal 5 ta hujjat/rasm yuklash mumkin. Ilovaga qaytib <b>'Saqlash'</b> tugmasini bosing.", parse_mode="HTML")
-                 return
+             if pending.category == "feedback":
+                 # Feedback only supports 1 file
+                 if len(current_files) >= 1:
+                     await message.answer("⚠️ Murojaat uchun faqat 1 ta fayl yuklash mumkin. Ilovaga qaytib <b>'YUBORISH'</b> tugmasini bosing.", parse_mode="HTML")
+                     return
+                     
+                 current_files.append(file_id)
+                 pending.file_ids = file_id # Overwrite, only 1
                  
-             current_files.append(file_id)
-             pending.file_ids = ",".join(current_files)
-             
-             pending.file_unique_id = file_unique_id
-             pending.file_size = file_size
-             pending.mime_type = mime_type
-             
-             await db.commit()
-             
-             # 4. Notify User
-             count = len(current_files)
-             title = pending.title or 'Hujjat'
-             
-             if count >= 5:
+                 pending.file_unique_id = file_unique_id
+                 pending.file_size = file_size
+                 pending.mime_type = mime_type
+                 await db.commit()
+                 
                  await message.answer(
-                     f"✅ <b>{title}</b> ({count}-fayl) qabul qilindi. Limit tugadi!\n\n"
-                     "Endi ilovaga qaytib, <b>'Saqlash'</b> tugmasini bosing.",
+                     f"✅ <b>Murojaat fayli</b> qabul qilindi!\n\n"
+                     "Endi ilovaga qaytib, <b>'YUBORISH'</b> tugmasini bosing.",
                      parse_mode="HTML"
                  )
                  await state.clear()
+                 return
              else:
-                 await message.answer(
-                     f"✅ <b>{title}</b> ({count}-fayl) qabul qilindi.\n\n"
-                     f"Yana {5-count} ta fayl/rasm yuklashingiz mumkin yoki ilovaga qaytib <b>'Saqlash'</b> tugmasini bosing.",
-                     parse_mode="HTML"
-                 )
-             return
+                 # Document & Certificate logic (up to 5 max)
+                 if len(current_files) >= 5:
+                     await message.answer("⚠️ Maksimal 5 ta hujjat/rasm yuklash mumkin. Ilovaga qaytib <b>'Saqlash'</b> tugmasini bosing.", parse_mode="HTML")
+                     return
+                     
+                 current_files.append(file_id)
+                 pending.file_ids = ",".join(current_files)
+                 
+                 pending.file_unique_id = file_unique_id
+                 pending.file_size = file_size
+                 pending.mime_type = mime_type
+                 
+                 await db.commit()
+                 
+                 # 4. Notify User
+                 count = len(current_files)
+                 title = pending.title or 'Hujjat'
+                 
+                 if count >= 5:
+                     await message.answer(
+                         f"✅ <b>{title}</b> ({count}-fayl) qabul qilindi. Limit tugadi!\n\n"
+                         "Endi ilovaga qaytib, <b>'Saqlash'</b> tugmasini bosing.",
+                         parse_mode="HTML"
+                     )
+                     await state.clear()
+                 else:
+                     await message.answer(
+                         f"✅ <b>{title}</b> ({count}-fayl) qabul qilindi.\n\n"
+                         f"Yana {5-count} ta fayl/rasm yuklashingiz mumkin yoki ilovaga qaytib <b>'Saqlash'</b> tugmasini bosing.",
+                         parse_mode="HTML"
+                     )
+                 return
 
     except Exception as e:
         print(f"Error in handle_app_file_upload: {e}")

@@ -110,25 +110,50 @@ async def cmd_start_deep_link(message: Message, command: CommandObject, session:
         )
         return
 
-    # Handle Upload Link
+    # Handle Upload Link (Documents, Certificates, Feedbacks)
     if token.startswith("upload_"):
         session_id = token[7:]
         result = await session.execute(select(TgAccount).where(TgAccount.telegram_id == user_id).options(selectinload(TgAccount.student), selectinload(TgAccount.staff)))
         tg_account = result.scalar_one_or_none()
         if not tg_account or not (tg_account.student or tg_account.staff):
-            await message.answer("❌ Botdan foydalanish uchun avval <b>Tengdosh</b> mobil ilovasiga kiring va 'Telegramga ulanish' tugmasinibosing.", parse_mode="HTML")
+            await message.answer("❌ Botdan foydalanish uchun avval <b>Tengdosh</b> mobil ilovasiga kiring va 'Telegramga ulanish' tugmasini bosing.", parse_mode="HTML")
             return
             
-        from models.states import DocumentAddStates
-        await state.set_state(DocumentAddStates.WAIT_FOR_APP_FILE)
-        await state.update_data(app_upload_session=session_id)
-        
-        await message.answer(
-            "📁 <b>Hujjat/Faollik yuklash</b>\n\n"
-            "Iltimos, rasm yoki faylni shu yerga yuboring.\n"
-            "<i>(Maksimal 5 ta gacha rasm yuborishingiz mumkin)</i>",
-            parse_mode="HTML"
-        )
+        from database.models import PendingUpload
+        pending = await session.get(PendingUpload, session_id)
+        category = pending.category if pending else "document"
+            
+        if category == "feedback":
+            from models.states import FeedbackStates
+            await state.set_state(FeedbackStates.WAIT_FOR_APP_FILE)
+            await state.update_data(app_upload_session=session_id)
+            title = pending.title if pending else ""
+            await message.answer(
+                f"📨 <b>Murojaat uchun fayl yuklash</b>\n\n"
+                f"Murojaat matni: <i>{title}</i>\n\n"
+                "<b>Iltimos, ilova qilmoqchi bo'lgan faylingizni (Rasm, Video yoki PDF) shu yerga yuboring:</b>",
+                parse_mode="HTML"
+            )
+        elif category == "certificate":
+            from models.states import CertificateAddStates
+            await state.set_state(CertificateAddStates.WAIT_FOR_APP_FILE)
+            await state.update_data(app_upload_session=session_id)
+            await message.answer(
+                "🎓 <b>Sertifikat yuklash</b>\n\n"
+                "Iltimos, sertifikatingizni rasm yoki fayl ko'rinishida yuboring.",
+                parse_mode="HTML"
+            )
+        else:
+            from models.states import DocumentAddStates
+            await state.set_state(DocumentAddStates.WAIT_FOR_APP_FILE)
+            await state.update_data(app_upload_session=session_id)
+            
+            await message.answer(
+                "📁 <b>Hujjat/Faollik yuklash</b>\n\n"
+                "Iltimos, rasm yoki faylni shu yerga yuboring.\n"
+                "<i>(Maksimal 5 ta gacha rasm yuborishingiz mumkin)</i>",
+                parse_mode="HTML"
+            )
         return
 
     # Handle Tutor Bulk Upload Link
