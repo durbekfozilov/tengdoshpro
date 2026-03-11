@@ -1203,14 +1203,12 @@ async def send_student_cert_to_management(
                 await bot.send_photo(tg_acc.telegram_id, cert.telegram_file_id, caption=caption, parse_mode="HTML")
             else:
                 await bot.send_document(tg_acc.telegram_id, cert.telegram_file_id, caption=caption, parse_mode="HTML")
-        except Exception as e:
-            if "Bad Request" in str(e) and ("Document" in str(e) or "Photo" in str(e) or "wrong file identifier" in str(e)):
-                 if is_photo:
-                     await bot.send_document(tg_acc.telegram_id, cert.telegram_file_id, caption=caption, parse_mode="HTML")
-                 else:
-                     await bot.send_photo(tg_acc.telegram_id, cert.telegram_file_id, caption=caption, parse_mode="HTML")
+        except Exception:
+            # Fallback to the other method
+            if is_photo:
+                await bot.send_document(tg_acc.telegram_id, cert.telegram_file_id, caption=caption, parse_mode="HTML")
             else:
-                 raise e
+                await bot.send_photo(tg_acc.telegram_id, cert.telegram_file_id, caption=caption, parse_mode="HTML")
             
         return {"success": True, "message": "Sertifikat Telegramingizga yuborildi!"}
     except Exception as e:
@@ -1276,15 +1274,12 @@ async def send_student_doc_to_management(
                 await bot.send_photo(tg_acc.telegram_id, doc.telegram_file_id, caption=caption, parse_mode="HTML")
             else:
                 await bot.send_document(tg_acc.telegram_id, doc.telegram_file_id, caption=caption, parse_mode="HTML")
-        except Exception as e:
-            if "Bad Request" in str(e) and ("Document" in str(e) or "Photo" in str(e) or "wrong file identifier" in str(e)):
-                # Fallback to the other method
-                if is_photo:
-                    await bot.send_document(tg_acc.telegram_id, doc.telegram_file_id, caption=caption, parse_mode="HTML")
-                else:
-                    await bot.send_photo(tg_acc.telegram_id, doc.telegram_file_id, caption=caption, parse_mode="HTML")
+        except Exception:
+            # Fallback to the other method
+            if is_photo:
+                await bot.send_document(tg_acc.telegram_id, doc.telegram_file_id, caption=caption, parse_mode="HTML")
             else:
-                raise e
+                await bot.send_photo(tg_acc.telegram_id, doc.telegram_file_id, caption=caption, parse_mode="HTML")
             
         return {"success": True, "message": "Hujjat botga yuborildi"}
     except Exception as e:
