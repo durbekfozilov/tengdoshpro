@@ -1187,6 +1187,7 @@ async def send_student_cert_to_management(
         return {"success": False, "message": "Sizning Telegram hisobingiz ulanmagan. Iltimos, botga kiring."}
 
     # 4. Send via Bot
+    from bot import bot
     try:
         caption = (
             f"🎓 <b>Talaba Sertifikati (Rahbariyat)</b>\n\n"
@@ -1250,6 +1251,7 @@ async def send_student_doc_to_management(
         return {"success": False, "message": "Sizning Telegram hisobingiz ulanmagan. Iltimos, botga kiring."}
 
     # 4. Send via Bot
+    from bot import bot
     try:
         caption = (
             f"📄 <b>Talaba Hujjati (Rahbariyat)</b>\n\n"
@@ -1268,6 +1270,10 @@ async def send_student_doc_to_management(
             
         return {"success": True, "message": "Hujjat botga yuborildi"}
     except Exception as e:
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"Error sending doc to management: {e}")
+        return {"success": False, "message": f"Botda xatolik yuz berdi: {str(e)}"}
         import traceback
         traceback.print_exc()
         print(f"DEBUG: Error sending doc: {e}")
