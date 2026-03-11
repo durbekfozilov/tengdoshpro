@@ -1541,8 +1541,8 @@ async def _process_and_send_zip_bg(export_items: list, tg_id: int, title: str):
                 filename = f"{clean_name}_{clean_title}_{item['id']}.{ext}"
                 
                 # Enforce safe ascii encoding to avoid ZipFile extractor bugs on Windows
-                from unidecode import unidecode
-                filename = unidecode(filename) # Convert to basic ascii characters
+                import unicodedata
+                filename = unicodedata.normalize('NFKD', filename).encode('ascii', 'ignore').decode('ascii')
                 
                 if zip_buffer.tell() + len(file_bytes) > MAX_BYTES:
                     size_limit_reached = True
