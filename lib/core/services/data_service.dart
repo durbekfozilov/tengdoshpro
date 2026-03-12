@@ -2322,7 +2322,7 @@ class DataService {
   Future<bool> sendDocumentRequest(int studentId, String? category) async {
     try {
       final token = await _authService.getToken();
-      String url = "${ApiConstants.backendUrl}/tutor/documents/request?student_id=$studentId";
+      String url = "${ApiConstants.backendUrl}/tutor/documents/request";
       
       final response = await http.post(
         Uri.parse(url),
@@ -2330,7 +2330,7 @@ class DataService {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
         },
-        body: json.encode({"category": category ?? "all"}),
+        body: json.encode({"student_id": studentId, "category": category ?? "all"}),
       ).timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {

@@ -249,14 +249,24 @@ async def get_group_document_details(
         
     return {"success": True, "data": data}
 
+from pydantic import BaseModel
+
+class DocumentRequestPayload(BaseModel):
+    student_id: Optional[int] = None
+    group_number: Optional[str] = None
+    category: Optional[str] = "all"
+
 @router.post("/documents/request")
 async def request_documents(
     student_id: Optional[int] = None,
     group_number: Optional[str] = None,
-    category: Optional[str] = Body(None),
+    payload: Optional[DocumentRequestPayload] = None,
     db: AsyncSession = Depends(get_session),
     tutor: Staff = Depends(get_current_staff)
 ):
+    actual_student_id = student_id or (payload.student_id if payload else None)
+    actual_group = group_number or (payload.group_number if payload else None)
+    category = payload.category if payload else None
     """
     Send a notification to a specific student or entire group to upload documents.
     """
@@ -265,9 +275,9 @@ async def request_documents(
     cat_name = category.capitalize() if category and category != "all" else "kerakli hujjatlarni"
     if category == "boshqa": cat_name = "so'ralgan hujjatni"
     
-    if student_id:
-        tg_acc = await db.scalar(select(TgAccount).where(TgAccount.student_id == student_id))
-        student = await db.scalar(select(Student).where(Student.id == student_id))
+    if actual_student_id:
+        tg_acc = await db.scalar(select(TgAccount).where(TgAccount.student_id == actual_student_id))
+        student = await db.scalar(select(Student).where(Student.id == actual_student_id))
         
         sent = False
         try:
@@ -301,12 +311,12 @@ async def request_documents(
         else:
             return {"success": False, "message": "Xabar yuborishda xato yoki talaba ulanmagan"}
         
-    elif group_number:
+    elif actual_group:
         # Verify access
         access_check = await db.execute(
             select(TutorGroup).where(
                 TutorGroup.tutor_id == tutor.id,
-                TutorGroup.group_number == group_number
+                TutorGroup.group_number == actual_group
             )
         )
         if not access_check.scalar_one_or_none():
@@ -316,7 +326,7 @@ async def request_documents(
         from sqlalchemy import exists, outerjoin
         
         # Base query for students in group with a TG account
-        stmt = select(Student, TgAccount).outerjoin(TgAccount, TgAccount.student_id == Student.id).where(Student.group_number == group_number)
+        stmt = select(Student, TgAccount).outerjoin(TgAccount, TgAccount.student_id == Student.id).where(Student.group_number == actual_group)
         
         # Subquery for checking existence of documents
         if category == "sertifikat":
@@ -342,7 +352,7 @@ async def request_documents(
             notified = False
             msg = (
                 f"🔔 <b>Guruh bo'yicha hujjat topshirish eslatmasi</b>\n\n"
-                f"Tyutoringiz <b>{tutor.full_name}</b> ({group_number} guruhi) barcha "
+                f"Tyutoringiz <b>{tutor.full_name}</b> ({actual_group} guruhi) barcha "
                 f"talabalardan <b>{cat_name}</b> yuklashni so'ramoqda."
             )
             if tg_acc:
