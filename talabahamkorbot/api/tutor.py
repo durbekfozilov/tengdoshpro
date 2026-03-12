@@ -9,8 +9,11 @@ import re
 from fastapi_cache.decorator import cache
 from database.db_connect import get_session
 from database.models import Staff, TutorGroup, Student, StaffRole, TyutorKPI, StudentFeedback, FeedbackReply, UserActivity, StudentDocument
+import logging
 from api.dependencies import get_current_staff
 from bot import bot
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/tutor", tags=["Tutor"])
 
@@ -310,10 +313,10 @@ async def request_documents(
              raise HTTPException(status_code=403, detail="Siz bu guruhga biriktirilmagansiz")
 
         # Find students who are missing the document(s)
-        from sqlalchemy import exists
+        from sqlalchemy import exists, outerjoin
         
         # Base query for students in group with a TG account
-        stmt = select(TgAccount).join(Student, TgAccount.student_id == Student.id).where(Student.group_number == group_number)
+        stmt = select(Student, TgAccount).outerjoin(TgAccount, TgAccount.student_id == Student.id).where(Student.group_number == group_number)
         
         # Subquery for checking existence of documents
         if category == "sertifikat":
@@ -330,20 +333,39 @@ async def request_documents(
         stmt = stmt.where(~doc_exists)
         
         result = await db.execute(stmt)
-        tg_accounts = result.scalars().all()
+        rows = result.all()
         
         count = 0
-        for acc in tg_accounts:
-            try:
-                msg = (
-                    f"🔔 <b>Guruh bo'yicha hujjat topshirish eslatmasi</b>\n\n"
-                    f"Tyutoringiz <b>{tutor.full_name}</b> ({group_number} guruhi) barcha "
-                    f"talabalardan <b>{cat_name}</b> yuklashni so'ramoqda."
-                )
-                await bot.send_message(acc.telegram_id, msg, parse_mode="HTML")
+        from services.notification_service import NotificationService
+        
+        for student, tg_acc in rows:
+            notified = False
+            msg = (
+                f"🔔 <b>Guruh bo'yicha hujjat topshirish eslatmasi</b>\n\n"
+                f"Tyutoringiz <b>{tutor.full_name}</b> ({group_number} guruhi) barcha "
+                f"talabalardan <b>{cat_name}</b> yuklashni so'ramoqda."
+            )
+            if tg_acc:
+                try:
+                    await bot.send_message(tg_acc.telegram_id, msg, parse_mode="HTML")
+                    notified = True
+                except:
+                    pass
+                    
+            if student.fcm_token:
+                try:
+                    await NotificationService.send_push(
+                        token=student.fcm_token,
+                        title="Hujjat topshirish eslatmasi",
+                        body=f"Tyutoringiz sizdan {cat_name} yuklashni so'ramoqda.",
+                        data={"route": "/main?tab=2"}
+                    )
+                    notified = True
+                except Exception as e:
+                    logger.error(f"FCM error inside group loop: {e}")
+                    
+            if notified:
                 count += 1
-            except:
-                pass
                 
         return {"success": True, "message": f"{count} ta talabaga xabar yuborildi"}
         
