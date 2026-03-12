@@ -412,15 +412,22 @@ async def get_tutor_groups(
             )
         )
         
+        total_count = await db.scalar(
+            select(func.count(StudentFeedback.id))
+            .join(Student, StudentFeedback.student_id == Student.id)
+            .where(Student.group_number == g.group_number)
+        )
+        
         result_data.append({
             "id": g.id, 
             "group_number": g.group_number, 
             "faculty_id": g.faculty_id,
-            "unread_appeals_count": unread_count or 0
+            "unread_appeals_count": unread_count or 0,
+            "total_appeals_count": total_count or 0
         })
 
     # eng ko'p murojaat yuborgan guruhlar tepaga chiqishi kerak
-    result_data.sort(key=lambda x: x["unread_appeals_count"], reverse=True)
+    result_data.sort(key=lambda x: (x["total_appeals_count"], x["unread_appeals_count"]), reverse=True)
 
     return {
         "success": True, 

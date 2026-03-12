@@ -106,8 +106,9 @@ class _TutorGroupsScreenState extends State<TutorGroupsScreen> {
                                       style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                                     ),
                                     Text(
-                                      group['faculty_id'] != null ? "Fakultet ID: ${group['faculty_id']}" : "Guruh", // Assuming API provided Faculty Name in groups too? No, only Appeal details.
-                                      // Actually getTutorGroups sends faculty_id. We can just say "Guruh" or nothing.
+                                      widget.isAppealsMode 
+                                          ? "Jami murojaatlar: ${group['total_appeals_count'] ?? 0} ta" 
+                                          : (group['faculty_id'] != null ? "Fakultet ID: ${group['faculty_id']}" : "Guruh"),
                                       style: TextStyle(color: Colors.grey[600], fontSize: 13),
                                     ),
                                   ],
