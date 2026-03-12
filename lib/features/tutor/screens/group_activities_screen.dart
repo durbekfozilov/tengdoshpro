@@ -241,7 +241,7 @@ class _GroupActivitiesScreenState extends State<GroupActivitiesScreen> with Sing
                       separatorBuilder: (_, __) => const SizedBox(width: 8),
                       itemBuilder: (context, idx) {
                         final imgFileId = item['images'][idx]['file_id'];
-                        final imageUrl = "${ApiConstants.backendUrl}/api/v1/files/$imgFileId";
+                        final imageUrl = "${ApiConstants.backendUrl}/files/$imgFileId";
                         return GestureDetector(
                           onTap: () {
                             showDialog(

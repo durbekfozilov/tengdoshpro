@@ -96,6 +96,12 @@ async def lifespan(app: FastAPI):
     # API Routers
     app.include_router(tutor_router, prefix="/api/v1/tutor", tags=["Tutor"])
     
+    # [BUGFIX] Global fallback for Flutter Tutor Image Bug where the app appends /api/v1 twice
+    @app.get("/api/v1/api/v1/files/{file_id}")
+    async def global_flutter_image_fallback(file_id: str):
+        from api.files import get_telegram_file
+        return await get_telegram_file(file_id)
+    
     if MODE == "POLLING":
         logger.info("🔄 Starting Polling in Background...")
         await bot.delete_webhook(drop_pending_updates=True)
@@ -224,20 +230,6 @@ async def start_scheduler():
     
     # scheduler.start()
     logger.info("⏰ Background Task Scheduler DISABLED by User Request")
-
-    # [NEW] Banner Analytics Flush (Buffer Optimization)
-    from services.banner_analytics import BannerAnalyticsService
-    
-    async def flush_banner_analytics_loop():
-        while True:
-            await asyncio.sleep(60) # Every 60 seconds
-            try:
-                await BannerAnalyticsService().flush()
-            except Exception as e:
-                logger.error(f"Banner flush error: {e}")
-
-    # Start independent loop
-    asyncio.create_task(flush_banner_analytics_loop())
 
 
 # ============================================================

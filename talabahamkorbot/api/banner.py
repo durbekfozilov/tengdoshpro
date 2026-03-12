@@ -1,15 +1,12 @@
 
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, desc
+from sqlalchemy import select, desc, update
 
 from api.dependencies import get_db
 from database.models import Banner
 
 router = APIRouter(prefix="/banner", tags=["Banner"])
-
-
-from services.banner_analytics import BannerAnalyticsService
 
 @router.get("/active")
 async def get_active_banner(
@@ -29,9 +26,10 @@ async def get_active_banner(
     banner = result.scalar_one_or_none()
     
     
-    # Increment view count via buffer
+    # Increment view count directly
     if banner:
-        await BannerAnalyticsService().increment_view(banner.id)
+        await db.execute(update(Banner).where(Banner.id == banner.id).values(views=Banner.views + 1))
+        await db.commit()
     
     if not banner:
         return {"active": False}
@@ -84,5 +82,6 @@ async def track_banner_click(
     """
     Increment click count for a banner
     """
-    await BannerAnalyticsService().increment_click(banner_id)
+    await db.execute(update(Banner).where(Banner.id == banner_id).values(clicks=Banner.clicks + 1))
+    await db.commit()
     return {"status": "ok"}

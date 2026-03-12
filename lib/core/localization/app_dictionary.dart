@@ -184,8 +184,8 @@ class AppDictionary {
       'ru': 'Выберите тип активности',
     },
     'social_form_step2_title': {
-      'uz': 'Faollik tafsilotlari',
-      'ru': 'Детали активности',
+      'uz': 'Qaysi yo\'nalish bo\'yicha kirilganligi',
+      'ru': 'По какому направлению введено',
     },
     'social_base_name': {
       'uz': 'Faollik nomi',

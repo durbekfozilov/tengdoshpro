@@ -157,8 +157,8 @@ async def get_my_profile(
              "student_status": "active" if student.is_active else "inactive",
              "hemis_id": staff_id,
              "hemis_login": staff_id,
-             "is_premium": is_premium_active,
-             "premium_expiry": student.premium_expiry.isoformat() if student.premium_expiry else None,
+             "is_premium": student.is_premium,
+             "premium_expiry": student.premium_expiry,
              "custom_badge": getattr(student, 'custom_badge', None) if is_premium_active else None,
              "is_registered_bot": False # Simplification
         }
@@ -173,6 +173,7 @@ async def get_my_profile(
               is_premium_active = False
               
     data['is_premium'] = is_premium_active
+    data['premium_expiry'] = student.premium_expiry
     if not is_premium_active:
          data['custom_badge'] = None
     

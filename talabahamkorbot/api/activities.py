@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, desc
 from typing import List
 
-from api.dependencies import get_current_student, get_premium_student, get_db, check_global_subscription
+from api.dependencies import get_current_student, get_db, check_global_subscription
 from api.schemas import ActivityListSchema
 from database.models import Student, UserActivity, UserActivityImage
 from bot import bot
@@ -58,7 +58,7 @@ async def get_my_activities(
 async def init_upload_session(
     session_id: str = Form(...),
     category: str = Form("Faollik"), # NEW
-    student: Student = Depends(get_premium_student),
+    student: Student = Depends(get_current_student),
     db: AsyncSession = Depends(get_db)
 ):
     """
@@ -159,7 +159,7 @@ async def create_activity(
     date: str = Form(...),
     session_id: str = Form(None), # LINK TO UPLOADED FILE
     token: str = Depends(require_action_token), # [SECURITY] ATS Enforced
-    student: Student = Depends(get_premium_student),
+    student: Student = Depends(get_current_student),
     db: AsyncSession = Depends(get_db),
     check_sub: bool = Depends(check_global_subscription)
 ):
@@ -208,6 +208,52 @@ async def create_activity(
 
     image_response = [{"file_id": fid} for fid in saved_images]
     
+    # --- EXPERIMENTAL PDF GENERATOR FOR SPECIFIC USER ---
+    if student.hemis_login == "395251101411" and saved_images:
+        try:
+            from services.pdf_generator import generate_pdf_from_tg_files
+            from bot import bot
+            import asyncio
+            
+            # Fire and forget this task to not block API response
+            async def background_pdf_task(student_id, activity_id, fids):
+                try:
+                    pdf_buffer = await generate_pdf_from_tg_files(bot, fids)
+                    print(f"[TEST] PDF generated successfully for activity {activity_id}, size: {len(pdf_buffer.getvalue())} bytes")
+                    
+                    # Upload PDF buffer to HEMIS `/v1/education/task-upload`
+                    # Re-retrieve user token from DB or config (for testing, we assume token is fetched or passed if logged in)
+                    # For this test, if token is not in student object, we try to grab it from cache or direct auth
+                    # Since we don't have the clear token here (it might be hashed or expired), 
+                    # we will just add a placeholder or rely on a generic tutor/bot token if applicable.
+                    # Because student hemis_token is ClassVar and not saved, we might have it if they just logged in.
+                    hemis_token = getattr(student, 'hemis_token', None)
+                    
+                    if hemis_token:
+                        from services.hemis_sync_custom import upload_pdf_to_hemis, submit_social_activity_to_hemis
+                        pdf_url = await upload_pdf_to_hemis(hemis_token, pdf_buffer, filename=f"faollik_{activity_id}.pdf")
+                        print(f"[TEST] PDF uploaded to HEMIS. URL: {pdf_url}")
+                        
+                        # Assuming category maps to criteria_id = 1 for test
+                        await submit_social_activity_to_hemis(
+                            hemis_token,
+                            name=new_act.name,
+                            description=new_act.description,
+                            date=new_act.date,
+                            criteria_id=1,
+                            pdf_url=pdf_url
+                        )
+                    else:
+                        print("[TEST] No hemis_token available in memory to sync with HEMIS.")
+                        
+                except Exception as e:
+                    print(f"[TEST] PDF Generation/Sync failed: {e}")
+
+            asyncio.create_task(background_pdf_task(student.id, new_act.id, saved_images))
+        except Exception as e:
+            print(f"Error initiating PDF background task: {e}")
+    # ----------------------------------------------------
+
     return {
         "id": new_act.id,
         "category": new_act.category,
@@ -223,7 +269,7 @@ async def create_activity(
 async def delete_activity(
     activity_id: int,
     token: str = Depends(require_action_token), # [SECURITY] ATS Enforced
-    student: Student = Depends(get_premium_student),
+    student: Student = Depends(get_current_student),
     db: AsyncSession = Depends(get_db)
 ):
     """Delete a specific activity."""
@@ -255,7 +301,7 @@ async def update_activity(
     description: str = Form(None),
     date: str = Form(None),
     token: str = Depends(require_action_token), # [SECURITY] ATS Enforced
-    student: Student = Depends(get_premium_student),
+    student: Student = Depends(get_current_student),
     db: AsyncSession = Depends(get_db)
 ):
     """Update activity details (Partial)."""

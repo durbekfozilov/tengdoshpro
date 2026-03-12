@@ -1,15 +1,15 @@
-import sys
 import asyncio
-from sqlalchemy import select
 from database.db_connect import AsyncSessionLocal
-from database.models import Staff
+from database.models import Student, Staff
+from sqlalchemy import select
 
 async def main():
-    async with AsyncSessionLocal() as db:
-        result = await db.execute(select(Staff).where(Staff.jshshir == '30302995690037'))
-        st = result.scalars().all()
-        for s in st:
-            print(f"ID={s.id} Name={s.full_name} EmpID={s.employee_id_number} JSHSHIR={s.jshshir} Role={s.role}")
-        print("Done")
-
+    async with AsyncSessionLocal() as session:
+        stu = await session.scalar(select(Student).where(Student.id == 1))
+        stf = await session.scalar(select(Staff).where(Staff.id == 1))
+        print("Student 1:", bool(stu))
+        print("Staff 1:", bool(stf))
+        
+        stf10 = await session.scalar(select(Staff).where(Staff.id > 1))
+        print("Some Staff ID:", stf10.id if stf10 else "None")
 asyncio.run(main())

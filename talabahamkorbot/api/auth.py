@@ -797,7 +797,8 @@ async def login_via_hemis(
     # Prepare response data specifically
     profile_data = StudentProfileSchema.model_validate(student).model_dump()
     profile_data['first_name'] = first_name # Explicitly add first_name to response
-    
+    profile_data['is_premium'] = student.is_premium
+    profile_data['premium_expiry'] = student.premium_expiry
     raw_role = student.hemis_role or "student"
     role_map_auth = {
         "student": "Talaba",
