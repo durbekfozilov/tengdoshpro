@@ -155,16 +155,20 @@ async def get_student_or_staff(
         staff = await db.get(Staff, token_data["id"])
         if not staff:
             raise HTTPException(status_code=404, detail="Xodim topilmadi")
-        setattr(staff, 'hemis_token', decrypt_data(token_data.get("hemis_token")))
-        setattr(staff, 'image_url', decrypt_data(token_data.get("avatar")))
+        if token_data.get("hemis_token"):
+            setattr(staff, 'hemis_token', decrypt_data(token_data.get("hemis_token")))
+        if token_data.get("avatar"):
+            setattr(staff, 'transient_avatar', token_data.get("avatar"))
         setattr(staff, 'role_type', 'staff')
         return staff
         
     student = await db.get(Student, token_data["id"])
     if not student:
         raise HTTPException(status_code=404, detail="Talaba topilmadi")
-    setattr(student, 'hemis_token', decrypt_data(token_data.get("hemis_token")))
-    setattr(student, 'image_url', decrypt_data(token_data.get("avatar")))
+    if token_data.get("hemis_token"):
+        setattr(student, 'hemis_token', decrypt_data(token_data.get("hemis_token")))
+    if token_data.get("avatar"):
+        setattr(student, 'transient_avatar', token_data.get("avatar"))
     setattr(student, 'role_type', 'student')
     return student
 
