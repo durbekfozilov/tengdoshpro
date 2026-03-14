@@ -37,6 +37,8 @@ async def get_current_user_token_data(
             actual_hash = hash_user_agent(current_ua)
             
             if expected_hash != actual_hash:
+                 # Only warn, do not block or force disconnect for Flutter
+                 # Since flutter often sends Dart/3.x or okhttp which might differ from initial login
                  logger.warning(f"Security Alert: Token User-Agent Mismatch! Expected: {expected_hash}, Actual: {actual_hash} (UA: {current_ua})")
                  # raise HTTPException(status_code=401, detail="Xavfsizlik: Token boshqa qurilmada foydalanilmoqda!")
 

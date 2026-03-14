@@ -52,7 +52,11 @@ def verify_token(token: str):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         return payload
-    except JWTError:
+    except Exception as e:
+        # Avoid filling logs with "Not enough segments" for legacy tokens
+        if "Not enough segments" not in str(e):
+             # logger.debug(f"JWT Verification Failed: {e}")
+             pass
         return None
 
 # RATE LIMITING
