@@ -33,45 +33,14 @@ async def get_my_clubs(
         .options(selectinload(ClubMembership.club))
     )
     result_memberships = memberships.all()
-    joined_club_ids = {m.club_id for m in result_memberships}
-    
-    # Check for department admin / leader roles
-    all_clubs = await db.scalars(select(Club))
     
     s_role = getattr(student, 'role', '') or ''
     s_hemis = getattr(student, 'hemis_role', '') or ''
     roles = [s_role.lower(), s_hemis.lower()]
     
-    admin_clubs = []
-    
-    for c in all_clubs.all():
-        is_direct_leader = getattr(c, 'leader_student_id', None) == student.id
-        club_dept = getattr(c, 'department', '') or ''
-        club_dept_norm = club_dept.lower().replace(' ', '_')
-        
-        is_dept_admin = False
-        if club_dept_norm == 'student_council' and ('student_council' in roles or 'yetakchi' in roles):
-            is_dept_admin = True
-        elif club_dept_norm and club_dept_norm in roles:
-            is_dept_admin = True
-            
-        if (is_direct_leader or is_dept_admin) and c.id not in joined_club_ids:
-            from datetime import datetime
-            mock_m = ClubMembership(
-                id=0,
-                student_id=student.id,
-                club_id=c.id,
-                club=c,
-                status="active",
-                joined_at=datetime.utcnow()
-            )
-            admin_clubs.append(mock_m)
-            joined_club_ids.add(c.id)
-            
-    combined = list(result_memberships) + admin_clubs
     result = []
     
-    for m in combined:
+    for m in result_memberships:
         data = ClubMembershipSchema.from_orm(m)
         is_direct_leader = getattr(m.club, 'leader_student_id', None) == student.id
         
@@ -79,9 +48,10 @@ async def get_my_clubs(
         club_dept_norm = club_dept.lower().replace(' ', '_')
         
         is_dept_admin = False
-        if club_dept_norm == 'student_council' and ('student_council' in roles or 'yetakchi' in roles):
+        is_student_council_role = 'student council' in s_role.lower() or 'student council' in s_hemis.lower()
+        if club_dept_norm == 'student_council' and ('student_council' in roles or 'yetakchi' in roles or is_student_council_role):
             is_dept_admin = True
-        elif club_dept_norm and club_dept_norm in roles:
+        elif club_dept_norm and (club_dept_norm in roles or club_dept_norm.replace('_', ' ') in s_role.lower() or club_dept_norm.replace('_', ' ') in s_hemis.lower()):
             is_dept_admin = True
             
         if is_direct_leader:
@@ -137,6 +107,34 @@ async def create_club(
     db.add(membership)
     await db.commit()
     
+    # [NEW] Also add all students matching the department logic automatically
+    if club.department:
+        from sqlalchemy import func, or_
+        club_dept_norm = club.department.lower().replace(' ', '_')
+        dept_spaced = club_dept_norm.replace('_', ' ')
+        
+        conds = [
+            func.lower(Student.hemis_role) == club_dept_norm,
+            func.lower(Student.hemis_role) == dept_spaced
+        ]
+        
+        if club_dept_norm == 'student_council':
+            conds.extend([
+                func.lower(Student.hemis_role).contains('student_council'),
+                func.lower(Student.hemis_role).contains('yetakchi'),
+                func.lower(Student.hemis_role).contains('student council')
+            ])
+            
+        admins = await db.scalars(select(Student).where(or_(*conds)))
+        for admin in admins.all():
+            if admin.id != leader_id:
+                m = ClubMembership(
+                    student_id=admin.id,
+                    club_id=club.id
+                )
+                db.add(m)
+        await db.commit()
+    
     return club
 
 @router.get("/all", response_model=List[ClubSchema])
@@ -188,9 +186,10 @@ async def get_all_clubs(
         roles = [s_role.lower(), s_hemis.lower()]
         
         is_dept_admin = False
-        if club_dept_norm == 'student_council' and ('student_council' in roles or 'yetakchi' in roles):
+        is_student_council_role = 'student council' in s_role.lower() or 'student council' in s_hemis.lower()
+        if club_dept_norm == 'student_council' and ('student_council' in roles or 'yetakchi' in roles or is_student_council_role):
             is_dept_admin = True
-        elif club_dept_norm and club_dept_norm in roles:
+        elif club_dept_norm and (club_dept_norm in roles or club_dept_norm.replace('_', ' ') in s_role.lower() or club_dept_norm.replace('_', ' ') in s_hemis.lower()):
             is_dept_admin = True
             
         data.is_joined = is_joined or is_direct_leader or is_dept_admin
