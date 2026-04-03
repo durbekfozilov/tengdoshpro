@@ -92,4 +92,7 @@ class ApiConstants {
   // Rating
   static String get ratingTargets => '$backendUrl/rating/targets';
   static String get ratingSubmit => '$backendUrl/rating/submit';
+  static String get ratingStats => '$backendUrl/management/rating/stats';
+  static String get ratingActivate => '$backendUrl/management/rating/activate';
+  static String get ratingStatus => '$backendUrl/management/rating/status';
 }

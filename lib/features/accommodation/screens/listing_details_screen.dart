@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../models/accommodation_listing.dart';
-import '../../core/constants/api_constants.dart';
-import '../../core/theme/app_theme.dart';
+import '../../../../core/constants/api_constants.dart';
+import '../../../../core/theme/app_theme.dart';
 import 'package:intl/intl.dart';
 
 class ListingDetailsScreen extends StatefulWidget {

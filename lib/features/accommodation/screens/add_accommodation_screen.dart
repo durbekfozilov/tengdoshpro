@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../../core/theme/app_theme.dart';
-import '../../core/localization/app_dictionary.dart';
-import '../../core/services/data_service.dart';
+import '../../../../core/theme/app_theme.dart';
+import '../../../../core/localization/app_dictionary.dart';
+import '../../../../core/services/data_service.dart';
 
 class AddAccommodationScreen extends StatefulWidget {
   const AddAccommodationScreen({super.key});

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../core/theme/app_theme.dart';
-import '../../core/services/data_service.dart';
+import '../../../../core/theme/app_theme.dart';
+import '../../../../core/services/data_service.dart';
 import '../models/dorm_models.dart';
 
 // --- RULES SCREEN ---

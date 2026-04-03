@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../core/theme/app_theme.dart';
+import '../../../../core/theme/app_theme.dart';
 import 'dorm_issue_screen.dart';
 import 'dorm_roommate_screen.dart';
 import 'dorm_details_widgets.dart';

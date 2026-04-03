@@ -32,7 +32,7 @@ class _ManagementRatingHubScreenState extends State<ManagementRatingHubScreen> {
 
   Future<void> _toggleStatus() async {
     setState(() => _isLoading = true);
-    final result = await _dataService.toggleRatingActivation('tutor', !_isActive);
+    final Map<String, dynamic> result = await _dataService.toggleRatingActivation('tutor', !_isActive);
     if (result['success'] == true) {
       await _loadStatus();
       if (mounted) {

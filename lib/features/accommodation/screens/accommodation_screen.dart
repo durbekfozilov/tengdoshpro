@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../core/theme/app_theme.dart';
-import '../../core/localization/app_dictionary.dart';
-import '../../core/services/data_service.dart';
-import '../../core/models/student.dart';
+import '../../../../core/theme/app_theme.dart';
+import '../../../../core/localization/app_dictionary.dart';
+import '../../../../core/services/data_service.dart';
+import '../../../../core/models/student.dart';
 import '../models/accommodation_listing.dart';
 import '../widgets/listing_card.dart';
 import 'add_accommodation_screen.dart';
