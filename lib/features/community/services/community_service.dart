@@ -529,10 +529,9 @@ class CommunityService {
         final jsonMap = json.decode(response.body);
         
         // Map manually because it's a single object, not list
-        final createdAtStr = jsonMap['created_at'];
         return Comment.fromJson(jsonMap);
-        throw Exception("Failed to create comment: ${response.statusCode}");
       }
+      throw Exception("Failed to create comment: ${response.statusCode}");
     } catch (e) {
       print("CommunityService: Error creating comment: $e");
       rethrow;
