@@ -262,20 +262,19 @@ class DataService {
     return false;
   }
 
-  Future<bool> toggleRatingActivation(String roleType, bool isActive) async {
+  Future<Map<String, dynamic>> toggleRatingActivation(String roleType, bool isActive) async {
     try {
       final response = await _post(
         ApiConstants.managementRatingActivate,
         body: {'role_type': roleType, 'is_active': isActive},
       );
       if (response.statusCode == 200) {
-        final body = json.decode(response.body);
-        return body['success'] ?? false;
+        return json.decode(utf8.decode(response.bodyBytes));
       }
     } catch (e) {
       debugPrint("DataService: Error toggling rating activation: $e");
     }
-    return false;
+    return {'success': false, 'message': 'Ulanishda xatolik yuz berdi'};
   }
 
   Future<List<dynamic>> getManagementRatingStats() async {
