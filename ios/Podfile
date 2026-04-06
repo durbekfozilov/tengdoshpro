@@ -72,8 +72,8 @@ post_install do |installer|
         config.build_settings['ONLY_ACTIVE_ARCH'] = 'YES'
       end
 
-      # [FIX] Ensure simulators do not exclude arm64 on Apple Silicon Macs
-      config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'i386'
+      # [FIX] Exclude arm64 for simulators to fix MLImage 'built for iOS' link error on M1/M2 Macs
+      config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'i386 arm64'
 
       # [FIX] Force removal of simulator architectures for Release/Archive to fix "Invalid Executable"
       if config.name == 'Release'
