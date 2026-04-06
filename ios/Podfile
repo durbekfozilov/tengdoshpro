@@ -29,20 +29,11 @@ target 'Runner' do
   use_frameworks! :linkage => :static
   use_modular_headers!
 
+  # [FIX] Force app_links to use local plugin path to avoid duplication with standard CocoaPod
+  pod 'app_links', :path => File.join('.symlinks', 'plugins', 'app_links', 'ios')
+
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
 
-  # Explicitly add these to resolve module lookup issues with static linkage
-  pod 'app_links', :modular_headers => true
-  pod 'shared_preferences_foundation', :modular_headers => true
-  pod 'flutter_native_splash', :modular_headers => true
-  pod 'SDWebImage', :modular_headers => true
-  pod 'SDWebImageWebPCoder', :modular_headers => true
-  pod 'libwebp', :modular_headers => true
-  
-  # Fix GoogleUtilities/Firebase header issues
-  pod 'GoogleUtilities', :modular_headers => true
-  pod 'FirebaseCore', :modular_headers => true
-  
   target 'RunnerTests' do
     inherit! :search_paths
   end
