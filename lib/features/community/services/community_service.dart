@@ -224,9 +224,9 @@ class CommunityService {
         
         if (decoded is List) {
           data = decoded;
-        } else if (decoded is Map \u0026\u0026 decoded.containsKey('data')) {
+        } else if (decoded is Map && decoded.containsKey('data')) {
            data = decoded['data'] is List ? decoded['data'] : [];
-        } else if (decoded is Map \u0026\u0026 decoded.containsKey('posts')) {
+        } else if (decoded is Map && decoded.containsKey('posts')) {
            data = decoded['posts'] is List ? decoded['posts'] : [];
         } else {
            print("CommunityService: Unknown JSON structure for posts");
@@ -256,7 +256,7 @@ class CommunityService {
         List<dynamic> data;
         if (decoded is List) {
           data = decoded;
-        } else if (decoded is Map \u0026\u0026 decoded.containsKey('data')) {
+        } else if (decoded is Map && decoded.containsKey('data')) {
            data = decoded['data'] is List ? decoded['data'] : [];
         } else {
            return [];
@@ -279,7 +279,7 @@ class CommunityService {
 
       if (response.statusCode == 200) {
         final decoded = json.decode(utf8.decode(response.bodyBytes));
-        if (decoded is Map \u0026\u0026 decoded.containsKey('data')) {
+        if (decoded is Map && decoded.containsKey('data')) {
            return _mapJsonToPost(decoded['data']);
         }
         return _mapJsonToPost(decoded);
