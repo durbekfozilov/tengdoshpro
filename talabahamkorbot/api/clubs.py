@@ -202,6 +202,16 @@ async def get_all_clubs(
             
         clubs_data.append(data)
         
+    # Sort clubs: 
+    # 1. PR klubi always first
+    # 2. Joined clubs next
+    # 3. Descending by member count
+    clubs_data.sort(key=lambda x: (
+        not (x.name.lower().strip() == "pr klubi"),
+        not x.is_joined,
+        -getattr(x, 'members_count', 0)
+    ))
+        
     return clubs_data
 
 @router.post("/join")
