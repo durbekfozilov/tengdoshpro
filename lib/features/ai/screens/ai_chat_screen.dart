@@ -8,12 +8,16 @@ import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class AiChatScreen extends StatefulWidget {
   final String? initialQuery;
+  final String? initialKeyword;
+  final String? keywordLabel;
   final bool isGrantAnalysis;
   final bool isSentimentAnalysis;
 
   const AiChatScreen({
     super.key, 
     this.initialQuery, 
+    this.initialKeyword,
+    this.keywordLabel,
     this.isGrantAnalysis = false,
     this.isSentimentAnalysis = false,
   });
@@ -21,6 +25,7 @@ class AiChatScreen extends StatefulWidget {
   @override
   State<AiChatScreen> createState() => _AiChatScreenState();
 }
+
 
 class _AiChatScreenState extends State<AiChatScreen> {
   final TextEditingController _controller = TextEditingController();
@@ -68,6 +73,10 @@ class _AiChatScreenState extends State<AiChatScreen> {
        Future.delayed(const Duration(milliseconds: 500), () {
            if (mounted) _sendSentimentAnalysis();
        });
+    } else if (widget.initialKeyword != null) {
+       Future.delayed(const Duration(milliseconds: 500), () {
+           if (mounted) _sendKeywordAnalysis(widget.initialKeyword!, widget.keywordLabel ?? widget.initialKeyword!);
+       });
     } else if (widget.initialQuery != null && widget.initialQuery!.isNotEmpty) {
        // Allow UI to render first
        Future.delayed(const Duration(milliseconds: 500), () {
@@ -75,6 +84,7 @@ class _AiChatScreenState extends State<AiChatScreen> {
        });
     }
   }
+
 
   Future<void> _sendGrantAnalysis() async {
     setState(() {
@@ -253,11 +263,78 @@ class _AiChatScreenState extends State<AiChatScreen> {
               },
             ),
           ),
+          _buildKeywordsChips(),
           _buildInputArea(),
         ],
       ),
     );
   }
+
+  final Map<String, String> _aiKeywords = {
+    'summary': 'Umumiy xulosa',
+    'grades': 'Baholar tahlili',
+    'attendance': 'Davomat tahlili',
+    'subjects': 'Fanlar tahlili',
+    'timetable': 'Dars jadvali',
+    'contract': 'Shartnoma',
+    'courses': 'Kurslar',
+    'plagiarism': 'Plagiat',
+    'diploma': 'Diplom/BIT',
+  };
+
+  Widget _buildKeywordsChips() {
+    return Container(
+      height: 50,
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border(top: BorderSide(color: Colors.grey.withOpacity(0.1))),
+      ),
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        children: _aiKeywords.entries.map((entry) {
+          return Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: ActionChip(
+              label: Text(entry.value, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
+              backgroundColor: AppTheme.backgroundWhite,
+              side: BorderSide(color: AppTheme.primaryBlue.withOpacity(0.2)),
+              onPressed: () => _sendKeywordAnalysis(entry.key, entry.value),
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  Future<void> _sendKeywordAnalysis(String keyword, String label) async {
+    setState(() {
+      _messages.add({"role": "user", "content": "🔍 $label"});
+      _isTyping = true;
+    });
+    _scrollToBottom();
+    
+    try {
+      final result = await _dataService.sendAiChat(keyword: keyword);
+      if (mounted) {
+        setState(() {
+          _isTyping = false;
+          if (result['success'] == true) {
+            final response = result['data']['response'];
+            _messages.add({"role": "assistant", "content": response});
+          } else {
+             final error = result['error'] ?? "⚠️ Xatolik yuz berdi.";
+             _messages.add({"role": "assistant", "content": error});
+          }
+        });
+        _scrollToBottom();
+      }
+    } catch (e) {
+      _handleError(e);
+    }
+  }
+
 
   Widget _buildMessageBubble(String text, bool isUser) {
     return Align(

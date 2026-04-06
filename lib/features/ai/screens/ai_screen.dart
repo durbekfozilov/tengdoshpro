@@ -28,39 +28,69 @@ class AiScreen extends StatelessWidget {
             return _buildLockedUI(context);
           }
 
-          return Container(
-            color: AppTheme.backgroundWhite,
+          return ListView(
             padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(
-                  "Sizga qanday yordam bera olaman? Quyidagi mavzulardan birini tanlang:",
-                  style: TextStyle(color: Colors.grey[600], fontSize: 15),
-                  textAlign: TextAlign.start,
-                ),
-                const SizedBox(height: 20),
-                
-                _buildAiButton(context, "Kredit-modul tizimi", Icons.straighten, () {
-                   Navigator.push(context, MaterialPageRoute(builder: (_) => const AiChatScreen(
-                     initialQuery: "Kredit-modul tizimi nima va GPA qanday hisoblanadi?"
-                   )));
-                }),
-                _buildAiButton(context, "Konspekt qilish (File/Matn)", Icons.note_alt, () {
-                   Navigator.push(context, MaterialPageRoute(builder: (_) => const KonspektScreen()));
-                }),
-                _buildAiButton(context, "Grant taqsimoti", Icons.school, () {
-                   Navigator.push(context, MaterialPageRoute(builder: (_) => const AiChatScreen(
-                     isGrantAnalysis: true,
-                   )));
-                }),
-                const Divider(height: 30),
-                _buildAiButton(context, "AI bilan suhbat", Icons.chat_bubble, () {
-                   Navigator.push(context, MaterialPageRoute(builder: (_) => const AiChatScreen()));
-                }, isPrimary: true),
-              ],
-            ),
+            children: [
+              Text(
+                "Sizga qanday yordam bera olaman? Quyidagi mavzulardan birini tanlang:",
+                style: TextStyle(color: Colors.grey[600], fontSize: 15),
+                textAlign: TextAlign.start,
+              ),
+              const SizedBox(height: 20),
+              
+              _buildAiButton(context, "Kredit-modul tizimi", Icons.account_tree_outlined, () {
+                 Navigator.push(context, MaterialPageRoute(builder: (_) => const AiChatScreen(
+                   initialQuery: "Kredit-modul tizimi nima va GPA qanday hisoblanadi?"
+                 )));
+              }),
+              _buildAiButton(context, "Konspekt qilish (File/Matn)", Icons.note_alt_outlined, () {
+                 Navigator.push(context, MaterialPageRoute(builder: (_) => const KonspektScreen()));
+              }),
+              _buildAiButton(context, "Grant taqsimoti tahlili", Icons.workspace_premium_outlined, () {
+                 Navigator.push(context, MaterialPageRoute(builder: (_) => const AiChatScreen(isGrantAnalysis: true)));
+              }),
+
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 12.0),
+                child: Text("Akademik Ma'lumotlar Tahlili", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppTheme.primaryBlue)),
+              ),
+              
+              _buildAiButton(context, "Umumiy akademik xulosa", Icons.summarize_outlined, () {
+                 Navigator.push(context, MaterialPageRoute(builder: (_) => const AiChatScreen(initialKeyword: "summary", keywordLabel: "Umumiy xulosa")));
+              }),
+              _buildAiButton(context, "Baholar tahlili", Icons.auto_graph_outlined, () {
+                 Navigator.push(context, MaterialPageRoute(builder: (_) => const AiChatScreen(initialKeyword: "grades", keywordLabel: "Baholar tahlili")));
+              }),
+              _buildAiButton(context, "Davomat tahlili", Icons.event_note_outlined, () {
+                 Navigator.push(context, MaterialPageRoute(builder: (_) => const AiChatScreen(initialKeyword: "attendance", keywordLabel: "Davomat tahlili")));
+              }),
+              _buildAiButton(context, "Shartnoma va To'lovlar", Icons.receipt_long_outlined, () {
+                 Navigator.push(context, MaterialPageRoute(builder: (_) => const AiChatScreen(initialKeyword: "contract", keywordLabel: "Shartnoma holati")));
+              }),
+              _buildAiButton(context, "Fanlar tahlili", Icons.library_books_outlined, () {
+                 Navigator.push(context, MaterialPageRoute(builder: (_) => const AiChatScreen(initialKeyword: "subjects", keywordLabel: "Fanlar tahlili")));
+              }),
+              _buildAiButton(context, "Dars jadvali tahlili", Icons.calendar_month_outlined, () {
+                 Navigator.push(context, MaterialPageRoute(builder: (_) => const AiChatScreen(initialKeyword: "timetable", keywordLabel: "Dars jadvali")));
+              }),
+              _buildAiButton(context, "Kurslar va yo'nalishlar", Icons.school_outlined, () {
+                 Navigator.push(context, MaterialPageRoute(builder: (_) => const AiChatScreen(initialKeyword: "courses", keywordLabel: "Kurslar tahlili")));
+              }),
+              _buildAiButton(context, "Plagiat tekshiruvi", Icons.fact_check_outlined, () {
+                 Navigator.push(context, MaterialPageRoute(builder: (_) => const AiChatScreen(initialKeyword: "plagiarism", keywordLabel: "Plagiat tekshiruvi")));
+              }),
+              _buildAiButton(context, "Diplom/BIT tahlili", Icons.history_edu_outlined, () {
+                 Navigator.push(context, MaterialPageRoute(builder: (_) => const AiChatScreen(initialKeyword: "diploma", keywordLabel: "Diplom/BIT tahlili")));
+              }),
+
+              const Divider(height: 40),
+              _buildAiButton(context, "AI bilan erkin muloqot", Icons.auto_awesome, () {
+                 Navigator.push(context, MaterialPageRoute(builder: (_) => const AiChatScreen()));
+              }, isPrimary: true),
+              const SizedBox(height: 20),
+            ],
           );
+
         },
       ),
     );

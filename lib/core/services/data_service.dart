@@ -1506,6 +1506,7 @@ class DataService {
   }
 
   // 17. Send AI Message
+  // 17. Send AI Message (Old version - for backward compatibility)
   Future<String?> sendAiMessage(String message) async {
     try {
       final response = await http.post(
@@ -1529,6 +1530,34 @@ class DataService {
       return null;
     }
   }
+
+  // 17.2 Send AI Chat (New version - with keywords)
+  Future<Map<String, dynamic>> sendAiChat({String? keyword, String? text, String? question}) async {
+    try {
+      final response = await http.post(
+        Uri.parse(ApiConstants.aiChat),
+        headers: await _getHeaders(),
+        body: json.encode({
+          if (keyword != null) 'keyword': keyword,
+          if (text != null) 'text': text,
+          if (question != null) 'question': question,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        return json.decode(response.body);
+      } else if (response.statusCode == 403) {
+        throw Exception("PREMIUM_REQUIRED");
+      } else {
+        return json.decode(response.body);
+      }
+    } catch (e) {
+      if (e.toString().contains("PREMIUM_REQUIRED")) rethrow;
+      debugPrint("DataService: Error in AI chat: $e");
+      return {"success": false, "error": e.toString()};
+    }
+  }
+
 
   // 17.5 Predict Grant
   Future<String?> predictGrant() async {
