@@ -298,6 +298,24 @@ class DataService {
     }
   }
 
+  Future<Map<String, dynamic>> createManagementSurvey(Map<String, dynamic> surveyData) async {
+    try {
+      final response = await _post(
+        '${ApiConstants.backendUrl}/management/rating/create',
+        body: surveyData,
+      );
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return json.decode(utf8.decode(response.bodyBytes));
+      } else {
+        final body = json.decode(utf8.decode(response.bodyBytes));
+        return {'success': false, 'message': body['message'] ?? 'Xato: ${response.statusCode}'};
+      }
+    } catch (e) {
+      debugPrint("DataService: Error creating management survey: $e");
+      return {'success': false, 'message': 'Ulanishda xatolik: $e'};
+    }
+  }
+
   Future<List<dynamic>> getManagementRatingStats() async {
     try {
       final response = await _get(ApiConstants.managementRatingStats);

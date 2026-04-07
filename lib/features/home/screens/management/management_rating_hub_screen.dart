@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/services/data_service.dart';
-import 'management_rating_stats_screen.dart';
+import 'create_management_survey_screen.dart';
 
 class ManagementRatingHubScreen extends StatefulWidget {
   const ManagementRatingHubScreen({super.key});
@@ -78,7 +78,15 @@ class _ManagementRatingHubScreenState extends State<ManagementRatingHubScreen> {
               icon: Icons.add_task_rounded,
               color: _isActive ? Colors.green : Colors.blue,
               isLoading: _isLoading,
-              onTap: _toggleStatus,
+              onTap: () async {
+                final result = await Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const CreateManagementSurveyScreen()),
+                );
+                if (result == true) {
+                  _loadStatus();
+                }
+              },
             ),
             const SizedBox(height: 24),
             _buildLargeButton(
