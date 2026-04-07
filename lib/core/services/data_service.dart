@@ -270,11 +270,21 @@ class DataService {
       );
       if (response.statusCode == 200) {
         return json.decode(utf8.decode(response.bodyBytes));
+      } else {
+        try {
+          final body = json.decode(utf8.decode(response.bodyBytes));
+          return {
+            'success': false, 
+            'message': body['message'] ?? body['detail'] ?? 'Xato: ${response.statusCode}'
+          };
+        } catch (_) {
+          return {'success': false, 'message': 'Server xatosi: ${response.statusCode}'};
+        }
       }
     } catch (e) {
       debugPrint("DataService: Error toggling rating activation: $e");
+      return {'success': false, 'message': 'Ulanishda xatolik: $e'};
     }
-    return {'success': false, 'message': 'Ulanishda xatolik yuz berdi'};
   }
 
   Future<List<dynamic>> getManagementRatingStats() async {
