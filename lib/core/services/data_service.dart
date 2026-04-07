@@ -350,6 +350,30 @@ class DataService {
     }
   }
 
+  Future<List<dynamic>> getManagementSurveys() async {
+    try {
+      final response = await _get(ApiConstants.managementRatingList);
+      if (response.statusCode == 200) {
+        return json.decode(utf8.decode(response.bodyBytes));
+      }
+    } catch (e) {
+      debugPrint("DataService: Error fetching management surveys: $e");
+    }
+    return [];
+  }
+
+  Future<Map<String, dynamic>> getSurveyAnalyticsDetail(int surveyId) async {
+    try {
+      final response = await _get('${ApiConstants.managementRatingStatsDetail}/$surveyId');
+      if (response.statusCode == 200) {
+        return json.decode(utf8.decode(response.bodyBytes));
+      }
+    } catch (e) {
+      debugPrint("DataService: Error fetching survey analytics detail: $e");
+    }
+    return {};
+  }
+
   Future<List<dynamic>> getManagementRatingStats() async {
     try {
       final response = await _get(ApiConstants.managementRatingStats);

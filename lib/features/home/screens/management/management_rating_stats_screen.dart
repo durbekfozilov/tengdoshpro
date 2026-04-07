@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/services/data_service.dart';
-import '../../../../core/localization/app_dictionary.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'survey_detail_analytics_screen.dart';
 
 class ManagementRatingStatsScreen extends StatefulWidget {
   const ManagementRatingStatsScreen({super.key});
@@ -13,22 +12,52 @@ class ManagementRatingStatsScreen extends StatefulWidget {
 class _ManagementRatingStatsScreenState extends State<ManagementRatingStatsScreen> {
   final DataService _dataService = DataService();
   bool _isLoading = true;
-  List<dynamic> _stats = [];
+  List<dynamic> _surveys = [];
 
   @override
   void initState() {
     super.initState();
-    _loadStats();
+    _loadSurveys();
   }
 
-  Future<void> _loadStats() async {
+  Future<void> _loadSurveys() async {
     setState(() => _isLoading = true);
-    final stats = await _dataService.getManagementRatingStats();
+    final surveys = await _dataService.getManagementSurveys();
+    
+    // Mock data if empty for testing
+    if (surveys.isEmpty) {
+      _surveys = [
+        {
+          'id': 1,
+          'title': "Tyutorlarni baholash (Aprel)",
+          'status': 'active', // active, finished, pending
+          'start_at': '2026-04-01 09:00:00',
+          'end_at': '2026-04-30 18:00:00',
+          'total_votes': 156,
+        },
+        {
+          'id': 2,
+          'title': "Mart oyi yakuniy so'rovnoma",
+          'status': 'finished',
+          'start_at': '2026-03-01 09:00:00',
+          'end_at': '2026-03-31 18:00:00',
+          'total_votes': 1240,
+        },
+        {
+          'id': 3,
+          'title': "May oyi rejasi",
+          'status': 'pending',
+          'start_at': '2026-05-01 09:00:00',
+          'end_at': '2026-05-31 18:00:00',
+          'total_votes': 0,
+        }
+      ];
+    } else {
+      _surveys = surveys;
+    }
+
     if (mounted) {
-      setState(() {
-        _stats = stats;
-        _isLoading = false;
-      });
+      setState(() => _isLoading = false);
     }
   }
 
@@ -37,162 +66,128 @@ class _ManagementRatingStatsScreenState extends State<ManagementRatingStatsScree
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: Text(AppDictionary.tr(context, 'lbl_tutor_rating_stats')),
+        title: const Text("So'rovnomalar natijalari"),
         elevation: 0,
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         actions: [
           IconButton(
-            onPressed: _loadStats,
+            onPressed: _loadSurveys,
             icon: const Icon(Icons.refresh_rounded),
           ),
         ],
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : _stats.isEmpty
-              ? const _NoDataView()
+          : _surveys.isEmpty
+              ? _buildEmptyState()
               : ListView.builder(
                   padding: const EdgeInsets.all(16),
-                  itemCount: _stats.length,
+                  itemCount: _surveys.length,
                   itemBuilder: (context, index) {
-                    final item = _stats[index];
-                    return _RankingCard(item: item);
+                    final survey = _surveys[index];
+                    return _SurveyListItem(survey: survey);
                   },
                 ),
     );
   }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.assignment_outlined, size: 80, color: Colors.grey[300]),
+          const SizedBox(height: 16),
+          Text(
+            "So'rovnomalar topilmadi",
+            style: TextStyle(fontSize: 18, color: Colors.grey[600], fontWeight: FontWeight.w600),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
-class _RankingCard extends StatefulWidget {
-  final dynamic item;
-  const _RankingCard({required this.item});
-
-  @override
-  State<_RankingCard> createState() => _RankingCardState();
-}
-
-class _RankingCardState extends State<_RankingCard> with SingleTickerProviderStateMixin {
-  bool _isExpanded = false;
+class _SurveyListItem extends StatelessWidget {
+  final dynamic survey;
+  const _SurveyListItem({required this.survey});
 
   @override
   Widget build(BuildContext context) {
-    final item = widget.item;
-    final List<dynamic> breakdown = item['breakdown'] ?? [];
+    final String status = survey['status'] ?? 'pending';
+    final Color statusColor = _getStatusColor(status);
+    final String statusText = _getStatusText(status);
 
-    return AnimatedSize(
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-      child: Card(
-        margin: const EdgeInsets.only(bottom: 16),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        elevation: 4,
-        shadowColor: Colors.black12,
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: () => setState(() => _isExpanded = !_isExpanded),
+    return Card(
+      margin: const EdgeInsets.only(bottom: 16),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      elevation: 4,
+      shadowColor: Colors.black12,
+      child: InkWell(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => SurveyDetailAnalyticsScreen(surveyId: survey['id'], title: survey['title']),
+            ),
+          );
+        },
+        borderRadius: BorderRadius.circular(20),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 30,
-                      backgroundColor: Colors.blue[50],
-                      backgroundImage: item['image_url'] != null
-                          ? CachedNetworkImageProvider(item['image_url'])
-                          : null,
-                      child: item['image_url'] == null
-                          ? const Icon(Icons.person_pin_rounded, color: Colors.blue, size: 30)
-                          : null,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: statusColor.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            item['full_name'] ?? 'Noma\'lum',
-                            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            item['role_name'] ?? '',
-                            style: TextStyle(color: Colors.grey[600], fontSize: 13),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                          decoration: BoxDecoration(
-                            color: Colors.blue,
-                            borderRadius: BorderRadius.circular(12),
-                            boxShadow: [
-                              BoxShadow(color: Colors.blue.withOpacity(0.3), blurRadius: 4, offset: const Offset(0, 2)),
-                            ],
-                          ),
-                          child: Row(
-                            children: [
-                              const Icon(Icons.star_rounded, color: Colors.white, size: 24),
-                              const SizedBox(width: 4),
-                              Text(
-                                item['average_rating'].toString(),
-                                style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white),
-                              ),
-                            ],
-                          ),
+                          width: 8,
+                          height: 8,
+                          decoration: BoxDecoration(color: statusColor, shape: BoxShape.circle),
                         ),
-                        const SizedBox(height: 4),
+                        const SizedBox(width: 8),
                         Text(
-                          "${item['total_votes']} ${AppDictionary.tr(context, 'lbl_votes_count')}",
-                          style: TextStyle(color: Colors.grey[600], fontSize: 11),
+                          statusText,
+                          style: TextStyle(color: statusColor, fontWeight: FontWeight.bold, fontSize: 12),
                         ),
                       ],
                     ),
-                  ],
-                ),
-              ),
-              if (_isExpanded) ...[
-                const Divider(height: 1),
-                Padding(
-                  padding: const EdgeInsets.all(24.0),
-                  child: Column(
-                    children: [
-                      Text(
-                        AppDictionary.tr(context, 'lbl_rating_distribution'),
-                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 32),
-                      Row(
-                        children: [
-                          Expanded(
-                            flex: 1,
-                            child: SizedBox(
-                              height: 160,
-                              child: _SimplePieChart(breakdown: breakdown),
-                            ),
-                          ),
-                          const SizedBox(width: 24),
-                          Expanded(
-                            flex: 1,
-                            child: Column(
-                              children: [
-                                ...breakdown.reversed.map((b) => _buildLegendRow(b)).toList(),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 12),
-                    ],
                   ),
-                ),
-              ],
+                  Text(
+                    "${survey['total_votes']} ta ovoz",
+                    style: TextStyle(color: Colors.grey[600], fontSize: 13, fontWeight: FontWeight.w500),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Text(
+                survey['title'] ?? 'Nomsiz so\'rovnoma',
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Icon(Icons.calendar_today_outlined, size: 14, color: Colors.grey[600]),
+                  const SizedBox(width: 8),
+                  Text(
+                    "${survey['start_at'].substring(0, 10)} - ${survey['end_at'].substring(0, 10)}",
+                    style: TextStyle(color: Colors.grey[600], fontSize: 13),
+                  ),
+                  const Spacer(),
+                  const Icon(Icons.arrow_forward_ios_rounded, size: 16, color: Colors.grey),
+                ],
+              ),
             ],
           ),
         ),
@@ -200,138 +195,21 @@ class _RankingCardState extends State<_RankingCard> with SingleTickerProviderSta
     );
   }
 
-  Widget _buildLegendRow(dynamic b) {
-    final int rating = b['rating'];
-    final int count = b['count'];
-    final double percentage = (b['percentage'] as num).toDouble();
-    final Color color = _getRatingColor(rating);
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        children: [
-          Container(
-            width: 12,
-            height: 12,
-            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              "$rating ${AppDictionary.tr(context, 'lbl_rating_score')}",
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-            ),
-          ),
-          Text(
-            "$count ta (${percentage.toStringAsFixed(0)}%)",
-            style: TextStyle(color: Colors.grey[600], fontSize: 11),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Color _getRatingColor(int rating) {
-    switch (rating) {
-      case 5: return Colors.green;
-      case 4: return Colors.lightGreen;
-      case 3: return Colors.orangeAccent;
-      case 2: return Colors.orange;
-      case 1: return Colors.red;
-      default: return Colors.grey;
-    }
-  }
-}
-
-class _SimplePieChart extends StatelessWidget {
-  final List<dynamic> breakdown;
-  const _SimplePieChart({required this.breakdown});
-
-  @override
-  Widget build(BuildContext context) {
-    return CustomPaint(
-      painter: _PieChartPainter(breakdown: breakdown),
-      child: Container(),
-    );
-  }
-}
-
-class _PieChartPainter extends CustomPainter {
-  final List<dynamic> breakdown;
-  _PieChartPainter({required this.breakdown});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final double totalVotes = breakdown.fold(0, (sum, b) => sum + b['count']);
-    if (totalVotes == 0) return;
-
-    final Offset center = Offset(size.width / 2, size.height / 2);
-    final double radius = size.height / 2;
-    double startAngle = -1.5708; // Start at top
-
-    final Paint paint = Paint()
-      ..style = PaintingStyle.fill
-      ..isAntiAlias = true;
-
-    // Use order: 1, 2, 3, 4, 5 to match colors correctly
-    final List<dynamic> sortedBreakdown = List.from(breakdown)..sort((a, b) => a['rating'].compareTo(b['rating']));
-
-    for (final b in sortedBreakdown) {
-      final double sweepAngle = (b['count'] / totalVotes) * 6.28319; // 2 * pi
-      if (sweepAngle == 0) continue;
-
-      paint.color = _getRatingColor(b['rating']);
-      
-      canvas.drawArc(
-        Rect.fromCircle(center: center, radius: radius),
-        startAngle,
-        sweepAngle,
-        true,
-        paint,
-      );
-      
-      startAngle += sweepAngle;
-    }
-    
-    // Draw hole in middle (Donut style looks better)
-    final Paint holePaint = Paint()..color = Colors.white;
-    canvas.drawCircle(center, radius * 0.4, holePaint);
-  }
-
-  Color _getRatingColor(int rating) {
-    switch (rating) {
-      case 5: return Colors.green;
-      case 4: return Colors.lightGreen;
-      case 3: return Colors.orangeAccent;
-      case 2: return Colors.orange;
-      case 1: return Colors.red;
+  Color _getStatusColor(String status) {
+    switch (status) {
+      case 'active': return Colors.green;
+      case 'finished': return Colors.red;
+      case 'pending': return Colors.orange;
       default: return Colors.grey;
     }
   }
 
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
-}
-
-class _NoDataView extends StatelessWidget {
-  const _NoDataView();
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(Icons.query_stats_rounded, size: 80, color: Colors.grey[300]),
-          const SizedBox(height: 16),
-          Text(
-            AppDictionary.tr(context, 'msg_no_data'),
-            style: TextStyle(fontSize: 18, color: Colors.grey[600], fontWeight: FontWeight.w600),
-          ),
-          const SizedBox(height: 8),
-          const Text("...", textAlign: TextAlign.center),
-        ],
-      ),
-    );
+  String _getStatusText(String status) {
+    switch (status) {
+      case 'active': return "Faol";
+      case 'finished': return "Tugagan";
+      case 'pending': return "Kutilayotgan";
+      default: return "Noma'lum";
+    }
   }
 }
