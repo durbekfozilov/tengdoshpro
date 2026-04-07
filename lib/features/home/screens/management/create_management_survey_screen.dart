@@ -112,8 +112,9 @@ class _CreateManagementSurveyScreenState extends State<CreateManagementSurveyScr
     final surveyData = {
       "title": _titleController.text,
       "role_type": "tutor",
-      "start_at": _startDate.toIso8601String(),
-      "end_at": _endDate.toIso8601String(),
+      "type": "rating",
+      "start_at": DateFormat('yyyy-MM-dd HH:mm:ss').format(_startDate),
+      "end_at": DateFormat('yyyy-MM-dd HH:mm:ss').format(_endDate),
       "questions": _questions.map((q) => {
         "text": q.text,
         "options": q.options,
