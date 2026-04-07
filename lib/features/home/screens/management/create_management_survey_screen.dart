@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/services/data_service.dart';
@@ -115,10 +116,10 @@ class _CreateManagementSurveyScreenState extends State<CreateManagementSurveyScr
       "type": "rating",
       "start_at": DateFormat('yyyy-MM-dd HH:mm:ss').format(_startDate),
       "end_at": DateFormat('yyyy-MM-dd HH:mm:ss').format(_endDate),
-      "questions": _questions.map((q) => {
+      "questions": json.encode(_questions.map((q) => {
         "text": q.text,
         "options": q.options.map((o) => {"text": o}).toList(),
-      }).toList(),
+      }).toList()),
     };
 
     final Map<String, dynamic> result;
