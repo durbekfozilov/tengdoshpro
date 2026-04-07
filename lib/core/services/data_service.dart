@@ -301,14 +301,18 @@ class DataService {
   Future<Map<String, dynamic>> createManagementSurvey(Map<String, dynamic> surveyData) async {
     try {
       final response = await _post(
-        '${ApiConstants.backendUrl}/management/rating/create',
+        '${ApiConstants.backendUrl}/management/rating',
         body: surveyData,
       );
       if (response.statusCode == 200 || response.statusCode == 201) {
         return json.decode(utf8.decode(response.bodyBytes));
       } else {
-        final body = json.decode(utf8.decode(response.bodyBytes));
-        return {'success': false, 'message': body['message'] ?? 'Xato: ${response.statusCode}'};
+        try {
+          final body = json.decode(utf8.decode(response.bodyBytes));
+          return {'success': false, 'message': body['message'] ?? 'Xato: ${response.statusCode}'};
+        } catch (_) {
+          return {'success': false, 'message': 'Server xatosi: ${response.statusCode}'};
+        }
       }
     } catch (e) {
       debugPrint("DataService: Error creating management survey: $e");

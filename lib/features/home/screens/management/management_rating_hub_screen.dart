@@ -14,7 +14,6 @@ class _ManagementRatingHubScreenState extends State<ManagementRatingHubScreen> {
   final DataService _dataService = DataService();
   bool _isActive = false;
   bool _isLoading = true;
-
   Map<String, dynamic>? _activeSurvey;
 
   @override
@@ -37,6 +36,33 @@ class _ManagementRatingHubScreenState extends State<ManagementRatingHubScreen> {
     }
   }
 
+  Future<void> _toggleStatus() async {
+    setState(() => _isLoading = true);
+    final Map<String, dynamic> result = await _dataService.toggleRatingActivation('tutor', !_isActive);
+    
+    if (result['success'] == true) {
+      await _loadStatus();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(result['message'] ?? (_isActive ? "So'rovnoma to'xtatildi" : "So'rovnoma faollashtirildi")),
+            backgroundColor: _isActive ? Colors.orange : Colors.green,
+          ),
+        );
+      }
+    } else {
+      setState(() => _isLoading = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(result['message'] ?? "Xatolik yuz berdi"),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,48 +80,41 @@ class _ManagementRatingHubScreenState extends State<ManagementRatingHubScreen> {
             child: Column(
               children: [
                 const SizedBox(height: 10),
+                // 1. Permanent Toggle Button
                 _buildLargeButton(
                   context,
-                  title: "Tyutorlarni baholash so'rovnomasini yaratish",
-                  subtitle: _isActive ? "Hozirda faol" : "Hozirda to'xtatilgan",
-                  icon: Icons.add_task_rounded,
-                  color: _isActive ? Colors.green : Colors.blue,
+                  title: _isActive ? "Baholashni to'xtatish" : "Baholashni boshlash",
+                  subtitle: _isActive ? "Hozirda barcha tyutorlar uchun faol" : "Hozirda baholash to'xtatilgan",
+                  icon: _isActive ? Icons.stop_circle_outlined : Icons.play_circle_outline_rounded,
+                  color: _isActive ? Colors.red : Colors.green,
+                  onTap: _toggleStatus,
+                ),
+                const SizedBox(height: 24),
+                // 2. Manage Survey Button
+                _buildLargeButton(
+                  context,
+                  title: _activeSurvey == null ? "Yangi so'rovnoma yaratish" : "So'rovnomani tahrirlash",
+                  subtitle: "Savollar, variantlar va muddatlar",
+                  icon: Icons.settings_suggest_rounded,
+                  color: Colors.blue,
                   onTap: () async {
                     final result = await Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => const CreateManagementSurveyScreen()),
+                      MaterialPageRoute(
+                        builder: (context) => CreateManagementSurveyScreen(initialData: _activeSurvey),
+                      ),
                     );
                     if (result == true) {
                       _loadStatus();
                     }
                   },
                 ),
-                if (_activeSurvey != null) ...[
-                  const SizedBox(height: 24),
-                  _buildLargeButton(
-                    context,
-                    title: "So'rovnomani tahrirlash",
-                    subtitle: "Savollar va muddatlarni o'zgartirish",
-                    icon: Icons.edit_calendar_rounded,
-                    color: Colors.orange,
-                    onTap: () async {
-                      final result = await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => CreateManagementSurveyScreen(initialData: _activeSurvey),
-                        ),
-                      );
-                      if (result == true) {
-                        _loadStatus();
-                      }
-                    },
-                  ),
-                ],
                 const SizedBox(height: 24),
+                // 3. Stats Button
                 _buildLargeButton(
                   context,
-                  title: "Mavjud so'rovnomalar bo'yicha statistika",
-                  subtitle: "Natijalarni ko'rish",
+                  title: "Natijalar va statistika",
+                  subtitle: "Tyutorlar reytingini ko'rish",
                   icon: Icons.analytics_rounded,
                   color: Colors.indigo,
                   onTap: () {
