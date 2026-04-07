@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/services/data_service.dart';
 import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
+import 'package:talabahamkor_mobile/core/constants/feature_flags.dart';
 import 'resources_screen.dart';
 
 class SubjectDetailScreen extends StatefulWidget {
@@ -93,6 +94,7 @@ class _SubjectDetailScreenState extends State<SubjectDetailScreen> {
                       _buildInfoCard(teachers, "$totalHours soat$hoursDetailStr", type),
                       const SizedBox(height: 20),
                       
+                      if (FeatureFlags.isAttendanceEnabled) ...[
                       // 2. Attendance Stat Card
                       _buildAttendanceCard(missed, percent, "$totalHours soat$hoursDetailStr"),
                       const SizedBox(height: 20),
@@ -107,6 +109,7 @@ class _SubjectDetailScreenState extends State<SubjectDetailScreen> {
                         ...list.map((item) => _buildAttendanceItem(item)).toList(),
                       ] else 
                         const Text("Qoldirilgan darslar yo'q ✅", style: TextStyle(color: Colors.green, fontWeight: FontWeight.w500)),
+                      ],
                         
                       const SizedBox(height: 20),
                       

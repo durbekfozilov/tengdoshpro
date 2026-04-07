@@ -2237,16 +2237,30 @@ class DataService {
   // 27. Get Subscription Plans
   Future<List<dynamic>> getSubscriptionPlans() async {
     try {
+      // 1. Try with headers (to get role-specific plans if any)
       final response = await http.get(
         Uri.parse('${ApiConstants.backendUrl}/plans'),
         headers: await _getHeaders(),
       );
+      
       if (response.statusCode == 200) {
-        return json.decode(response.body);
+        final List<dynamic> data = json.decode(response.body);
+        if (data.isNotEmpty) return data;
       }
+
+      // 2. Fallback: Try without headers (to get public/student plans)
+      // This helps management users who might not have role-specific plans defined.
+      final publicResponse = await http.get(
+        Uri.parse('${ApiConstants.backendUrl}/plans'),
+      );
+      
+      if (publicResponse.statusCode == 200) {
+        return json.decode(publicResponse.body);
+      }
+      
       return [];
     } catch (e) {
-      print("Error fetching subscription plans: $e");
+      debugPrint("Error fetching subscription plans: $e");
       return [];
     }
   }

@@ -9,6 +9,7 @@ import '../../academic/screens/survey_list_screen.dart';
 import 'finance/subsidy_screen.dart';
 import 'contract_screen.dart';
 import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
+import 'package:talabahamkor_mobile/core/constants/feature_flags.dart';
 
 class AcademicScreen extends StatefulWidget {
   const AcademicScreen({super.key});
@@ -123,6 +124,7 @@ class _AcademicScreenState extends State<AcademicScreen> {
                   ),
                   const SizedBox(height: 32),
                   
+                  if (FeatureFlags.isAttendanceEnabled) ...[
                   // Attendance Breakdown
                   const Align(
                     alignment: Alignment.centerLeft,
@@ -144,12 +146,14 @@ class _AcademicScreenState extends State<AcademicScreen> {
                             _buildStatRow("Jami", "$_missedHours soat", Colors.blue),
                           ],
                         ),
+                  ],
                 ],
               ),
             ),
             const SizedBox(height: 24),
 
             // Menu List
+            if (FeatureFlags.isAttendanceEnabled)
             _buildMenuItem(context, "Davomat", Icons.calendar_month_rounded, Colors.green),
             _buildMenuItem(context, "Dars jadvali", Icons.schedule_rounded, Colors.blue),
             _buildMenuItem(context, "Fanlar va resurslar", Icons.library_books_rounded, Colors.orange),

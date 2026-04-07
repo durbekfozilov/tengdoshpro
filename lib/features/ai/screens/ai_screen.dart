@@ -5,6 +5,7 @@ import 'konspekt_screen.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/providers/auth_provider.dart';
 import '../../profile/screens/subscription_screen.dart';
+import 'package:talabahamkor_mobile/core/constants/feature_flags.dart';
 // import '../student_module/screens/schedule_screen.dart';
 
 class AiScreen extends StatelessWidget {
@@ -61,6 +62,7 @@ class AiScreen extends StatelessWidget {
               _buildAiButton(context, "Baholar tahlili", Icons.auto_graph_outlined, () {
                  Navigator.push(context, MaterialPageRoute(builder: (_) => const AiChatScreen(initialKeyword: "grades", keywordLabel: "Baholar tahlili")));
               }),
+              if (FeatureFlags.isAttendanceEnabled)
               _buildAiButton(context, "Davomat tahlili", Icons.event_note_outlined, () {
                  Navigator.push(context, MaterialPageRoute(builder: (_) => const AiChatScreen(initialKeyword: "attendance", keywordLabel: "Davomat tahlili")));
               }),

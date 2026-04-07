@@ -10,6 +10,7 @@ import 'package:talabahamkor_mobile/features/tutor/screens/tutor_documents_group
 import 'package:talabahamkor_mobile/features/tutor/screens/tutor_appeals_main_screen.dart';
 import '../../library/screens/library_screen.dart';
 import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
+import 'package:talabahamkor_mobile/core/constants/feature_flags.dart';
 
 
 class TutorDashboardScreen extends StatelessWidget {
@@ -119,6 +120,7 @@ class TutorDashboardScreen extends StatelessWidget {
                       color: Colors.teal,
                       onTap: () => _showNotImplemented(context, "Klublar (Guruh)"),
                     ),
+                    if (FeatureFlags.isAttendanceEnabled)
                     DashboardCard(
                       title: AppDictionary.tr(context, 'lbl_attendance'),
                       icon: Icons.verified_user_rounded,

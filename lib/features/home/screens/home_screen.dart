@@ -24,6 +24,7 @@ import 'package:talabahamkor_mobile/features/home/widgets/management_dashboard.d
 import 'package:talabahamkor_mobile/features/tutor/screens/tutor_dashboard_screen.dart'; // [NEW]
 import 'package:talabahamkor_mobile/features/profile/screens/subscription_screen.dart';
 import 'package:talabahamkor_mobile/features/student_module/screens/qr_scanner_screen.dart';
+import 'package:talabahamkor_mobile/core/constants/feature_flags.dart';
 import '../../clubs/screens/clubs_screen.dart';
 import '../../appeals/screens/appeals_screen.dart';
 import '../../library/screens/library_screen.dart';
@@ -337,6 +338,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                 ),
+                if (FeatureFlags.isQrScannerEnabled)
                 IconButton(
                   icon: const Icon(Icons.qr_code_scanner_rounded, size: 28, color: Colors.black87),
                   onPressed: () {

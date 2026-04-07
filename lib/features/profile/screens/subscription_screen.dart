@@ -38,6 +38,9 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
       final profileData = await _dataService.getProfile();
       final plansData = await _dataService.getSubscriptionPlans();
       
+      debugPrint("SubscriptionScreen: Loaded profile: $profileData");
+      debugPrint("SubscriptionScreen: Loaded ${plansData.length} plans. Content: $plansData");
+
       if (mounted) {
         setState(() {
           _student = Student.fromJson(profileData);
@@ -46,6 +49,7 @@ class _SubscriptionScreenState extends State<SubscriptionScreen> {
         });
       }
     } catch (e) {
+      debugPrint("SubscriptionScreen: Error loading data: $e");
       if (mounted) {
         setState(() => _isLoading = false);
         ScaffoldMessenger.of(context).showSnackBar(
