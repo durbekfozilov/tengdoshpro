@@ -391,6 +391,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildStudentDashboard() {
+    final student = Provider.of<AuthProvider>(context).currentUser;
     return Column(
       children: [
             // 2. GPA/AnnouncementModel Module (Full Width)
