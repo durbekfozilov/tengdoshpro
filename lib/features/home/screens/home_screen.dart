@@ -469,7 +469,9 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
 
-            if (_dashboard?['has_active_rating'] == true && (_dashboard?['active_rating_roles'] as List).contains('tutor'))
+            if (_dashboard?['has_active_rating'] == true && 
+                (_dashboard?['active_rating_roles'] as List).contains('tutor') &&
+                student != null && student.courseNumber < 4)
               Container(
                 margin: const EdgeInsets.only(bottom: 24),
                 padding: const EdgeInsets.all(16),
@@ -497,8 +499,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white),
                           ),
                           Text(
-                            AppDictionary.tr(context, 'lbl_rating_select_hint'),
-                            style: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 13),
+                            "O'z tyutoringiz foaliyatini baholang",
+                            style: TextStyle(color: Colors.white.withValues(alpha: 0.9), fontSize: 13),
                           ),
                         ],
                       ),

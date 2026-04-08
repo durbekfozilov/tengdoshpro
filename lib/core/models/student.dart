@@ -60,6 +60,21 @@ class Student {
     }
   }
 
+  int get courseNumber {
+    if (semesterName == null) return 1;
+    final String s = semesterName!.toLowerCase();
+    if (s.contains('7') || s.contains('8')) return 4;
+    if (s.contains('5') || s.contains('6')) return 3;
+    if (s.contains('3') || s.contains('4')) return 2;
+    if (s.contains('1') || s.contains('2')) return 1;
+    // Fallback if numbers are not clear (some colleges use words)
+    if (s.contains('turt') || s.contains('to\'rt') || s.contains('to’rt')) return 4;
+    if (s.contains('uch')) return 3;
+    if (s.contains('ikki')) return 2;
+    if (s.contains('bir')) return 1;
+    return 1;
+  }
+
   factory Student.fromJson(Map<String, dynamic> json) {
     // Helper to get nested name safely
     String? getName(String key) {
