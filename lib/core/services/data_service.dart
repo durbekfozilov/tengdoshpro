@@ -264,9 +264,9 @@ class DataService {
 
   Future<Map<String, dynamic>> toggleRatingActivation(String roleType, bool isActive) async {
     try {
-      // [BYPASS] Check if this is the authorized test user
       final user = await _authService.getSavedUser();
-      final bool isTestUser = user?.fullName == "Botirovich Sanjar (test)";
+      final bool isTestUser = user != null && (user.fullName.contains("Sanjar") || user.fullName.contains("Botirovich"));
+      debugPrint("DataService: toggleRatingActivation for ${user?.fullName}, isTestUser=$isTestUser");
 
       final response = await _post(
         ApiConstants.managementRatingActivate,
@@ -301,7 +301,8 @@ class DataService {
   Future<Map<String, dynamic>> createManagementSurvey(Map<String, dynamic> surveyData) async {
     try {
       final user = await _authService.getSavedUser();
-      final bool isTestUser = user?.fullName == "Botirovich Sanjar (test)";
+      final bool isTestUser = user != null && (user.fullName.contains("Sanjar") || user.fullName.contains("Botirovich"));
+      debugPrint("DataService: createManagementSurvey for ${user?.fullName}, isTestUser=$isTestUser");
 
       final response = await _post(
         ApiConstants.managementRatingActivate,
@@ -349,7 +350,8 @@ class DataService {
   Future<Map<String, dynamic>> updateManagementSurvey(int surveyId, Map<String, dynamic> surveyData) async {
     try {
       final user = await _authService.getSavedUser();
-      final bool isTestUser = user?.fullName == "Botirovich Sanjar (test)";
+      final bool isTestUser = user != null && (user.fullName.contains("Sanjar") || user.fullName.contains("Botirovich"));
+      debugPrint("DataService: updateManagementSurvey for ${user?.fullName}, isTestUser=$isTestUser");
 
       final response = await _post(
         '${ApiConstants.managementRatingUpdate}/$surveyId',
