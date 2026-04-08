@@ -1928,12 +1928,22 @@ class DataService {
       final response = await _get("${ApiConstants.backendUrl}/tutor/dashboard");
       if (response.statusCode == 200) {
         final body = json.decode(response.body);
-        if (body['success'] == true) {
-          return body['data'];
-        }
+        if (body['success'] == true) return body['data'];
       }
     } catch (e) {
       debugPrint("DataService: Error fetching tutor dashboard: $e");
+    }
+    return {};
+  }
+
+  Future<Map<String, dynamic>> getTutorRatingStats() async {
+    try {
+      final response = await _get(ApiConstants.tutorRatingStats);
+      if (response.statusCode == 200) {
+        return json.decode(utf8.decode(response.bodyBytes));
+      }
+    } catch (e) {
+      debugPrint("DataService: Error fetching tutor rating stats: $e");
     }
     return {};
   }

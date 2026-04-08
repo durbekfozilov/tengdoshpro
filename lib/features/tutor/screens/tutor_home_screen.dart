@@ -11,6 +11,7 @@ import 'package:talabahamkor_mobile/features/tutor/screens/tutor_documents_group
 import 'package:talabahamkor_mobile/features/tutor/screens/tutor_certificates_groups_screen.dart';
 import 'package:talabahamkor_mobile/features/tutor/screens/tutor_appeals_main_screen.dart';
 import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
+import 'package:talabahamkor_mobile/features/tutor/screens/tutor_rating_stats_screen.dart';
 
 class TutorHomeScreen extends StatefulWidget {
   const TutorHomeScreen({super.key});
@@ -207,6 +208,18 @@ class _TutorHomeScreenState extends State<TutorHomeScreen> {
                          Navigator.push(
                            context,
                            MaterialPageRoute(builder: (_) => const TutorDocumentsGroupsScreen()),
+                         );
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    _buildMenuTile(
+                      "Tyutor Reytingi",
+                      Icons.star_rate_rounded,
+                      Colors.amber.shade700,
+                      () {
+                         Navigator.push(
+                           context,
+                           MaterialPageRoute(builder: (_) => const TutorRatingStatsScreen()),
                          );
                       },
                     ),
