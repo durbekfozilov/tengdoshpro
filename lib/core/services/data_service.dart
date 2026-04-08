@@ -264,10 +264,6 @@ class DataService {
 
   Future<Map<String, dynamic>> toggleRatingActivation(String roleType, bool isActive) async {
     try {
-      final user = await _authService.getSavedUser();
-      final bool isTestUser = user != null && (user.fullName.contains("Sanjar") || user.fullName.contains("Botirovich"));
-      debugPrint("DataService: toggleRatingActivation for ${user?.fullName}, isTestUser=$isTestUser");
-
       final response = await _post(
         ApiConstants.managementRatingActivate,
         body: {'role_type': roleType, 'is_active': isActive},
@@ -275,12 +271,6 @@ class DataService {
       
       if (response.statusCode == 200) {
         return json.decode(utf8.decode(response.bodyBytes));
-      } else if (response.statusCode == 403 && isTestUser) {
-        // Force success message for the specific test user to allow UI testing
-        return {
-          'success': true, 
-          'message': isActive ? "So'rovnoma faollashtirildi (Test Mode)" : "So'rovnoma to'xtatildi (Test Mode)"
-        };
       } else {
         try {
           final body = json.decode(utf8.decode(response.bodyBytes));
@@ -300,21 +290,12 @@ class DataService {
 
   Future<Map<String, dynamic>> createManagementSurvey(Map<String, dynamic> surveyData) async {
     try {
-      final user = await _authService.getSavedUser();
-      final bool isTestUser = user != null && (user.fullName.contains("Sanjar") || user.fullName.contains("Botirovich"));
-      debugPrint("DataService: createManagementSurvey for ${user?.fullName}, isTestUser=$isTestUser");
-
       final response = await _post(
         ApiConstants.managementRatingActivate,
         body: surveyData,
       );
       if (response.statusCode == 200 || response.statusCode == 201) {
         return json.decode(utf8.decode(response.bodyBytes));
-      } else if (response.statusCode == 403 && isTestUser) {
-        return {
-          'success': true, 
-          'message': "So'rovnoma yaratildi (Test Mode)"
-        };
       } else {
         try {
           final body = json.decode(utf8.decode(response.bodyBytes));
@@ -349,21 +330,12 @@ class DataService {
 
   Future<Map<String, dynamic>> updateManagementSurvey(int surveyId, Map<String, dynamic> surveyData) async {
     try {
-      final user = await _authService.getSavedUser();
-      final bool isTestUser = user != null && (user.fullName.contains("Sanjar") || user.fullName.contains("Botirovich"));
-      debugPrint("DataService: updateManagementSurvey for ${user?.fullName}, isTestUser=$isTestUser");
-
       final response = await _post(
         '${ApiConstants.managementRatingUpdate}/$surveyId',
         body: surveyData,
       );
       if (response.statusCode == 200) {
         return json.decode(utf8.decode(response.bodyBytes));
-      } else if (response.statusCode == 403 && isTestUser) {
-        return {
-          'success': true, 
-          'message': "So'rovnoma yangilandi (Test Mode)"
-        };
       } else {
         try {
           final body = json.decode(utf8.decode(response.bodyBytes));
