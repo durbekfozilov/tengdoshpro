@@ -25,8 +25,8 @@ class _CreateTutorRatingSurveyScreenState extends State<CreateTutorRatingSurveyS
   void initState() {
     super.initState();
     _isEditing = widget.initialData != null;
-    _titleController = TextEditingController(text: widget.initialData?['title'] ?? "");
-    _descriptionController = TextEditingController(text: widget.initialData?['description'] ?? "");
+    _titleController = TextEditingController(text: widget.initialData?['title'] ?? "O'zJOKU Tyutorlar reytingi - Bahorgi semestr");
+    _descriptionController = TextEditingController(text: widget.initialData?['description'] ?? "Hurmatli talabalar, o'z tyutoringizni 1 dan 5 gacha bo'lgan ball tizimida baholang. Ushbu so'rovnoma faqat Jurnalistika va ommaviy kommunikatsiyalar universiteti (O'zJOKU) talabalari uchun ochiq.");
     
     if (_isEditing) {
       final data = widget.initialData!;
