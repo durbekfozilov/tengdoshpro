@@ -206,28 +206,42 @@ class _SurveyListItem extends StatelessWidget {
                   style: TextStyle(color: Colors.grey[600], fontSize: 13),
                 ),
                 const Spacer(),
-                ElevatedButton(
-                  onPressed: onEdit,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue[50],
-                    foregroundColor: Colors.blue[700],
-                    elevation: 0,
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: Colors.grey),
+              ],
+            ),
+            const SizedBox(height: 20),
+            const Divider(height: 1),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: onEdit,
+                    icon: const Icon(Icons.edit_outlined, size: 16),
+                    label: const Text("Tahrirlash", style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue[50],
+                      foregroundColor: Colors.blue[700],
+                      elevation: 0,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
                   ),
-                  child: const Text("Tahrirlash", style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                 ),
-                const SizedBox(width: 8),
-                ElevatedButton(
-                  onPressed: onToggle,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: isActive ? Colors.grey[200] : Colors.green[600],
-                    foregroundColor: isActive ? Colors.black87 : Colors.white,
-                    elevation: 0,
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: onToggle,
+                    icon: Icon(isActive ? Icons.stop_circle_outlined : Icons.play_circle_outline, size: 16),
+                    label: Text(isActive ? "To'xtatish" : "Aktiv qilish", style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: isActive ? Colors.orange[50] : Colors.green[600],
+                      foregroundColor: isActive ? Colors.orange[800] : Colors.white,
+                      elevation: 0,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
                   ),
-                  child: Text(isActive ? "To'xtatish" : "Aktiv qilish", style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                 ),
               ],
             ),

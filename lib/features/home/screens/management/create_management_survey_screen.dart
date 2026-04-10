@@ -36,12 +36,20 @@ class _CreateManagementSurveyScreenState extends State<CreateManagementSurveyScr
       if (data['end_at'] != null) _endDate = DateTime.parse(data['end_at']);
       _isActive = data['is_active'] ?? false;
       
-      final List<dynamic>? questionsJson = data['questions'];
       if (questionsJson != null) {
-        _questions = questionsJson.map((q) => QuestionData(
-          text: q['text'] ?? "",
-          options: List<String>.from(q['options'] ?? []),
-        )).toList();
+        _questions = questionsJson.map((q) {
+          final optionsRaw = q['options'] as List? ?? [];
+          final options = optionsRaw.map((o) {
+            if (o is String) return o;
+            if (o is Map && o.containsKey('text')) return o['text'] as String;
+            return o.toString();
+          }).toList();
+          
+          return QuestionData(
+            text: q['text'] ?? "",
+            options: options,
+          );
+        }).toList();
       }
     }
 
