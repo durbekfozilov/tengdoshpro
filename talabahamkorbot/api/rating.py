@@ -137,6 +137,7 @@ async def submit_rating(
     new_record = RatingRecord(
         user_id=student.id,
         rated_person_id=req.rated_person_id,
+        activation_id=req.activation_id,
         role_type=req.role_type,
         university_id=student.university_id,
         rating=req.rating,

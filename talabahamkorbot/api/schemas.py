@@ -397,6 +397,7 @@ class RatingTargetSchema(BaseModel):
 
 class RatingSubmitSchema(BaseModel):
     rated_person_id: int
+    activation_id: Optional[int] = None # [NEW] Linked Survey ID
     role_type: str
     rating: int # 1-5 (Overall or single)
     answers: Optional[list] = [] # [NEW] Custom question answers

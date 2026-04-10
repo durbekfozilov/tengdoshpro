@@ -1780,6 +1780,7 @@ class RatingRecord(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey("students.id", ondelete="CASCADE"), nullable=False, index=True)
     rated_person_id: Mapped[int] = mapped_column(Integer, ForeignKey("staff.id", ondelete="CASCADE"), nullable=False, index=True)
+    activation_id: Mapped[int | None] = mapped_column(Integer, ForeignKey("rating_activations.id", ondelete="SET NULL"), nullable=True, index=True)
     role_type: Mapped[str] = mapped_column(String(32), nullable=False) # tutor, dean, vice_dean
     university_id: Mapped[int] = mapped_column(Integer, nullable=False, index=True)
     rating: Mapped[int] = mapped_column(Integer, nullable=False) # 1-5 (Overall or single)
