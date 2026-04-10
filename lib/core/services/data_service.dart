@@ -194,7 +194,9 @@ class DataService {
           "clubs_count": data['clubs_count'] ?? 0,
           "activities_approved_count": data['activities_approved_count'] ?? 0,
           "has_active_election": data['has_active_election'] ?? false,
-          "active_election_id": data['active_election_id']
+          "active_election_id": data['active_election_id'],
+          "has_active_rating": data['has_active_rating'] ?? false,
+          "active_rating_roles": data['active_rating_roles'] ?? [],
         };
 
         // Update Local DB (Non-blocking or at least non-failing for UI)
