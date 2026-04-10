@@ -110,6 +110,7 @@ async def get_dashboard_stats(
     activations = act_res.scalars().all()
     has_active_rating = len(activations) > 0
     active_roles = [a.role_type for a in activations]
+    rating_expires_at = activations[0].expires_at if activations else None
 
     return StudentDashboardSchema(
         gpa=gpa,
@@ -122,5 +123,6 @@ async def get_dashboard_stats(
         has_active_election=has_active_election,
         active_election_id=active_election_id,
         has_active_rating=has_active_rating,
-        active_rating_roles=active_roles
+        active_rating_roles=active_roles,
+        expires_at=rating_expires_at
     )

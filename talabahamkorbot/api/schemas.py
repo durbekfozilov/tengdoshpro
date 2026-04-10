@@ -96,6 +96,7 @@ class StudentDashboardSchema(BaseModel):
     # Rating Info
     has_active_rating: bool = False
     active_rating_roles: list[str] = []
+    expires_at: Optional[datetime] = None
 
 class ClubSchema(BaseModel):
     id: int
@@ -402,6 +403,7 @@ class RatingSubmitSchema(BaseModel):
 class RatingStatusSchema(BaseModel):
     is_active: bool
     active_roles: list[str] = [] # tutor, dean, vice_dean
+    expires_at: Optional[datetime] = None
 
 class RatingStatsBreakdownSchema(BaseModel):
     rating: int

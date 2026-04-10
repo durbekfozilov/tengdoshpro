@@ -28,10 +28,12 @@ async def get_active_ratings(
     activations = result.scalars().all()
     
     active_roles = [a.role_type for a in activations]
+    expires_at = activations[0].expires_at if activations else None
     
     return {
         "is_active": len(active_roles) > 0,
-        "active_roles": active_roles
+        "active_roles": active_roles,
+        "expires_at": expires_at
     }
 
 @router.get("/targets/{role_type}", response_model=list[RatingTargetSchema])

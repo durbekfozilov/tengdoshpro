@@ -1766,6 +1766,7 @@ class RatingActivation(Base):
     university_id: Mapped[int] = mapped_column(Integer, ForeignKey("universities.id", ondelete="CASCADE"), nullable=False, index=True)
     role_type: Mapped[str] = mapped_column(String(32), nullable=False) # tutor, dean, vice_dean
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    expires_at: Mapped[datetime | None] = mapped_column(DateTime(), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(), default=datetime.utcnow)
 
     university: Mapped["University"] = relationship("University")
