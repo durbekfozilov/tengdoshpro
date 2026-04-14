@@ -47,7 +47,7 @@ class _CreateManagementSurveyScreenState extends State<CreateManagementSurveyScr
           }).toList();
           
           return QuestionData(
-            text: q['text'] ?? "",
+            text: q['title'] ?? q['text'] ?? "",
             options: options,
           );
         }).toList();
@@ -129,9 +129,13 @@ class _CreateManagementSurveyScreenState extends State<CreateManagementSurveyScr
       "is_active": _isActive,
       "start_at": DateFormat('yyyy-MM-dd HH:mm:ss').format(_startDate),
       "end_at": DateFormat('yyyy-MM-dd HH:mm:ss').format(_endDate),
-      "questions": _questions.map((q) => {
-        "text": q.text,
-        "options": q.options.map((o) => {"text": o}).toList(),
+      "questions": _questions.asMap().entries.map((entry) {
+        final q = entry.value;
+        return {
+          "id": entry.key + 1,
+          "title": q.text,
+          "options": q.options,
+        };
       }).toList(),
     };
 

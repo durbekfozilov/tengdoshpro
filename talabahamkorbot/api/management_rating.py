@@ -248,6 +248,19 @@ async def list_management_surveys(
         
     return surveys
 
+@router.post("/update/{activation_id}")
+async def update_rating_activation_with_id(
+    activation_id: int,
+    req: RatingActivationToggleSchema,
+    staff: Staff = Depends(get_current_staff),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Handle existing survey updates where ID is in the path.
+    """
+    req.id = activation_id
+    return await toggle_rating_activation(req, staff, db)
+
 @router.post("/update")
 async def update_rating_activation(
     req: RatingActivationToggleSchema,

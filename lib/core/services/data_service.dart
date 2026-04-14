@@ -335,8 +335,9 @@ class DataService {
 
   Future<Map<String, dynamic>> updateManagementSurvey(int surveyId, Map<String, dynamic> surveyData) async {
     try {
+      surveyData['id'] = surveyId;
       final response = await _post(
-        '${ApiConstants.managementRatingUpdate}/$surveyId',
+        ApiConstants.managementRatingUpdate,
         body: surveyData,
       );
       if (response.statusCode == 200) {
