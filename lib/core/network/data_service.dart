@@ -117,7 +117,7 @@ class DataService {
       final response = await http.Response.fromStream(streamedResponse);
 
       if (response.statusCode == 200) {
-        final body = json.decode(response.body);
+        final body = response.data;
         if (body['success'] == true) {
           return body['data']['image_url'];
         } else {
@@ -144,7 +144,7 @@ class DataService {
       final response = await _get(url);
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> data = json.decode(response.body);
+        final Map<String, dynamic> data = response.data;
         if (data['success'] == true && data['data'] != null) {
           if (data['data'] is List) {
              return data['data'] as List<dynamic>;
@@ -184,7 +184,7 @@ class DataService {
       final response = await _get(url, timeout: const Duration(seconds: 60));
 
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
+        final data = response.data;
         final result = {
           "gpa": double.tryParse(data['gpa']?.toString() ?? "0") ?? 0.0,
           "missed_hours": data['missed_hours'] ?? 0,
@@ -247,7 +247,7 @@ class DataService {
       }
       final response = await _get(url);
       if (response.statusCode == 200) {
-        final body = json.decode(response.body);
+        final body = response.data;
         if (body['success'] == true) {
           return body['data'];
         }
@@ -262,7 +262,7 @@ class DataService {
     try {
       final response = await _get(ApiConstants.managementRatingStatus);
       if (response.statusCode == 200) {
-        final body = json.decode(response.body);
+        final body = response.data;
         return body['is_active'] ?? false;
       }
     } catch (e) {
@@ -279,10 +279,10 @@ class DataService {
       );
       
       if (response.statusCode == 200) {
-        return json.decode(utf8.decode(response.bodyBytes));
+        return json.decode(utf8.decode(response.dataBytes));
       } else {
         try {
-          final body = json.decode(utf8.decode(response.bodyBytes));
+          final body = json.decode(utf8.decode(response.dataBytes));
           return {
             'success': false, 
             'message': body['message'] ?? body['detail'] ?? 'Xato: ${response.statusCode}'
@@ -304,10 +304,10 @@ class DataService {
         body: surveyData,
       );
       if (response.statusCode == 200 || response.statusCode == 201) {
-        return json.decode(utf8.decode(response.bodyBytes));
+        return json.decode(utf8.decode(response.dataBytes));
       } else {
         try {
-          final body = json.decode(utf8.decode(response.bodyBytes));
+          final body = json.decode(utf8.decode(response.dataBytes));
           if (response.statusCode == 422) {
             return {
               'success': false, 
@@ -329,7 +329,7 @@ class DataService {
     try {
       final response = await _get(ApiConstants.managementRatingActiveSurvey);
       if (response.statusCode == 200) {
-        return json.decode(utf8.decode(response.bodyBytes));
+        return json.decode(utf8.decode(response.dataBytes));
       }
     } catch (e) {
       debugPrint("DataService: Error fetching active survey: $e");
@@ -345,10 +345,10 @@ class DataService {
         body: surveyData,
       );
       if (response.statusCode == 200) {
-        return json.decode(utf8.decode(response.bodyBytes));
+        return json.decode(utf8.decode(response.dataBytes));
       } else {
         try {
-          final body = json.decode(utf8.decode(response.bodyBytes));
+          final body = json.decode(utf8.decode(response.dataBytes));
           if (response.statusCode == 422) {
             return {
               'success': false, 
@@ -370,7 +370,7 @@ class DataService {
     try {
       final response = await _get(ApiConstants.managementRatingList);
       if (response.statusCode == 200) {
-        return json.decode(utf8.decode(response.bodyBytes));
+        return json.decode(utf8.decode(response.dataBytes));
       }
     } catch (e) {
       debugPrint("DataService: Error fetching management surveys: $e");
@@ -382,7 +382,7 @@ class DataService {
     try {
       final response = await _get('${ApiConstants.managementRatingStatsDetail}/$surveyId');
       if (response.statusCode == 200) {
-        return json.decode(utf8.decode(response.bodyBytes));
+        return json.decode(utf8.decode(response.dataBytes));
       }
     } catch (e) {
       debugPrint("DataService: Error fetching survey analytics detail: $e");
@@ -394,7 +394,7 @@ class DataService {
     try {
       final response = await _get(ApiConstants.managementRatingStats);
       if (response.statusCode == 200) {
-        return json.decode(response.body);
+        return response.data;
       }
     } catch (e) {
       debugPrint("DataService: Error fetching management rating stats: $e");
@@ -410,7 +410,7 @@ class DataService {
         body: {'qr_code': qrCode},
       );
       if (response.statusCode == 200) {
-        return json.decode(response.body);
+        return response.data;
       }
       return {'success': false, 'message': 'HTTP xatolik: ${response.statusCode}'};
     } catch (e) {
@@ -423,7 +423,7 @@ class DataService {
     try {
       final response = await _get(ApiConstants.managementFaculties);
       if (response.statusCode == 200) {
-        final body = json.decode(response.body);
+        final body = response.data;
         if (body['success'] == true) return body['data'];
       }
     } catch (e) {
@@ -436,7 +436,7 @@ class DataService {
     try {
       final response = await _get("${ApiConstants.managementFaculties}/$facultyId/levels");
       if (response.statusCode == 200) {
-        final body = json.decode(response.body);
+        final body = response.data;
         if (body['success'] == true) return body['data'];
       }
     } catch (e) {
@@ -449,7 +449,7 @@ class DataService {
     try {
       final response = await _get("${ApiConstants.managementGroups}/$groupNumber/students");
       if (response.statusCode == 200) {
-        final body = json.decode(response.body);
+        final body = response.data;
         if (body['success'] == true) return body['data'];
       }
     } catch (e) {
@@ -484,7 +484,7 @@ class DataService {
 
       final response = await _get(url);
       if (response.statusCode == 200) {
-        final body = json.decode(response.body);
+        final body = response.data;
         if (body['success'] == true) return body;
       }
     } catch (e) {
@@ -511,7 +511,7 @@ class DataService {
 
       final response = await _get(url);
       if (response.statusCode == 200) {
-        final body = json.decode(response.body);
+        final body = response.data;
         if (body['success'] == true) return body['data'];
       }
     } catch (e) {
@@ -532,7 +532,7 @@ class DataService {
       }
       final response = await _get(url);
       if (response.statusCode == 200) {
-        final body = json.decode(response.body);
+        final body = response.data;
         if (body['success'] == true) return body['data'];
       }
     } catch (e) {
@@ -563,7 +563,7 @@ class DataService {
 
       final response = await _get(url);
       if (response.statusCode == 200) {
-        final body = json.decode(response.body);
+        final body = response.data;
         if (body['success'] == true) return body['data'];
       }
     } catch (e) {
@@ -604,7 +604,7 @@ class DataService {
 
       final response = await _get(url);
       if (response.statusCode == 200) {
-        final body = json.decode(response.body);
+        final body = response.data;
         if (body['success'] == true) return body;
       }
     } catch (e) {
@@ -641,7 +641,7 @@ class DataService {
 
       final response = await _post(url);
       if (response.statusCode == 200) {
-        return json.decode(response.body);
+        return response.data;
       }
     } catch (e) {
       debugPrint("DataService: Error exporting documents zip: $e");
@@ -653,7 +653,7 @@ class DataService {
     try {
       final response = await _get("${ApiConstants.managementStudents}/$studentId/full-details");
       if (response.statusCode == 200) {
-        final body = json.decode(response.body);
+        final body = response.data;
         if (body['success'] == true) return body['data'];
       }
     } catch (e) {
@@ -696,9 +696,9 @@ class DataService {
     );
 
     if (response.statusCode == 200) {
-      return json.decode(response.body);
+      return response.data;
     } else {
-      throw Exception('Failed to init session: ${response.body}');
+      throw Exception('Failed to init session: ${response.data}');
     }
   }
 
@@ -714,7 +714,7 @@ class DataService {
     );
 
     if (response.statusCode == 200) {
-      return json.decode(response.body);
+      return response.data;
     }
     return {"status": "pending"};
   }
@@ -736,9 +736,9 @@ class DataService {
     );
 
     if (response.statusCode == 200) {
-      return json.decode(response.body);
+      return response.data;
     } else {
-      throw Exception('Failed to init tutor upload: ${response.body}');
+      throw Exception('Failed to init tutor upload: ${response.data}');
     }
   }
 
@@ -746,7 +746,7 @@ class DataService {
     final response = await _get('${ApiConstants.tutorActivitiesUploadStatus}/$sessionId');
 
     if (response.statusCode == 200) {
-      return json.decode(response.body);
+      return response.data;
     }
     return {"status": "pending"};
   }
@@ -774,9 +774,9 @@ class DataService {
     );
 
     if (response.statusCode == 200) {
-      return json.decode(response.body);
+      return response.data;
     } else {
-      throw Exception('Failed to create tutor bulk activities: ${response.body}');
+      throw Exception('Failed to create tutor bulk activities: ${response.data}');
     }
   }
   // --- END TUTOR BULK ACTIVITY ENDPOINTS ---
@@ -786,9 +786,9 @@ class DataService {
   Future<Map<String, dynamic>> unlinkTelegram() async {
     final response = await authPost('${ApiConstants.backendUrl}/student/unlink-telegram');
     if (response.statusCode == 200) {
-      return json.decode(response.body);
+      return response.data;
     } else {
-      throw Exception('Failed to unlink Telegram: ${response.body}');
+      throw Exception('Failed to unlink Telegram: ${response.data}');
     }
   }
 
@@ -910,7 +910,7 @@ class DataService {
       ).timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
-        return json.decode(utf8.decode(response.bodyBytes));
+        return json.decode(utf8.decode(response.dataBytes));
       }
     } catch (e) {
       debugPrint("DataService: Error fetching clubs: $e");
@@ -927,7 +927,7 @@ class DataService {
       ).timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
-        return {'success': true, 'data': json.decode(utf8.decode(response.bodyBytes))};
+        return {'success': true, 'data': json.decode(utf8.decode(response.dataBytes))};
       }
       return {'success': false, 'message': 'Klub yaratishda xatolik'};
     } catch (e) {
@@ -944,7 +944,7 @@ class DataService {
       ).timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
-        return json.decode(utf8.decode(response.bodyBytes));
+        return json.decode(utf8.decode(response.dataBytes));
       }
     } catch (_) {}
     return [];
@@ -959,7 +959,7 @@ class DataService {
       ).timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
-        return json.decode(utf8.decode(response.bodyBytes));
+        return json.decode(utf8.decode(response.dataBytes));
       }
     } catch (e) {
       debugPrint("DataService: Error joining club: $e");
@@ -974,7 +974,7 @@ class DataService {
         Uri.parse('${ApiConstants.backendUrl}/student/clubs/$clubId/members'),
         headers: await _getHeaders(),
       ).timeout(const Duration(seconds: 15));
-      if (response.statusCode == 200) return json.decode(utf8.decode(response.bodyBytes));
+      if (response.statusCode == 200) return json.decode(utf8.decode(response.dataBytes));
     } catch (_) {}
     return [];
   }
@@ -996,7 +996,7 @@ class DataService {
         Uri.parse('${ApiConstants.backendUrl}/student/clubs/$clubId/announcements'),
         headers: await _getHeaders(),
       ).timeout(const Duration(seconds: 15));
-      if (response.statusCode == 200) return json.decode(utf8.decode(response.bodyBytes));
+      if (response.statusCode == 200) return json.decode(utf8.decode(response.dataBytes));
     } catch (_) {}
     return [];
   }
@@ -1024,7 +1024,7 @@ class DataService {
         Uri.parse('${ApiConstants.backendUrl}/student/clubs/$clubId/events'),
         headers: await _getHeaders(),
       ).timeout(const Duration(seconds: 15));
-      if (response.statusCode == 200) return json.decode(utf8.decode(response.bodyBytes));
+      if (response.statusCode == 200) return json.decode(utf8.decode(response.dataBytes));
     } catch (_) {}
     return [];
   }
@@ -1069,7 +1069,7 @@ class DataService {
         Uri.parse('${ApiConstants.backendUrl}/student/clubs/events/$eventId/participants'),
         headers: await _getHeaders(),
       ).timeout(const Duration(seconds: 15));
-      if (response.statusCode == 200) return json.decode(utf8.decode(response.bodyBytes));
+      if (response.statusCode == 200) return json.decode(utf8.decode(response.dataBytes));
     } catch (_) {}
     return [];
   }
@@ -1080,7 +1080,7 @@ class DataService {
         Uri.parse('${ApiConstants.backendUrl}/student/clubs/$clubId/members/$studentId'),
         headers: await _getHeaders(),
       ).timeout(const Duration(seconds: 15));
-      if (response.statusCode == 200) return json.decode(utf8.decode(response.bodyBytes));
+      if (response.statusCode == 200) return json.decode(utf8.decode(response.dataBytes));
     } catch (_) {}
     return null;
   }
@@ -1102,7 +1102,7 @@ class DataService {
     try {
       final response = await _get(ApiConstants.announcements);
       if (response.statusCode == 200) {
-        final body = json.decode(response.body);
+        final body = response.data;
         if (body['success'] == true) {
           final List<dynamic> list = body['data'];
           return list.map((item) => AnnouncementModel.fromJson(item)).toList();
@@ -1119,7 +1119,7 @@ class DataService {
     try {
       final response = await _get(ApiConstants.banner);
       if (response.statusCode == 200) {
-        final body = json.decode(response.body);
+        final body = response.data;
         if (body['active'] == true) {
            return BannerModel.fromJson(body);
         }
@@ -1135,7 +1135,7 @@ class DataService {
     try {
       final response = await _get('${ApiConstants.backendUrl}/banner/list');
       if (response.statusCode == 200) {
-        final body = json.decode(response.body);
+        final body = response.data;
         if (body['success'] == true) {
            final List<dynamic> list = body['data'];
            return list.map((item) => BannerModel.fromJson(item)).toList();
@@ -1159,7 +1159,7 @@ class DataService {
     try {
       final response = await _post('${ApiConstants.announcements}/$id/read');
       if (response.statusCode == 200) {
-        final body = json.decode(response.body);
+        final body = response.data;
         return body['success'] == true;
       }
     } catch (e) {
@@ -1175,7 +1175,7 @@ class DataService {
         Uri.parse(ApiConstants.feedback),
         headers: await _getHeaders(),
       ).timeout(const Duration(seconds: 10));
-      if (response.statusCode == 200) return json.decode(response.body);
+      if (response.statusCode == 200) return response.data;
     } catch (e) {
       debugPrint("Feedback Load Error: $e");
     }
@@ -1218,7 +1218,7 @@ class DataService {
       ).timeout(const Duration(seconds: 10));
       
       if (response.statusCode == 200) {
-        return json.decode(response.body);
+        return response.data;
       }
     } catch (e) {
       debugPrint("Feedback Detail Error: $e");
@@ -1251,7 +1251,7 @@ class DataService {
       Uri.parse(ApiConstants.documents),
       headers: await _getHeaders(),
     ).timeout(const Duration(seconds: 10));
-    if (response.statusCode == 200) return json.decode(response.body);
+    if (response.statusCode == 200) return response.data;
     throw Exception('Failed to load documents');
   }
 
@@ -1286,7 +1286,7 @@ class DataService {
       final response = await _get(url);
 
       if (response.statusCode == 200) {
-        final body = json.decode(response.body);
+        final body = response.data;
         final data = body is Map && body.containsKey('data') ? body['data'] : body;
         final List<dynamic> items = (data is List) ? data : (data['items'] ?? []);
         
@@ -1327,7 +1327,7 @@ class DataService {
       
       final response = await _get(url);
       if (response.statusCode == 200) {
-        final body = json.decode(response.body);
+        final body = response.data;
         if (body['success'] == true) {
           return body['data'];
         }
@@ -1346,7 +1346,7 @@ class DataService {
       }
       final response = await _get(url);
       if (response.statusCode == 200) {
-        final body = json.decode(response.body);
+        final body = response.data;
         if (body['success'] == true) {
           final List<dynamic> items = body['data'];
           // await _dbService.saveCache('schedule', studentId, {'items': items});
@@ -1368,14 +1368,14 @@ class DataService {
       );
 
       if (response.statusCode == 200) {
-        final body = json.decode(response.body);
+        final body = response.data;
         if (body['success'] == true) {
           // Update locally stored password too
           await _authService.updateSavedPassword(newPassword);
           return true;
         }
       } else {
-        final body = json.decode(response.body);
+        final body = response.data;
         throw Exception(body['detail'] ?? "Xatolik yuz berdi");
       }
     } catch (e) {
@@ -1402,7 +1402,7 @@ class DataService {
       );
 
       if (response.statusCode == 200) {
-        final body = json.decode(response.body);
+        final body = response.data;
         if (body['success'] == true) {
           // If password changed, update locally stored password too
           if (newPassword != null && newPassword.isNotEmpty) {
@@ -1411,7 +1411,7 @@ class DataService {
           return true;
         }
       } else {
-        final body = json.decode(response.body);
+        final body = response.data;
         throw Exception(body['detail'] ?? "Xatolik yuz berdi");
       }
     } catch (e) {
@@ -1447,7 +1447,7 @@ class DataService {
       final response = await _get(url);
 
       if (response.statusCode == 200) {
-        final dynamic body = json.decode(response.body);
+        final dynamic body = response.data;
         List<dynamic> items = [];
         
         if (body is Map && body['success'] == true) {
@@ -1470,7 +1470,7 @@ class DataService {
           return items;
         }
       } else {
-        print("Grades API Error: ${response.statusCode} - ${response.body}");
+        print("Grades API Error: ${response.statusCode} - ${response.data}");
       }
     } catch (e) {
       print("Grades Sync Error: $e");
@@ -1488,7 +1488,7 @@ class DataService {
       }
       final response = await _get(url);
       if (response.statusCode == 200) {
-        final body = json.decode(response.body);
+        final body = response.data;
         if (body['success'] == true) {
           return body['data'];
         }
@@ -1533,7 +1533,7 @@ class DataService {
       final response = await _get(url);
 
       if (response.statusCode == 200) {
-        final body = json.decode(response.body);
+        final body = response.data;
         if (body['success'] == true) {
           final items = body['data'];
           // DISABLED LOCAL CACHE: No update
@@ -1556,7 +1556,7 @@ class DataService {
       ).timeout(const Duration(seconds: 20));
 
       if (response.statusCode == 200) {
-        final body = json.decode(response.body);
+        final body = response.data;
         if (body['success'] == true) return body['data'];
       }
       return [];
@@ -1576,7 +1576,7 @@ class DataService {
       );
 
       if (response.statusCode == 200) {
-        final body = json.decode(response.body);
+        final body = response.data;
         print("Bot Send Response: $body");
         return body['success'] == true;
       }
@@ -1601,7 +1601,7 @@ class DataService {
       );
 
       if (response.statusCode == 200) {
-        final body = json.decode(response.body);
+        final body = response.data;
         if (body['success'] == true) {
           return body['data'];
         }
@@ -1624,7 +1624,7 @@ class DataService {
       );
 
       if (response.statusCode == 200) {
-        final body = json.decode(response.body);
+        final body = response.data;
         if (body['success'] == true) {
            return body['data'];
         }
@@ -1653,11 +1653,11 @@ class DataService {
       );
 
       if (response.statusCode == 200) {
-        return json.decode(response.body);
+        return response.data;
       } else if (response.statusCode == 403) {
         throw Exception("PREMIUM_REQUIRED");
       } else {
-        return json.decode(response.body);
+        return response.data;
       }
     } catch (e) {
       if (e.toString().contains("PREMIUM_REQUIRED")) rethrow;
@@ -1673,7 +1673,7 @@ class DataService {
       final response = await _post('${ApiConstants.backendUrl}/ai/predict-grant');
 
       if (response.statusCode == 200) {
-        final body = json.decode(response.body);
+        final body = response.data;
         if (body['success'] == true) {
           return body['data'];
         }
@@ -1695,7 +1695,7 @@ class DataService {
       );
 
       if (response.statusCode == 200) {
-        final body = json.decode(response.body);
+        final body = response.data;
         if (body['success'] == true) {
            return body['data'];
         }
@@ -1729,7 +1729,7 @@ class DataService {
         headers: await _getHeaders(),
       );
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
+        final data = response.data;
         return data['data'] ?? [];
       }
     } catch (e) {
@@ -1748,7 +1748,7 @@ class DataService {
           'title': title,
         },
       );
-      return json.decode(response.body);
+      return response.data;
     } catch (e) {
       print("DataService: Error initiating upload: $e");
       return {"success": false, "message": "Tarmoq xatosi"};
@@ -1759,7 +1759,7 @@ class DataService {
     try {
       final response = await _get("${ApiConstants.backendUrl}/student/documents/upload-status/$sessionId");
       if (response.statusCode == 200) {
-        return json.decode(response.body);
+        return response.data;
       }
     } catch (e) {
       print("DataService: Error checking status: $e");
@@ -1773,7 +1773,7 @@ class DataService {
         "${ApiConstants.backendUrl}/student/documents/finalize",
         body: {'session_id': sessionId},
       );
-      return json.decode(response.body);
+      return response.data;
     } catch (e) {
       print("DataService: Error finalizing upload: $e");
       return {"success": false, "message": "Tarmoq xatosi"};
@@ -1796,7 +1796,7 @@ class DataService {
           'is_anonymous': isAnonymous,
         },
       );
-      return json.decode(response.body);
+      return response.data;
     } catch (e) {
       print("DataService: Error initiating feedback upload: $e");
       return {"success": false, "message": "Tarmoq xatosi"};
@@ -1807,7 +1807,7 @@ class DataService {
   Future<Map<String, dynamic>> getElectionDetails(int electionId) async {
     final response = await _get("${ApiConstants.backendUrl}/election/$electionId");
     if (response.statusCode == 200) {
-      final body = json.decode(response.body);
+      final body = response.data;
       // Support both wrapped {"success": true, "data": {...}} and raw {...}
       if (body is Map<String, dynamic>) {
         return body['data'] ?? body;
@@ -1825,7 +1825,7 @@ class DataService {
     try {
       final response = await _get("${ApiConstants.backendUrl}/tutor/groups");
       if (response.statusCode == 200) {
-        final body = json.decode(response.body);
+        final body = response.data;
         if (body['success'] == true) {
           return body['data'];
         }
@@ -1847,7 +1847,7 @@ class DataService {
       
       debugPrint("DataService: Status: ${response.statusCode}");
       if (response.statusCode == 200) {
-        final body = json.decode(response.body);
+        final body = response.data;
         if (body['success'] == true) {
           final list = body['data'] as List;
           debugPrint("DataService: Found ${list.length} appeals");
@@ -1856,7 +1856,7 @@ class DataService {
              debugPrint("DataService: Success false. Message: ${body['message']}");
         }
       } else {
-         debugPrint("DataService: Error Error Body: ${response.body}");
+         debugPrint("DataService: Error Error Body: ${response.data}");
       }
     } catch (e) {
       debugPrint("DataService: Error fetching group appeals: $e");
@@ -1878,7 +1878,7 @@ class DataService {
     );
 
     if (response.statusCode != 200) {
-      throw Exception("Failed to reply: ${response.body}");
+      throw Exception("Failed to reply: ${response.data}");
     }
   }
 
@@ -1891,7 +1891,7 @@ class DataService {
       }
       final response = await _get(url);
       if (response.statusCode == 200) {
-        final body = json.decode(response.body);
+        final body = response.data;
         if (body['success'] == true) return body['data'] as List;
       }
     } catch (e) {
@@ -1905,7 +1905,7 @@ class DataService {
     try {
       final response = await _get("${ApiConstants.backendUrl}/tutor/appeals/stats");
       if (response.statusCode == 200) {
-        final body = json.decode(response.body);
+        final body = response.data;
         if (body['success'] == true) return body['stats'];
       }
     } catch (e) {
@@ -1919,7 +1919,7 @@ class DataService {
     try {
       final response = await _get("${ApiConstants.backendUrl}/tutor/appeals/$id");
       if (response.statusCode == 200) {
-        final body = json.decode(response.body);
+        final body = response.data;
         if (body['success'] == true) return body['detail'];
       }
     } catch (e) {
@@ -1933,7 +1933,7 @@ class DataService {
     try {
       final response = await _get("${ApiConstants.backendUrl}/tutor/dashboard");
       if (response.statusCode == 200) {
-        final body = json.decode(response.body);
+        final body = response.data;
         if (body['success'] == true) return body['data'];
       }
     } catch (e) {
@@ -1946,7 +1946,7 @@ class DataService {
     try {
       final response = await _get(ApiConstants.tutorRatingStats);
       if (response.statusCode == 200) {
-        return json.decode(utf8.decode(response.bodyBytes));
+        return json.decode(utf8.decode(response.dataBytes));
       }
     } catch (e) {
       debugPrint("DataService: Error fetching tutor rating stats: $e");
@@ -1964,7 +1964,7 @@ class DataService {
       
       final response = await _get(url);
       if (response.statusCode == 200) {
-        final body = json.decode(response.body);
+        final body = response.data;
         if (body['success'] == true) {
           return body['data'];
         }
@@ -1981,7 +1981,7 @@ class DataService {
       body: {"candidate_id": candidateId},
     );
     if (response.statusCode == 200) return true;
-    final body = json.decode(response.body);
+    final body = response.data;
     throw Exception(body['detail'] ?? "Ovoz berishda xato yuz berdi");
   }
 
@@ -1990,7 +1990,7 @@ class DataService {
     try {
       final response = await _get("${ApiConstants.backendUrl}/tutor/activities/stats");
       if (response.statusCode == 200) {
-        final body = json.decode(response.body);
+        final body = response.data;
         if (body['success'] == true) {
           return body['data'];
         }
@@ -2007,7 +2007,7 @@ class DataService {
     try {
       final response = await _get("${ApiConstants.backendUrl}/tutor/activities/recent");
       if (response.statusCode == 200) {
-        final body = json.decode(response.body);
+        final body = response.data;
         if (body['success'] == true) {
           return body;
         }
@@ -2024,7 +2024,7 @@ class DataService {
     try {
       final response = await _get("${ApiConstants.backendUrl}/tutor/activities/group/$groupNumber");
       if (response.statusCode == 200) {
-        final body = json.decode(response.body);
+        final body = response.data;
         if (body['success'] == true) {
           return body['data'];
         }
@@ -2057,7 +2057,7 @@ class DataService {
     try {
       final response = await _get("${ApiConstants.backendUrl}/student/feedback/upload-status/$sessionId");
       if (response.statusCode == 200) {
-        return json.decode(response.body);
+        return response.data;
       }
     } catch (e) {
       print("DataService: Error checking feedback status: $e");
@@ -2090,7 +2090,7 @@ class DataService {
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
       
-      return json.decode(response.body);
+      return response.data;
     } catch (e) {
       print("DataService: Error creating feedback: $e");
       return {"status": "error", "message": "Tarmoq xatosi"};
@@ -2116,7 +2116,7 @@ class DataService {
         Uri.parse("${ApiConstants.backendUrl}/student/documents/$docId/send-to-bot"),
         headers: await _getHeaders(),
       );
-      final data = json.decode(response.body);
+      final data = response.data;
       return data['message'];
     } catch (e) {
       print("DataService: Error sending doc to bot: $e");
@@ -2133,7 +2133,7 @@ class DataService {
       );
 
       if (response.statusCode == 200) {
-        final body = json.decode(response.body);
+        final body = response.data;
         if (body['success'] == true) {
            return body['message'];
         } else {
@@ -2154,7 +2154,7 @@ class DataService {
         headers: await _getHeaders(),
       );
       if (response.statusCode == 200) {
-        final data = json.decode(response.body);
+        final data = response.data;
         return data['data'] ?? [];
       }
     } catch (e) {
@@ -2172,7 +2172,7 @@ class DataService {
           'title': title,
         },
       );
-      return json.decode(response.body);
+      return response.data;
     } catch (e) {
       print("DataService: Error initiating certificate upload: $e");
       return {"success": false, "message": "Tarmoq xatosi"};
@@ -2183,7 +2183,7 @@ class DataService {
     try {
       final response = await _get("${ApiConstants.backendUrl}/student/certificates/upload-status/$sessionId");
       if (response.statusCode == 200) {
-        return json.decode(response.body);
+        return response.data;
       }
     } catch (e) {
       print("DataService: Error checking certificate status: $e");
@@ -2197,7 +2197,7 @@ class DataService {
         "${ApiConstants.backendUrl}/student/certificates/finalize",
         body: {'session_id': sessionId},
       );
-      return json.decode(response.body);
+      return response.data;
     } catch (e) {
       print("DataService: Error finalizing certificate upload: $e");
       return {"success": false, "message": "Tarmoq xatosi"};
@@ -2223,7 +2223,7 @@ class DataService {
         Uri.parse("${ApiConstants.backendUrl}/student/certificates/$certId/send-to-bot"),
         headers: await _getHeaders(),
       );
-      final data = json.decode(response.body);
+      final data = response.data;
       return data['message'];
     } catch (e) {
       print("DataService: Error sending cert to bot: $e");
@@ -2302,7 +2302,7 @@ class DataService {
       );
 
       if (response.statusCode == 200) {
-        final body = json.decode(response.body);
+        final body = response.data;
         if (body['success'] == true) {
           return body['url'];
         }
@@ -2323,7 +2323,7 @@ class DataService {
       );
 
       if (response.statusCode == 200) {
-        final body = json.decode(response.body);
+        final body = response.data;
         if (body['success'] == true) {
           return body['url'];
         }
@@ -2344,7 +2344,7 @@ class DataService {
       );
 
       if (response.statusCode == 200) {
-        final body = json.decode(response.body);
+        final body = response.data;
         if (body['success'] == true) {
           return body['url'];
         }
@@ -2366,7 +2366,7 @@ class DataService {
       );
       
       if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(response.body);
+        final List<dynamic> data = response.data;
         if (data.isNotEmpty) return data;
       }
 
@@ -2377,7 +2377,7 @@ class DataService {
       );
       
       if (publicResponse.statusCode == 200) {
-        return json.decode(publicResponse.body);
+        return publicResponse.data;
       }
       
       return [];
@@ -2394,7 +2394,7 @@ class DataService {
         Uri.parse('${ApiConstants.backendUrl}/plans/buy/$planId'),
         headers: await _getHeaders(),
       );
-      final body = json.decode(response.body);
+      final body = response.data;
       
       if (response.statusCode == 200) {
          return {"status": "success", "message": body['message'] ?? "Muvaffaqiyatli xarid"};
@@ -2414,7 +2414,7 @@ class DataService {
         Uri.parse('${ApiConstants.backendUrl}/plans/trial'),
         headers: await _getHeaders(),
       );
-      final body = json.decode(response.body);
+      final body = response.data;
       
       if (response.statusCode == 200) {
         return body; 
@@ -2448,7 +2448,7 @@ class DataService {
   Future<SurveyListResponse> getSurveys() async {
     final response = await _get(ApiConstants.surveys);
     if (response.statusCode == 200) {
-      return SurveyListResponse.fromJson(json.decode(response.body));
+      return SurveyListResponse.fromJson(response.data);
     }
     throw Exception('Failed to load surveys');
   }
@@ -2459,7 +2459,7 @@ class DataService {
       body: {'survey_id': surveyId},
     );
     if (response.statusCode == 200) {
-      return SurveyStartResponse.fromJson(json.decode(response.body));
+      return SurveyStartResponse.fromJson(response.data);
     }
     throw Exception('Failed to start survey');
   }
@@ -2474,7 +2474,7 @@ class DataService {
       },
     );
     if (response.statusCode == 200) {
-      final body = json.decode(response.body);
+      final body = response.data;
       return body['success'] == true;
     }
     return false;
@@ -2486,7 +2486,7 @@ class DataService {
       body: {'quiz_rule_id': quizRuleId},
     );
     if (response.statusCode == 200) {
-      final body = json.decode(response.body);
+      final body = response.data;
       return body['success'] == true;
     }
     return false;
@@ -2497,7 +2497,7 @@ class DataService {
     try {
       final response = await _get("${ApiConstants.backendUrl}/tutor/documents/stats");
       if (response.statusCode == 200) {
-        final body = json.decode(response.body);
+        final body = response.data;
         if (body['success'] == true) {
           return body['data'];
         }
@@ -2515,7 +2515,7 @@ class DataService {
       String encodedGroup = Uri.encodeComponent(groupNumber);
       final response = await _get("${ApiConstants.backendUrl}/tutor/documents/group/$encodedGroup");
       if (response.statusCode == 200) {
-        final body = json.decode(response.body);
+        final body = response.data;
         if (body['success'] == true) {
           return body['data'];
         }
@@ -2532,7 +2532,7 @@ class DataService {
     try {
       final response = await _get("${ApiConstants.backendUrl}/tutor/documents/all");
       if (response.statusCode == 200) {
-        final body = json.decode(response.body);
+        final body = response.data;
         if (body['success'] == true) {
           return body['data'];
         }
@@ -2575,7 +2575,7 @@ class DataService {
       String encodedGroup = Uri.encodeComponent(groupNumber);
       final response = await _get("${ApiConstants.tutorGroupStudents}/$encodedGroup");
       if (response.statusCode == 200) {
-        final body = json.decode(response.body);
+        final body = response.data;
         if (body['success'] == true) {
           return body['data'];
         }
@@ -2599,7 +2599,7 @@ class DataService {
         },
       );
       if (response.statusCode == 200) {
-        final body = json.decode(response.body);
+        final body = response.data;
         return body['success'] == true;
       }
     } catch (e) {
@@ -2613,7 +2613,7 @@ class DataService {
     try {
       final response = await _get("${ApiConstants.backendUrl}/tutor/certificates/stats");
       if (response.statusCode == 200) {
-        final body = json.decode(response.body);
+        final body = response.data;
         if (body['success'] == true) {
           return body['data'];
         }
@@ -2630,7 +2630,7 @@ class DataService {
     try {
       final response = await _get("${ApiConstants.backendUrl}/tutor/certificates/group/${groupNumber.toString()}");
       if (response.statusCode == 200) {
-        final body = json.decode(response.body);
+        final body = response.data;
         if (body['success'] == true) {
           return body['data'];
         }
@@ -2647,7 +2647,7 @@ class DataService {
     try {
       final response = await _get("${ApiConstants.backendUrl}/tutor/certificates/student/$studentId");
       if (response.statusCode == 200) {
-        final body = json.decode(response.body);
+        final body = response.data;
         if (body['success'] == true) {
           return body['data'];
         }
@@ -2663,7 +2663,7 @@ class DataService {
   Future<String?> downloadStudentCertificateForTutor(int certId) async {
     try {
       final response = await _post("${ApiConstants.backendUrl}/tutor/certificates/$certId/download");
-      final body = json.decode(response.body);
+      final body = response.data;
       if (response.statusCode == 200) {
         return body['message'] ?? "Sertifikat botga yuborildi";
       }
@@ -2678,7 +2678,7 @@ class DataService {
     try {
       final response = await _get("${ApiConstants.backendUrl}/management/analytics");
       if (response.statusCode == 200) {
-        final body = json.decode(utf8.decode(response.bodyBytes));
+        final body = json.decode(utf8.decode(response.dataBytes));
         if (body['success'] == true) {
           return body['data'];
         }
@@ -2694,7 +2694,7 @@ class DataService {
     try {
       final response = await _get("${ApiConstants.backendUrl}/management/ai-report", timeout: const Duration(seconds: 45));
       if (response.statusCode == 200) {
-        final body = json.decode(utf8.decode(response.bodyBytes));
+        final body = json.decode(utf8.decode(response.dataBytes));
         if (body['success'] == true) {
           return body['data'];
         }
@@ -2710,7 +2710,7 @@ class DataService {
   Future<String?> downloadStudentCertificateForManagement(int certId) async {
     try {
       final response = await _post("${ApiConstants.backendUrl}/management/certificates/$certId/download");
-      final body = json.decode(response.body);
+      final body = response.data;
       if (response.statusCode == 200) {
         return body['message'] ?? "Sertifikat botga yuborildi";
       }
@@ -2725,7 +2725,7 @@ class DataService {
   Future<String?> downloadStudentDocumentForManagement(int docId, {String type = "document"}) async {
     try {
       final response = await _post("${ApiConstants.backendUrl}/management/documents/$docId/download?type=$type");
-      final body = json.decode(response.body);
+      final body = response.data;
       if (response.statusCode == 200) {
         return body['message'] ?? "Hujjat botga yuborildi";
       }
@@ -2740,7 +2740,7 @@ class DataService {
   Future<String?> predictSentiment() async {
     try {
       final response = await _post("${ApiConstants.backendUrl}/ai/predict-sentiment");
-      final body = json.decode(utf8.decode(response.bodyBytes));
+      final body = json.decode(utf8.decode(response.dataBytes));
       if (response.statusCode == 200 && body['success'] == true) {
         return body['data'];
       }
@@ -2758,7 +2758,7 @@ class DataService {
   Future<Map<String, dynamic>> getAnalyticsDashboard() async {
     final response = await _get(ApiConstants.managementAnalyticsDashboard);
     if (response.statusCode == 200) {
-      final body = json.decode(utf8.decode(response.bodyBytes));
+      final body = json.decode(utf8.decode(response.dataBytes));
       return body['success'] == true ? body['data'] : body;
     }
     throw Exception('Failed to load dashboard stats');
@@ -2798,7 +2798,7 @@ class DataService {
 
       final response = await _get(url);
       if (response.statusCode == 200) {
-        return json.decode(utf8.decode(response.bodyBytes));
+        return json.decode(utf8.decode(response.dataBytes));
       }
     } catch (e) {
       debugPrint("DataService: Error fetching management activities: $e");
@@ -2810,7 +2810,7 @@ class DataService {
     try {
       final response = await _post("${ApiConstants.managementActivities}/$activityId/approve");
       if (response.statusCode == 200) {
-        final body = json.decode(response.body);
+        final body = response.data;
         debugPrint("DataService: Approve Response: $body");
         return body['success'] == true;
       }
@@ -2828,7 +2828,7 @@ class DataService {
         body: {'comment': comment},
       );
       if (response.statusCode == 200) {
-        final body = json.decode(response.body);
+        final body = response.data;
         return body['success'] == true;
       }
     } catch (e) {
@@ -2840,7 +2840,7 @@ class DataService {
   Future<List<dynamic>> getActivityTrend() async {
     final response = await _get('${ApiConstants.backendUrl}/management/analytics/trend?days=30');
     if (response.statusCode == 200) {
-      return List<dynamic>.from(json.decode(utf8.decode(response.bodyBytes)));
+      return List<dynamic>.from(json.decode(utf8.decode(response.dataBytes)));
     }
     return [];
   }
@@ -2848,7 +2848,7 @@ class DataService {
   Future<List<dynamic>> getFacultyActivityStats() async {
     final response = await _get('${ApiConstants.backendUrl}/management/analytics/faculties');
     if (response.statusCode == 200) {
-      return List<dynamic>.from(json.decode(utf8.decode(response.bodyBytes)));
+      return List<dynamic>.from(json.decode(utf8.decode(response.dataBytes)));
     }
     return [];
   }
@@ -2856,7 +2856,7 @@ class DataService {
   Future<List<dynamic>> getRecentActivitySubmissions() async {
     final response = await _get('${ApiConstants.backendUrl}/management/analytics/recent-submissions?limit=10');
     if (response.statusCode == 200) {
-      return List<dynamic>.from(json.decode(utf8.decode(response.bodyBytes)));
+      return List<dynamic>.from(json.decode(utf8.decode(response.dataBytes)));
     }
     return [];
   }
@@ -2866,7 +2866,7 @@ class DataService {
     try {
       final response = await _get("${ApiConstants.backendUrl}/student/contract-info?force_refresh=$forceRefresh");
       if (response.statusCode == 200) {
-        final body = json.decode(response.body);
+        final body = response.data;
         
         // Handle both List and Map structures dynamically
         if (body is List) {
@@ -2899,7 +2899,7 @@ class DataService {
     try {
       final response = await _get('${ApiConstants.accommodation}/listings');
       if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(utf8.decode(response.bodyBytes));
+        final List<dynamic> data = json.decode(utf8.decode(response.dataBytes));
         return data.map((json) => AccommodationListing.fromJson(json)).toList();
       }
     } catch (e) {
@@ -2915,7 +2915,7 @@ class DataService {
         body: data,
       );
       if (response.statusCode == 200) {
-        return json.decode(utf8.decode(response.bodyBytes));
+        return json.decode(utf8.decode(response.dataBytes));
       }
     } catch (e) {
       debugPrint("DataService: Error creating accommodation listing: $e");
@@ -2927,7 +2927,7 @@ class DataService {
   Future<List<dynamic>> getDormRoommates() async {
     try {
        final resp = await _get(ApiConstants.dormRoommates);
-       if (resp.statusCode == 200) return json.decode(utf8.decode(resp.bodyBytes));
+       if (resp.statusCode == 200) return json.decode(utf8.decode(resp.dataBytes));
     } catch (_) {}
     return [];
   }
@@ -2935,7 +2935,7 @@ class DataService {
   Future<List<dynamic>> getDormRules() async {
     try {
       final resp = await _get(ApiConstants.dormRules);
-      if (resp.statusCode == 200) return json.decode(utf8.decode(resp.bodyBytes));
+      if (resp.statusCode == 200) return json.decode(utf8.decode(resp.dataBytes));
     } catch (_) {}
     return [];
   }
@@ -2943,7 +2943,7 @@ class DataService {
   Future<List<dynamic>> getDormMenu() async {
     try {
       final resp = await _get(ApiConstants.dormMenu);
-      if (resp.statusCode == 200) return json.decode(utf8.decode(resp.bodyBytes));
+      if (resp.statusCode == 200) return json.decode(utf8.decode(resp.dataBytes));
     } catch (_) {}
     return [];
   }
@@ -2951,7 +2951,7 @@ class DataService {
   Future<List<dynamic>> getDormRoster() async {
     try {
       final resp = await _get(ApiConstants.dormRoster);
-      if (resp.statusCode == 200) return json.decode(utf8.decode(resp.bodyBytes));
+      if (resp.statusCode == 200) return json.decode(utf8.decode(resp.dataBytes));
     } catch (_) {}
     return [];
   }
@@ -2959,7 +2959,7 @@ class DataService {
   Future<List<dynamic>> getMyDormIssues() async {
     try {
       final resp = await _get(ApiConstants.dormMyIssues);
-      if (resp.statusCode == 200) return json.decode(utf8.decode(resp.bodyBytes));
+      if (resp.statusCode == 200) return json.decode(utf8.decode(resp.dataBytes));
     } catch (_) {}
     return [];
   }
@@ -2970,7 +2970,7 @@ class DataService {
         'category': category,
         'description': description,
       });
-      return json.decode(utf8.decode(resp.bodyBytes));
+      return json.decode(utf8.decode(resp.dataBytes));
     } catch (e) {
       return {'success': false, 'message': e.toString()};
     }
@@ -2980,7 +2980,7 @@ class DataService {
     try {
       final response = await _get('${ApiConstants.ratingTargets}/$roleType');
       if (response.statusCode == 200) {
-        return json.decode(response.body);
+        return response.data;
       }
     } catch (e) {
       debugPrint("DataService: Error fetching rating targets: $e");
@@ -3007,10 +3007,10 @@ class DataService {
         },
       );
       if (response.statusCode == 200) {
-        final body = json.decode(response.body);
+        final body = response.data;
         return {'success': true, 'message': body['message'] ?? 'Bahoyingiz qabul qilindi'};
       } else {
-        final body = json.decode(response.body);
+        final body = response.data;
         return {'success': false, 'message': body['detail'] ?? 'Xatolik yuz berdi'};
       }
     } catch (e) {
@@ -3018,4 +3018,19 @@ class DataService {
       return {'success': false, 'message': 'Ulanishda xatolik yuz berdi'};
     }
   }
+
+  // Missing methods for Auth Strategy
+  Future<void> saveToken(String token) async {
+    await _authService.saveToken(token);
+  }
+
+  Future<void> logout() async {
+    await _authService.clearToken();
+    await _dbService.clearAll();
+  }
+
+  void updateUniversityServer(String prefix) {
+    _apiClient.updateBaseUrl(prefix);
+  }
+
 }
