@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
-import 'package:http/http.dart' as http;
+// import 'package:http/http.dart' as http; // Removed by cleanup
 import 'package:http_parser/http_parser.dart';
 import 'package:dio/dio.dart' as dio;
 import 'api_client.dart';
@@ -42,7 +42,38 @@ class DataService {
   }
 
   // Refactored POST using Dio
-  Future<dio.Response> _post(String url, {Object? body, Duration? timeout}) async {
+  Future<dio.Response> _post(String url, {Object? body, Duration? timeout}
+
+  // Refactored PUT using Dio
+  Future<dio.Response> _put(String url, {Object? body}) async {
+    try {
+      return await _apiClient.dio.put(url, data: body);
+    } on dio.DioException catch (e) {
+      _handleDioError(e);
+      rethrow;
+    }
+  }
+
+  // Refactored DELETE using Dio
+  Future<dio.Response> _delete(String url) async {
+    try {
+      return await _apiClient.dio.delete(url);
+    } on dio.DioException catch (e) {
+      _handleDioError(e);
+      rethrow;
+    }
+  }
+
+  // Refactored PATCH using Dio
+  Future<dio.Response> _patch(String url, {Object? body}) async {
+    try {
+      return await _apiClient.dio.patch(url, data: body);
+    } on dio.DioException catch (e) {
+      _handleDioError(e);
+      rethrow;
+    }
+  }
+) async {
     try {
       final response = await _apiClient.dio.post(
         url,
@@ -97,16 +128,16 @@ class DataService {
   Future<String?> uploadAvatar(File imageFile) async {
     try {
       final uri = Uri.parse('${ApiConstants.backendUrl}/student/image');
-      final request = http.MultipartRequest('POST', uri);
+      
       
       // Auth Header
       final token = await _authService.getToken();
-      request.headers['Authorization'] = 'Bearer $token';
-      request.headers['X-Api-Key'] = ApiConstants.apiToken;
+      
+      
 
       // File
       request.files.add(
-        await http.MultipartFile.fromPath(
+        await dio.MultipartFile.fromPath(
           'file', 
           imageFile.path,
           contentType: MediaType('image', 'jpeg')
@@ -114,7 +145,7 @@ class DataService {
       );
 
       final streamedResponse = await request.send();
-      final response = await http.Response.fromStream(streamedResponse);
+      final response = response;
 
       if (response.statusCode == 200) {
         final body = response.data;
@@ -682,18 +713,10 @@ class DataService {
   // NEW: Init Upload Session
   Future<Map<String, dynamic>> initUploadSession(String sessionId, String category) async {
     final token = await _authService.getToken();
-    final response = await http.post(
-      Uri.parse('${ApiConstants.activities}/upload/init'),
-      headers: {
-        'Authorization': 'Bearer $token',
-        'X-Api-Key': ApiConstants.apiToken,
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: {
+    final response = await _post('${ApiConstants.activities}/upload/init', body: {
         'session_id': sessionId,
         'category': category
-      },
-    );
+      },);
 
     if (response.statusCode == 200) {
       return response.data;
@@ -705,13 +728,7 @@ class DataService {
   // NEW: Check Upload Status
   Future<Map<String, dynamic>> checkUploadStatus(String sessionId) async {
     final token = await _authService.getToken();
-    final response = await http.get(
-      Uri.parse('${ApiConstants.activities}/upload/status/$sessionId'),
-      headers: {
-        'Authorization': 'Bearer $token',
-        'X-Api-Key': ApiConstants.apiToken,
-      },
-    );
+    final response = await _get('${ApiConstants.activities}/upload/status/$sessionId');
 
     if (response.statusCode == 200) {
       return response.data;
@@ -722,18 +739,10 @@ class DataService {
   // --- TUTOR BULK ACTIVITY ENDPOINTS ---
   Future<Map<String, dynamic>> tutorInitUploadSession(String sessionId, String category) async {
     final token = await _authService.getToken();
-    final response = await http.post(
-      Uri.parse(ApiConstants.tutorActivitiesUploadInit),
-      headers: {
-        'Authorization': 'Bearer $token',
-        'X-Api-Key': ApiConstants.apiToken,
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: {
+    final response = await _post(ApiConstants.tutorActivitiesUploadInit, body: {
         'session_id': sessionId,
         'category': category
-      },
-    );
+      },);
 
     if (response.statusCode == 200) {
       return response.data;
@@ -792,76 +801,42 @@ class DataService {
     }
   }
 
-  Future<SocialActivity?> addActivity(String category, String name, String description, String date, {String? sessionId}) async {
-    final token = await _authService.getToken();
-    var request = http.MultipartRequest('POST', Uri.parse(ApiConstants.activities));
-    request.headers['Authorization'] = 'Bearer $token';
-    request.headers['X-Api-Key'] = ApiConstants.apiToken;
-    
-    request.fields['category'] = category;
-    request.fields['name'] = name;
-    request.fields['description'] = description;
-    request.fields['date'] = date;
-    
-    if (sessionId != null) {
-      request.fields['session_id'] = sessionId;
-    }
-    
-    final response = await request.send();
-    final respStr = await response.stream.bytesToString();
-    
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      return SocialActivity.fromJson(json.decode(respStr));
-    } else {
-      // Parse error message if possible
-      String errorMessage = "Xatolik: ${response.statusCode}";
-      try {
-        final body = json.decode(respStr);
-        errorMessage = body['detail'] ?? body['message'] ?? errorMessage;
-      } catch (_) {}
-      
-      debugPrint("Add Activity Failed: ${response.statusCode} - $respStr");
-      throw Exception(errorMessage);
+    Future<dio.Response?> addActivity(String category, String name, String description, String date, {String? sessionId}) async {
+    try {
+      final formData = dio.FormData.fromMap({
+        'category': category,
+        'name': name,
+        'description': description,
+        'date': date,
+        if (sessionId != null) 'session_id': sessionId,
+      });
+
+      final response = await _post(ApiConstants.activities, body: formData);
+      return response;
+    } catch (e) {
+      debugPrint("Add Activity Exception: $e");
+      rethrow;
     }
   }
 
   // Edit Activity
-  Future<SocialActivity?> editActivity(String id, String category, String name, String description, String date) async {
-    final token = await _authService.getToken();
-    final uri = Uri.parse('${ApiConstants.activities}/$id');
-    
-    final request = http.MultipartRequest('PATCH', uri);
-    request.headers['Authorization'] = 'Bearer $token';
-    request.headers['X-Api-Key'] = ApiConstants.apiToken;
-    
-    // For PATCH, we use Form data as defined in FastAPI endpoint
-    request.fields['category'] = category;
-    request.fields['name'] = name;
-    request.fields['description'] = description;
-    request.fields['date'] = date;
-    
+    Future<dio.Response?> editActivity(String id, String category, String name, String description, String date) async {
     try {
-      final response = await request.send();
-      final respStr = await response.stream.bytesToString();
-      
-      if (response.statusCode == 200) {
-        return SocialActivity.fromJson(json.decode(respStr));
-      } else {
-        debugPrint("Edit Activity Error: ${response.statusCode} - $respStr");
-        throw Exception("Tahrirlashda xatolik: ${response.statusCode}");
-      }
+      final formData = dio.FormData.fromMap({
+        'category': category,
+        'name': name,
+        'description': description,
+        'date': date,
+      });
+      return await _patch('${ApiConstants.activities}/$id', body: formData);
     } catch (e) {
       debugPrint("Edit Activity Exception: $e");
       rethrow;
     }
   }
-
-  // Delete Activity
   Future<bool> deleteActivity(String id) async {
     try {
-      final response = await http.delete(
-        Uri.parse('${ApiConstants.activities}/$id'),
-        headers: await _getHeaders(),
+      final response = await _delete('${ApiConstants.activities}/$id'),
       );
       
       if (response.statusCode == 200) {
@@ -879,11 +854,7 @@ class DataService {
 
   Future<bool> updateClub(int clubId, Map<String, dynamic> data) async {
     try {
-      final response = await http.put(
-        Uri.parse('${ApiConstants.backendUrl}/student/clubs/$clubId'),
-        headers: await _getHeaders(),
-        body: json.encode(data),
-      ).timeout(const Duration(seconds: 15));
+      final response = await _put('${ApiConstants.backendUrl}/student/clubs/$clubId', body: json.encode(data)).timeout(const Duration(seconds: 15));
       return response.statusCode == 200;
     } catch (_) {
       return false;
@@ -892,10 +863,7 @@ class DataService {
 
   Future<bool> deleteClub(int clubId) async {
     try {
-      final response = await http.delete(
-        Uri.parse('${ApiConstants.backendUrl}/student/clubs/$clubId'),
-        headers: await _getHeaders(),
-      ).timeout(const Duration(seconds: 15));
+      final response = await _delete('${ApiConstants.backendUrl}/student/clubs/$clubId').timeout(const Duration(seconds: 15));
       return response.statusCode == 200;
     } catch (_) {
       return false;
@@ -904,10 +872,7 @@ class DataService {
 
   Future<List<dynamic>> getClubs() async {
     try {
-      final response = await http.get(
-        Uri.parse('${ApiConstants.backendUrl}/student/clubs/all'),
-        headers: await _getHeaders(),
-      ).timeout(const Duration(seconds: 15));
+      final response = await _get('${ApiConstants.backendUrl}/student/clubs/all').timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
         return response.data;
@@ -920,11 +885,7 @@ class DataService {
 
   Future<Map<String, dynamic>> createClub(Map<String, dynamic> data) async {
     try {
-      final response = await http.post(
-        Uri.parse('${ApiConstants.backendUrl}/student/clubs/'),
-        headers: await _getHeaders(),
-        body: json.encode(data),
-      ).timeout(const Duration(seconds: 15));
+      final response = await _post('${ApiConstants.backendUrl}/student/clubs/', body: json.encode(data)).timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
         return {'success': true, 'data': response.data};
@@ -938,10 +899,7 @@ class DataService {
 
   Future<List<dynamic>> getMyClubs() async {
     try {
-      final response = await http.get(
-        Uri.parse('${ApiConstants.backendUrl}/student/clubs/my'),
-        headers: await _getHeaders(),
-      ).timeout(const Duration(seconds: 15));
+      final response = await _get('${ApiConstants.backendUrl}/student/clubs/my').timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
         return response.data;
@@ -952,11 +910,7 @@ class DataService {
 
   Future<Map<String, dynamic>> joinClub(int clubId) async {
     try {
-      final response = await http.post(
-        Uri.parse('${ApiConstants.backendUrl}/student/clubs/join'),
-        headers: await _getHeaders(),
-        body: json.encode({'club_id': clubId}),
-      ).timeout(const Duration(seconds: 15));
+      final response = await _post('${ApiConstants.backendUrl}/student/clubs/join', body: json.encode({'club_id': clubId}).timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
         return response.data;
@@ -970,10 +924,7 @@ class DataService {
   // Club Role-Based Endpoints
   Future<List<dynamic>> getClubMembers(int clubId) async {
     try {
-      final response = await http.get(
-        Uri.parse('${ApiConstants.backendUrl}/student/clubs/$clubId/members'),
-        headers: await _getHeaders(),
-      ).timeout(const Duration(seconds: 15));
+      final response = await _get('${ApiConstants.backendUrl}/student/clubs/$clubId/members').timeout(const Duration(seconds: 15));
       if (response.statusCode == 200) return response.data;
     } catch (_) {}
     return [];
@@ -981,10 +932,7 @@ class DataService {
 
   Future<bool> removeClubMember(int clubId, int studentId) async {
     try {
-      final response = await http.delete(
-        Uri.parse('${ApiConstants.backendUrl}/student/clubs/$clubId/members/$studentId'),
-        headers: await _getHeaders(),
-      ).timeout(const Duration(seconds: 15));
+      final response = await _delete('${ApiConstants.backendUrl}/student/clubs/$clubId/members/$studentId').timeout(const Duration(seconds: 15));
       if (response.statusCode == 200) return true;
     } catch (_) {}
     return false;
@@ -992,10 +940,7 @@ class DataService {
 
   Future<List<dynamic>> getClubAnnouncements(int clubId) async {
     try {
-      final response = await http.get(
-        Uri.parse('${ApiConstants.backendUrl}/student/clubs/$clubId/announcements'),
-        headers: await _getHeaders(),
-      ).timeout(const Duration(seconds: 15));
+      final response = await _get('${ApiConstants.backendUrl}/student/clubs/$clubId/announcements').timeout(const Duration(seconds: 15));
       if (response.statusCode == 200) return response.data;
     } catch (_) {}
     return [];
@@ -1008,11 +953,7 @@ class DataService {
         'send_to_telegram': sendToTelegram,
         if (mediaUrl != null) 'media_url': mediaUrl,
       };
-      final response = await http.post(
-        Uri.parse('${ApiConstants.backendUrl}/student/clubs/$clubId/announcements'),
-        headers: await _getHeaders(),
-        body: json.encode(body),
-      ).timeout(const Duration(seconds: 15));
+      final response = await _post('${ApiConstants.backendUrl}/student/clubs/$clubId/announcements', body: json.encode(body).timeout(const Duration(seconds: 15));
       return response.statusCode == 200;
     } catch (_) {}
     return false;
@@ -1020,10 +961,7 @@ class DataService {
 
   Future<List<dynamic>> getClubEvents(int clubId) async {
     try {
-      final response = await http.get(
-        Uri.parse('${ApiConstants.backendUrl}/student/clubs/$clubId/events'),
-        headers: await _getHeaders(),
-      ).timeout(const Duration(seconds: 15));
+      final response = await _get('${ApiConstants.backendUrl}/student/clubs/$clubId/events').timeout(const Duration(seconds: 15));
       if (response.statusCode == 200) return response.data;
     } catch (_) {}
     return [];
@@ -1031,65 +969,16 @@ class DataService {
 
   Future<bool> createClubEvent(int clubId, Map<String, dynamic> data) async {
     try {
-      final response = await http.post(
-        Uri.parse('${ApiConstants.backendUrl}/student/clubs/$clubId/events'),
-        headers: await _getHeaders(),
-        body: json.encode(data),
-      ).timeout(const Duration(seconds: 15));
+      final response = await _post('${ApiConstants.backendUrl}/student/clubs/$clubId/events', body: json.encode(data)).timeout(const Duration(seconds: 15));
       return response.statusCode == 200;
     } catch (_) {}
     return false;
   }
 
-  Future<bool> completeEventActivity(int eventId) async {
+  Future<bool> completeEventActivity(int eventId, int studentId, String status) async {
     try {
-      final response = await http.post(
-        Uri.parse('${ApiConstants.backendUrl}/student/clubs/events/$eventId/complete_activity'),
-        headers: await _getHeaders(),
-      ).timeout(const Duration(seconds: 15));
-      return response.statusCode == 200;
-    } catch (_) {}
-    return false;
-  }
-
-  Future<bool> participateInClubEvent(int eventId) async {
-    try {
-      final response = await http.post(
-        Uri.parse('${ApiConstants.backendUrl}/student/clubs/events/$eventId/participate'),
-        headers: await _getHeaders(),
-      ).timeout(const Duration(seconds: 15));
-      return response.statusCode == 200;
-    } catch (_) {}
-    return false;
-  }
-
-  Future<List<dynamic>> getClubEventParticipants(int eventId) async {
-    try {
-      final response = await http.get(
-        Uri.parse('${ApiConstants.backendUrl}/student/clubs/events/$eventId/participants'),
-        headers: await _getHeaders(),
-      ).timeout(const Duration(seconds: 15));
-      if (response.statusCode == 200) return response.data;
-    } catch (_) {}
-    return [];
-  }
-
-  Future<Map<String, dynamic>?> getClubMemberProfile(int clubId, int studentId) async {
-    try {
-      final response = await http.get(
-        Uri.parse('${ApiConstants.backendUrl}/student/clubs/$clubId/members/$studentId'),
-        headers: await _getHeaders(),
-      ).timeout(const Duration(seconds: 15));
-      if (response.statusCode == 200) return response.data;
-    } catch (_) {}
-    return null;
-  }
-
-  Future<bool> updateClubEventAttendance(int eventId, int studentId, String status) async {
-    try {
-      final response = await http.post(
-        Uri.parse('${ApiConstants.backendUrl}/student/clubs/events/$eventId/attendance'),
-        headers: await _getHeaders(),
+      final response = await _post(
+        '${ApiConstants.backendUrl}/student/clubs/events/$eventId/complete_activity',
         body: json.encode({"student_id": studentId, "attendance_status": status}),
       ).timeout(const Duration(seconds: 15));
       return response.statusCode == 200;
@@ -1171,10 +1060,7 @@ class DataService {
   // 5. Get Feedback
   Future<List<dynamic>> getMyFeedback() async {
     try {
-      final response = await http.get(
-        Uri.parse(ApiConstants.feedback),
-        headers: await _getHeaders(),
-      ).timeout(const Duration(seconds: 10));
+      final response = await _get(ApiConstants.feedback).timeout(const Duration(seconds: 10));
       if (response.statusCode == 200) return response.data;
     } catch (e) {
       debugPrint("Feedback Load Error: $e");
@@ -1183,25 +1069,16 @@ class DataService {
   }
 
   // 6. Send Feedback (Multipart)
-  Future<bool> sendFeedback(String text, String role, String? filePath, {bool isAnonymous = false}) async {
+    Future<bool> sendFeedback(String text, String role, String? filePath, {bool isAnonymous = false}) async {
     try {
-      final token = await _authService.getToken();
-      var request = http.MultipartRequest('POST', Uri.parse(ApiConstants.feedback));
-      
-      request.headers.addAll({
-        'Authorization': 'Bearer $token',
-        'X-Api-Key': ApiConstants.apiToken,
+      final formData = dio.FormData.fromMap({
+        'text': text,
+        'role': role,
+        'is_anonymous': isAnonymous.toString(),
+        if (filePath != null) 'file': await dio.MultipartFile.fromFile(filePath),
       });
 
-      request.fields['text'] = text;
-      request.fields['role'] = role;
-      request.fields['is_anonymous'] = isAnonymous.toString();
-
-      if (filePath != null) {
-        request.files.add(await http.MultipartFile.fromPath('file', filePath));
-      }
-
-      var response = await request.send().timeout(const Duration(seconds: 30));
+      final response = await _post(ApiConstants.feedback, body: formData);
       return response.statusCode == 200 || response.statusCode == 201;
     } catch (e) {
       debugPrint("Feedback Send Error: $e");
@@ -1212,10 +1089,7 @@ class DataService {
   // 6.5 Get Feedback Detail (Chat)
   Future<Map<String, dynamic>?> getFeedbackDetail(int id) async {
     try {
-      final response = await http.get(
-        Uri.parse('${ApiConstants.feedback}$id'),
-        headers: await _getHeaders(),
-      ).timeout(const Duration(seconds: 10));
+      final response = await _get('${ApiConstants.feedback}$id').timeout(const Duration(seconds: 10));
       
       if (response.statusCode == 200) {
         return response.data;
@@ -1229,15 +1103,7 @@ class DataService {
   // 6.6 Reply to Feedback
   Future<void> replyToFeedback(int id, String text) async {
     final token = await _authService.getToken();
-    final response = await http.post(
-      Uri.parse('${ApiConstants.feedback}$id/reply'),
-      headers: {
-        'Authorization': 'Bearer $token',
-        'X-Api-Key': ApiConstants.apiToken,
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: {'text': text},
-    ).timeout(const Duration(seconds: 15));
+    final response = await _post('${ApiConstants.feedback}$id/reply', body: {'text': text},).timeout(const Duration(seconds: 15));
 
     if (response.statusCode != 200) {
       throw Exception('Failed to reply');
@@ -1247,10 +1113,7 @@ class DataService {
 
   // 7. Get Documents
   Future<List<dynamic>> getMyDocuments() async {
-    final response = await http.get(
-      Uri.parse(ApiConstants.documents),
-      headers: await _getHeaders(),
-    ).timeout(const Duration(seconds: 10));
+    final response = await _get(ApiConstants.documents).timeout(const Duration(seconds: 10));
     if (response.statusCode == 200) return response.data;
     throw Exception('Failed to load documents');
   }
@@ -1550,10 +1413,7 @@ class DataService {
   // 14. Get Subject Resources
   Future<List<dynamic>> getResources(String subjectId) async {
     try {
-      final response = await http.get(
-        Uri.parse("${ApiConstants.resources}/$subjectId"),
-        headers: await _getHeaders(),
-      ).timeout(const Duration(seconds: 20));
+      final response = await _get("${ApiConstants.resources}/$subjectId").timeout(const Duration(seconds: 20));
 
       if (response.statusCode == 200) {
         final body = response.data;
@@ -1569,10 +1429,7 @@ class DataService {
   // 15. Send Resource to Bot
   Future<bool> sendResourceToBot(String url, String name) async {
     try {
-      final response = await http.post(
-        Uri.parse("${ApiConstants.resources}/send"),
-        headers: await _getHeaders(),
-        body: json.encode({"url": url, "name": name})
+      final response = await _post("${ApiConstants.resources}/send", body: json.encode({"url": url, "name": name})
       );
 
       if (response.statusCode == 200) {
@@ -1595,9 +1452,7 @@ class DataService {
         url += "?semester=$semesterId";
       }
       
-      final response = await http.get(
-        Uri.parse(url),
-        headers: await _getHeaders(),
+      final response = await _get(url),
       );
 
       if (response.statusCode == 200) {
@@ -1617,10 +1472,7 @@ class DataService {
   // 17. Send AI Message (Old version - for backward compatibility)
   Future<String?> sendAiMessage(String message) async {
     try {
-      final response = await http.post(
-        Uri.parse(ApiConstants.aiChat),
-        headers: await _getHeaders(),
-        body: json.encode({'message': message}),
+      final response = await _post(ApiConstants.aiChat, body: json.encode({'message': message}),
       );
 
       if (response.statusCode == 200) {
@@ -1642,10 +1494,7 @@ class DataService {
   // 17.2 Send AI Chat (New version - with keywords)
   Future<Map<String, dynamic>> sendAiChat({String? keyword, String? text, String? question}) async {
     try {
-      final response = await http.post(
-        Uri.parse(ApiConstants.aiChat),
-        headers: await _getHeaders(),
-        body: json.encode({
+      final response = await _post(ApiConstants.aiChat, body: json.encode({
           if (keyword != null) 'keyword': keyword,
           if (text != null) 'text': text,
           if (question != null) 'question': question,
@@ -1689,9 +1538,7 @@ class DataService {
   // 18. Get AI History
   Future<List<dynamic>?> getAiHistory() async {
     try {
-      final response = await http.get(
-        Uri.parse('${ApiConstants.backendUrl}/ai/history'),
-        headers: await _getHeaders(),
+      final response = await _get('${ApiConstants.backendUrl}/ai/history'),
       );
 
       if (response.statusCode == 200) {
@@ -1710,9 +1557,7 @@ class DataService {
   // 19. Clear AI History
   Future<bool> clearAiHistory() async {
     try {
-      final response = await http.delete(
-        Uri.parse('${ApiConstants.backendUrl}/ai/history'),
-        headers: await _getHeaders(),
+      final response = await _delete('${ApiConstants.backendUrl}/ai/history'),
       );
 
       return response.statusCode == 200;
@@ -1724,9 +1569,7 @@ class DataService {
   // 20. Document Management
   Future<List<dynamic>> getDocuments() async {
     try {
-      final response = await http.get(
-        Uri.parse("${ApiConstants.backendUrl}/student/documents"),
-        headers: await _getHeaders(),
+      final response = await _get("${ApiConstants.backendUrl}/student/documents"),
       );
       if (response.statusCode == 200) {
         final data = response.data;
@@ -1869,13 +1712,7 @@ class DataService {
     final token = await _authService.getToken();
     final uri = Uri.parse('${ApiConstants.backendUrl}/tutor/appeals/$appealId/reply?text=${Uri.encodeComponent(text)}');
     
-    final response = await http.post(
-      uri,
-      headers: {
-        'Authorization': 'Bearer $token',
-        'X-Api-Key': ApiConstants.apiToken,
-      },
-    );
+    final response = await _post(uri.toString());
 
     if (response.statusCode != 200) {
       throw Exception("Failed to reply: ${response.data}");
@@ -2065,44 +1902,36 @@ class DataService {
     return {"status": "pending"};
   }
 
-  Future<Map<String, dynamic>> createFeedback({
+    Future<Map<String, dynamic>> createFeedback({
     required String text,
     String role = "dekanat",
     bool isAnonymous = false,
     String? sessionId,
   }) async {
     try {
-      final uri = Uri.parse("${ApiConstants.backendUrl}/student/feedback");
-      var request = http.MultipartRequest('POST', uri);
-      
-      final token = await _authService.getToken();
-      request.headers['Authorization'] = 'Bearer $token';
-      request.headers['X-Api-Key'] = ApiConstants.apiToken;
+      final formData = dio.FormData.fromMap({
+        'text': text,
+        'role': role,
+        'is_anonymous': isAnonymous.toString(),
+        if (sessionId != null) 'session_id': sessionId,
+      });
 
-      request.fields['text'] = text;
-      request.fields['role'] = role;
-      request.fields['is_anonymous'] = isAnonymous.toString();
-      
-      if (sessionId != null) {
-        request.fields['session_id'] = sessionId;
+      final response = await _post("${ApiConstants.backendUrl}/student/feedback", body: formData);
+
+      if (response.statusCode == 200) {
+        return response.data;
       }
-
-      final streamedResponse = await request.send();
-      final response = await http.Response.fromStream(streamedResponse);
-      
-      return response.data;
+      return {"success": false, "message": "Xatolik: ${response.statusCode}"};
     } catch (e) {
-      print("DataService: Error creating feedback: $e");
-      return {"status": "error", "message": "Tarmoq xatosi"};
+      debugPrint("createFeedback error: $e");
+      return {"success": false, "message": e.toString()};
     }
+  }
   }
 
   Future<bool> deleteDocument(int docId) async {
     try {
-      final response = await http.delete(
-        Uri.parse("${ApiConstants.backendUrl}/student/documents/$docId"),
-        headers: await _getHeaders(),
-      );
+      final response = await _delete("${ApiConstants.backendUrl}/student/documents/$docId");
       return response.statusCode == 200;
     } catch (e) {
       print("DataService: Error deleting document: $e");
@@ -2112,24 +1941,7 @@ class DataService {
 
   Future<String?> sendDocumentToBot(int docId) async {
     try {
-      final response = await http.post(
-        Uri.parse("${ApiConstants.backendUrl}/student/documents/$docId/send-to-bot"),
-        headers: await _getHeaders(),
-      );
-      final data = response.data;
-      return data['message'];
-    } catch (e) {
-      print("DataService: Error sending doc to bot: $e");
-      return "Tarmoq xatosi";
-    }
-  }
-
-  Future<String?> requestDocument(String type) async {
-    try {
-      final response = await http.post(
-        Uri.parse(ApiConstants.documentsSend),
-        headers: await _getHeaders(),
-        body: json.encode({'type': type}),
+      final response = await _post("${ApiConstants.backendUrl}/student/documents/$docId/send-to-bot", body: json.encode({'type': type}),
       );
 
       if (response.statusCode == 200) {
@@ -2149,9 +1961,7 @@ class DataService {
   // 21. Certificate Management
   Future<List<dynamic>> getCertificates() async {
     try {
-      final response = await http.get(
-        Uri.parse("${ApiConstants.backendUrl}/student/certificates"),
-        headers: await _getHeaders(),
+      final response = await _get("${ApiConstants.backendUrl}/student/certificates"),
       );
       if (response.statusCode == 200) {
         final data = response.data;
@@ -2206,9 +2016,7 @@ class DataService {
 
   Future<bool> deleteCertificate(int certId) async {
     try {
-      final response = await http.delete(
-        Uri.parse("${ApiConstants.backendUrl}/student/certificates/$certId"),
-        headers: await _getHeaders(),
+      final response = await _delete("${ApiConstants.backendUrl}/student/certificates/$certId"),
       );
       return response.statusCode == 200;
     } catch (e) {
@@ -2219,221 +2027,7 @@ class DataService {
 
   Future<String?> sendCertificateToBot(int certId) async {
     try {
-      final response = await http.post(
-        Uri.parse("${ApiConstants.backendUrl}/student/certificates/$certId/send-to-bot"),
-        headers: await _getHeaders(),
-      );
-      final data = response.data;
-      return data['message'];
-    } catch (e) {
-      print("DataService: Error sending cert to bot: $e");
-      return "Tarmoq xatosi";
-    }
-  }
-
-  Future<String?> summarizeContent({String? text, String? filePath}) async {
-    try {
-      final token = await _authService.getToken();
-      
-      // Use MultipartRequest for optional file upload
-      var request = http.MultipartRequest('POST', Uri.parse('${ApiConstants.backendUrl}/ai/summarize'));
-      request.headers['Authorization'] = 'Bearer $token';
-      request.headers['X-Api-Key'] = ApiConstants.apiToken;
-
-      if (text != null && text.isNotEmpty) {
-        request.fields['text'] = text;
-      }
-
-      if (filePath != null) {
-        request.files.add(await http.MultipartFile.fromPath('file', filePath));
-      }
-
-      var response = await request.send();
-      
-      if (response.statusCode == 200) {
-         final respStr = await response.stream.bytesToString();
-         final body = json.decode(respStr);
-         if (body['success'] == true) {
-            return body['data'];
-         } else {
-            return "Xatolik: ${body['message']}";
-         }
-      } else {
-         return "Server xatosi: ${response.statusCode}";
-      }
-    } catch (e) {
-      print("DataService: Error summarizing content: $e");
-      return "Tarmoq xatosi yoki fayl muammosi.";
-    }
-  }
-  // 22. Upload Profile Image
-  Future<String?> uploadProfileImage(String filePath) async {
-    try {
-      final token = await _authService.getToken();
-      
-      var request = http.MultipartRequest('POST', Uri.parse('${ApiConstants.backendUrl}/student/image'));
-      request.headers['Authorization'] = 'Bearer $token';
-      request.headers['X-Api-Key'] = ApiConstants.apiToken;
-      
-      request.files.add(await http.MultipartFile.fromPath('file', filePath));
-      
-      final response = await request.send();
-      
-      if (response.statusCode == 200) {
-        final respStr = await response.stream.bytesToString();
-        final body = json.decode(respStr);
-        if (body['success'] == true) {
-          return body['data']['image_url'];
-        }
-      }
-      return null;
-    } catch (e) {
-      print("Error uploading profile image: $e");
-      return null;
-    }
-  }
-
-  // 23. Get Payme URL
-  Future<String?> getPaymeUrl({int amount = 10000}) async {
-    try {
-      final response = await http.get(
-        Uri.parse('${ApiConstants.backendUrl}/payment/payme-url?amount=$amount'),
-        headers: await _getHeaders(),
-      );
-
-      if (response.statusCode == 200) {
-        final body = response.data;
-        if (body['success'] == true) {
-          return body['url'];
-        }
-      }
-      return null;
-    } catch (e) {
-      print("Error fetching Payme URL: $e");
-      return null;
-    }
-  }
-
-  // 24. Get Click URL
-  Future<String?> getClickUrl({int amount = 10000}) async {
-    try {
-      final response = await http.get(
-        Uri.parse('${ApiConstants.backendUrl}/payment/click-url?amount=$amount'),
-        headers: await _getHeaders(),
-      );
-
-      if (response.statusCode == 200) {
-        final body = response.data;
-        if (body['success'] == true) {
-          return body['url'];
-        }
-      }
-      return null;
-    } catch (e) {
-      print("Error fetching Click URL: $e");
-      return null;
-    }
-  }
-
-  // 25. Get Uzum URL
-  Future<String?> getUzumUrl({int amount = 10000}) async {
-    try {
-      final response = await http.get(
-        Uri.parse('${ApiConstants.backendUrl}/payment/uzum-url?amount=$amount'),
-        headers: await _getHeaders(),
-      );
-
-      if (response.statusCode == 200) {
-        final body = response.data;
-        if (body['success'] == true) {
-          return body['url'];
-        }
-      }
-      return null;
-    } catch (e) {
-      print("Error fetching Uzum URL: $e");
-      return null;
-    }
-  }
-
-  // 27. Get Subscription Plans
-  Future<List<dynamic>> getSubscriptionPlans() async {
-    try {
-      // 1. Try with headers (to get role-specific plans if any)
-      final response = await http.get(
-        Uri.parse('${ApiConstants.backendUrl}/plans'),
-        headers: await _getHeaders(),
-      );
-      
-      if (response.statusCode == 200) {
-        final List<dynamic> data = response.data;
-        if (data.isNotEmpty) return data;
-      }
-
-      // 2. Fallback: Try without headers (to get public/student plans)
-      // This helps management users who might not have role-specific plans defined.
-      final publicResponse = await http.get(
-        Uri.parse('${ApiConstants.backendUrl}/plans'),
-      );
-      
-      if (publicResponse.statusCode == 200) {
-        return response.data;
-      }
-      
-      return [];
-    } catch (e) {
-      debugPrint("Error fetching subscription plans: $e");
-      return [];
-    }
-  }
-
-  // 28. Purchase Subscription Plan
-  Future<Map<String, dynamic>> purchasePlan(String planId) async {
-    try {
-      final response = await http.post(
-        Uri.parse('${ApiConstants.backendUrl}/plans/buy/$planId'),
-        headers: await _getHeaders(),
-      );
-      final body = response.data;
-      
-      if (response.statusCode == 200) {
-         return {"status": "success", "message": body['message'] ?? "Muvaffaqiyatli xarid"};
-      } else {
-         return {"status": "error", "message": body['detail'] ?? "Xatolik"};
-      }
-    } catch (e) {
-      print("Error purchasing plan: $e");
-      return {'status': 'error', 'message': e.toString()};
-    }
-  }
-
-  // 29. Activate Trial
-  Future<Map<String, dynamic>> activateTrial() async {
-    try {
-      final response = await http.post(
-        Uri.parse('${ApiConstants.backendUrl}/plans/trial'),
-        headers: await _getHeaders(),
-      );
-      final body = response.data;
-      
-      if (response.statusCode == 200) {
-        return body; 
-      } else {
-        return {"status": "error", "message": body['detail'] ?? "Xatolik"};
-      }
-    } catch (e) {
-      print("Error activating trial: $e");
-      return {'status': 'error', 'message': e.toString()};
-    }
-  }
-
-  // 30. Update Badge
-  Future<bool> updateBadge(String emoji) async {
-    try {
-      final response = await http.put(
-        Uri.parse("${ApiConstants.backendUrl}/student/badge"),
-        headers: await _getHeaders(),
-        body: json.encode({"emoji": emoji}),
+      final response = await _post("${ApiConstants.backendUrl}/student/certificates/$certId/send-to-bot", body: json.encode({"emoji": emoji}),
       );
       
       return response.statusCode == 200;
@@ -2550,15 +2144,7 @@ class DataService {
       final token = await _authService.getToken();
       String url = "${ApiConstants.backendUrl}/tutor/documents/request";
       
-      final response = await http.post(
-        Uri.parse(url),
-        headers: {
-          'Authorization': 'Bearer $token',
-          'X-Api-Key': ApiConstants.apiToken,
-          'Content-Type': 'application/json',
-        },
-        body: json.encode({"student_id": studentId, "category": category ?? "all"}),
-      ).timeout(const Duration(seconds: 15));
+      final response = await _post(url, body: json.encode({"student_id": studentId, "category": category ?? "all"}).timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
         return true;
