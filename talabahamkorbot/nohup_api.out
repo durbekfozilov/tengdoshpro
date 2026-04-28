@@ -1,10 +1,11 @@
 /home/user/talabahamkor/talabahamkorbot/api/gpa.py:85: FastAPIDeprecationWarning: `regex` has been deprecated, please use `pattern` instead
   retake_policy: str = Query("latest", regex="^(latest|best)$"),
-/home/user/talabahamkor/talabahamkorbot/main.py:199: DeprecationWarning: 
+/home/user/talabahamkor/talabahamkorbot/main.py:201: DeprecationWarning: 
         on_event is deprecated, use lifespan event handlers instead.
 
         Read more about it in the
         [FastAPI docs for Lifespan Events](https://fastapi.tiangolo.com/advanced/events/).
         
   @app.on_event("startup")
+2026-04-20 10:57:30,971 - __main__ - INFO - 🌐 Web Portal mounted at /portal (path: /home/user/talabahamkor/talabahamkorbot/../web_portal)
 ERROR:    [Errno 98] Address already in use

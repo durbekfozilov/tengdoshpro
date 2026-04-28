@@ -219,6 +219,7 @@ class University(Base):
     short_name: Mapped[str | None] = mapped_column(String(64), nullable=True)
 
     required_channel: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    api_url: Mapped[str | None] = mapped_column(String(255), nullable=True) # Child server domain
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
 
     created_at: Mapped[datetime] = mapped_column(DateTime(), default=datetime.utcnow)
@@ -632,6 +633,49 @@ class UserActivity(Base):
     images: Mapped[list["UserActivityImage"]] = relationship(
         "UserActivityImage", back_populates="activity", cascade="all, delete-orphan"
     )
+
+# ============================================================
+# OFFICIAL GRANT EVALUATIONS (Regulation 149)
+# ============================================================
+
+class StudentEvaluation(Base):
+    __tablename__ = "student_evaluations"
+    __table_args__ = (
+        UniqueConstraint("student_id", "academic_year", name="uq_student_eval_year"),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    student_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("students.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    tutor_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey("staff.id", ondelete="SET NULL"), nullable=True, index=True
+    )
+    
+    academic_year: Mapped[str] = mapped_column(String(32), nullable=False) # e.g. "2024-2025"
+    gpa_snapshot: Mapped[float] = mapped_column(Float, default=0.0)
+    
+    # 11 Social Activity Categories (Annex 2)
+    score_reading: Mapped[int] = mapped_column(Integer, default=0)    # Kitobxonlik (0-20)
+    score_initiatives: Mapped[int] = mapped_column(Integer, default=0) # 5 tashabbus (0-20)
+    score_academic_social: Mapped[int] = mapped_column(Integer, default=0) # Akademik (0-10)
+    score_ethics: Mapped[int] = mapped_column(Integer, default=0)      # Odob-axloq (0-5)
+    score_achievements: Mapped[int] = mapped_column(Integer, default=0)  # Yutuqlar (0-10)
+    score_attendance: Mapped[int] = mapped_column(Integer, default=0)    # Davomat (0-5)
+    score_marifat: Mapped[int] = mapped_column(Integer, default=0)       # Ma'rifat (0-10)
+    score_volunteering: Mapped[int] = mapped_column(Integer, default=0)  # Volontyorlik (0-5)
+    score_culture: Mapped[int] = mapped_column(Integer, default=0)       # Madaniyat (0-5)
+    score_sports: Mapped[int] = mapped_column(Integer, default=0)        # Sport (0-5)
+    score_other: Mapped[int] = mapped_column(Integer, default=0)         # Boshqa (0-5)
+    
+    tutor_comment: Mapped[str | None] = mapped_column(Text, nullable=True)
+    status: Mapped[str] = mapped_column(String(32), default="draft") # draft, submitted
+    
+    created_at: Mapped[datetime] = mapped_column(DateTime(), default=datetime.utcnow)
+    updated_at: Mapped[datetime] = mapped_column(DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    student: Mapped["Student"] = relationship("Student")
+    tutor: Mapped["Staff"] = relationship("Staff")
 
 # ============================================================
 # YETAKCHI MODULI (LEADER MODULE)
@@ -1789,3 +1833,4 @@ class RatingRecord(Base):
 
     user: Mapped["Student"] = relationship("Student")
     rated_person: Mapped["Staff"] = relationship("Staff")
+    activation: Mapped["RatingActivation"] = relationship("RatingActivation")

@@ -1,21 +1,26 @@
 from fastapi import APIRouter, Depends, HTTPException, Body
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func, case, desc
-from sqlalchemy.orm import joinedload
+from sqlalchemy import select, func, case, desc, and_
+from sqlalchemy.orm import joinedload, selectinload
 from typing import List, Optional
 from datetime import datetime
 import re
 
 from fastapi_cache.decorator import cache
 from database.db_connect import get_session
-from database.models import Staff, TutorGroup, Student, StaffRole, TyutorKPI, StudentFeedback, FeedbackReply, UserActivity, StudentDocument
+from database.models import (
+    Staff, TutorGroup, Student, StaffRole, TyutorKPI, StudentFeedback, 
+    FeedbackReply, UserActivity, StudentDocument, StudentEvaluation, UserActivityImage,
+    RatingRecord, RatingActivation
+)
 import logging
 from api.dependencies import get_current_staff
 from bot import bot
+from api.schemas import StudentEvaluationSchema
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/tutor", tags=["Tutor"])
+router = APIRouter(tags=["Tutor"])
 
 @router.get("/documents/stats")
 async def get_tutor_document_stats(
@@ -550,7 +555,11 @@ async def get_tutor_students(
             {
                 "id": s.id,
                 "full_name": s.full_name,
-                "group": s.group_number,
+                "group_number": s.group_number,
+                "faculty_name": s.faculty_name,
+                "level_name": s.level_name,
+                "gpa": s.gpa,
+                "total_activity_count": s.total_activity_count,
                 "hemis_id": s.hemis_id,
                 "hemis_login": s.hemis_login,
                 "image_url": s.image_url,
@@ -1050,6 +1059,57 @@ async def get_group_activities(
     return {"success": True, "data": data}
 
 
+@router.get("/activities/student/{student_id}")
+async def get_student_activities(
+    student_id: int,
+    db: AsyncSession = Depends(get_session),
+    tutor: Staff = Depends(get_current_staff)
+):
+    """
+    Get activities for a specific student assigned to the tutor.
+    """
+    # 1. Verify access: student must be in one of the tutor's groups
+    groups_result = await db.execute(select(TutorGroup.group_number).where(TutorGroup.tutor_id == tutor.id))
+    my_groups = groups_result.scalars().all()
+    
+    student = await db.get(Student, student_id)
+    if not student:
+        raise HTTPException(status_code=404, detail="Talaba topilmadi")
+        
+    is_my_student = False
+    for group in my_groups:
+        if student.group_number and re.match(f"^{re.escape(group.strip())}( |$)", student.group_number, re.I):
+            is_my_student = True
+            break
+            
+    if not is_my_student:
+        raise HTTPException(status_code=403, detail="Siz bu talabaning ma'lumotlarini ko'rish huquqiga ega emassiz")
+
+    # 2. Fetch Activities
+    stmt = (
+        select(UserActivity)
+        .options(selectinload(UserActivity.images))
+        .where(UserActivity.student_id == student_id)
+        .order_by(UserActivity.created_at.desc())
+    )
+    result = await db.execute(stmt)
+    activities = result.scalars().all()
+    
+    data = []
+    for act in activities:
+        data.append({
+            "id": act.id,
+            "category": act.category,
+            "name": act.name,
+            "description": act.description,
+            "status": act.status,
+            "created_at": act.created_at.isoformat() if act.created_at else None,
+            "images": [{"file_id": img.file_id, "file_type": img.file_type} for img in act.images]
+        })
+        
+    return {"success": True, "data": data}
+
+
 @router.post("/activity/{activity_id}/review")
 async def review_activity(
     activity_id: int,
@@ -1429,4 +1489,201 @@ async def create_bulk_activities(
             
     await db.commit()
     return {"success": True, "created_count": created_count}
+
+@router.get("/evaluation/student/{student_id}")
+async def get_student_evaluation_detail(
+    student_id: int,
+    db: AsyncSession = Depends(get_session),
+    tutor: Staff = Depends(get_current_staff)
+):
+    """
+    Get detailed student social activity grouped by 11 categories + existing evaluation.
+    """
+    # 1. Verify Access (Student belongs to tutor's group)
+    student = await db.get(Student, student_id)
+    if not student:
+        raise HTTPException(status_code=404, detail="Talaba topilmadi")
+    
+    # Check if student belongs to tutor's group
+    group_check = await db.execute(
+        select(TutorGroup).where(
+            TutorGroup.tutor_id == tutor.id,
+            TutorGroup.group_number == student.group_number
+        )
+    )
+    if not group_check.scalar_one_or_none():
+        raise HTTPException(status_code=403, detail="Sizda ushbu talaba ma'lumotlarini ko'rish huquqi yo'q")
+
+    # 2. Fetch existing evaluation (if any)
+    eval_query = select(StudentEvaluation).where(
+        StudentEvaluation.student_id == student_id,
+        StudentEvaluation.academic_year == "2024-2025" 
+    )
+    eval_res = await db.execute(eval_query)
+    evaluation = eval_res.scalar_one_or_none()
+
+    # 2b. Fetch automated "Kitobxonlik" test results if they exist
+    quiz_query = select(RatingRecord).options(joinedload(RatingRecord.activation)).where(
+        RatingRecord.user_id == student_id,
+        RatingRecord.role_type == 'kitobxonlik'
+    ).order_by(RatingRecord.created_at.desc())
+    quiz_res = await db.execute(quiz_query)
+    kitobxon_record = quiz_res.scalars().first()
+    
+    kitobxon_test_data = None
+    if kitobxon_record:
+        kitobxon_test_data = {
+            "id": kitobxon_record.id,
+            "score": kitobxon_record.rating, # Out of 20
+            "questions": kitobxon_record.activation.questions if kitobxon_record.activation else [],
+            "answers": kitobxon_record.answers or [],
+            "date": kitobxon_record.created_at.strftime('%Y-%m-%d %H:%M')
+        }
+        # If evaluation exists, ensure its reading score matches the quiz
+        if evaluation:
+            evaluation.score_reading = kitobxon_record.rating
+
+    # 3. Fetch all approved activities
+    activities_query = select(UserActivity).options(selectinload(UserActivity.images)).where(
+        UserActivity.student_id == student_id,
+        UserActivity.status == "approved"
+    )
+    act_res = await db.execute(activities_query)
+    activities = act_res.scalars().all()
+
+    # 4. Map activities to categories (Helper)
+    # Regulation 149 Categories Mapping
+    categories_map = {
+        "score_reading": ["kitobxon", "reading"],
+        "score_initiatives": ["togarak", "circle", "5tashabbus"],
+        "score_academic_social": ["academic", "ilim", "konferensiya"],
+        "score_ethics": ["odob", "axloq"],
+        "score_achievements": ["yutuqlar", "republika", "xalqaro"],
+        "score_attendance": ["davomat"],
+        "score_marifat": ["marifat"],
+        "score_volunteering": ["volontyor", "charity"],
+        "score_culture": ["madaniy", "teatr", "muzey"],
+        "score_sports": ["sport", "musobaqa"],
+        "score_other": ["boshqa"]
+    }
+
+    detailed_activities = {k: [] for k in categories_map.keys()}
+    for act in activities:
+        found = False
+        for cat_key, keywords in categories_map.items():
+            if any(kw in act.category.lower() for kw in keywords):
+                detailed_activities[cat_key].append({
+                    "id": act.id,
+                    "title": act.name,
+                    "description": act.description,
+                    "date": act.date,
+                    "images": [img.file_id for img in act.images]
+                })
+                found = True
+                break
+        if not found:
+            detailed_activities["score_other"].append({
+                "id": act.id,
+                "title": act.name,
+                "description": act.description,
+                "date": act.date,
+                "images": [img.file_id for img in act.images]
+            })
+
+    return {
+        "success": True,
+        "student": {
+            "id": student.id,
+            "full_name": student.full_name,
+            "gpa": student.gpa,
+            "group_number": student.group_number,
+            "missed_hours": student.missed_hours
+        },
+        "evaluation": evaluation,
+        "activities": detailed_activities,
+        "kitobxon_test": kitobxon_test_data
+    }
+
+@router.post("/evaluation/student/{student_id}")
+async def save_student_evaluation(
+    student_id: int,
+    eval_data: StudentEvaluationSchema,
+    db: AsyncSession = Depends(get_session),
+    tutor: Staff = Depends(get_current_staff)
+):
+    """
+    Save or Update official grant evaluation for a student.
+    """
+    # 1. Access Check
+    student = await db.get(Student, student_id)
+    if not student:
+        raise HTTPException(status_code=404, detail="Talaba topilmadi")
+    
+    group_check = await db.execute(
+        select(TutorGroup).where(
+            TutorGroup.tutor_id == tutor.id,
+            TutorGroup.group_number == student.group_number
+        )
+    )
+    if not group_check.scalar_one_or_none():
+        raise HTTPException(status_code=403, detail="Sizda ushbu amalni bajarish huquqi yo'q")
+
+    # 2. Update or Create
+    eval_query = select(StudentEvaluation).where(
+        StudentEvaluation.student_id == student_id,
+        StudentEvaluation.academic_year == eval_data.academic_year
+    )
+    eval_res = await db.execute(eval_query)
+    evaluation = eval_res.scalar_one_or_none()
+
+    update_data = eval_data.dict(exclude={"academic_year", "score_reading"})
+    status = eval_data.status
+
+    # If kitobxon test exists, force its score into common evaluation model
+    quiz_query = select(RatingRecord).where(
+        RatingRecord.user_id == student_id,
+        RatingRecord.role_type == 'kitobxonlik'
+    ).order_by(RatingRecord.created_at.desc())
+    quiz_res = await db.execute(quiz_query)
+    kitobxon_record = quiz_res.scalars().first()
+    
+    score_reading = eval_data.score_reading
+    if kitobxon_record:
+        score_reading = kitobxon_record.rating
+
+    if evaluation:
+        # Update existing
+        for key, val in update_data.items():
+            setattr(evaluation, key, val)
+        evaluation.score_reading = score_reading
+        evaluation.status = status
+        evaluation.updated_at = datetime.utcnow()
+    else:
+        # Create new
+        evaluation = StudentEvaluation(
+            student_id=student_id,
+            tutor_id=tutor.id,
+            academic_year=eval_data.academic_year,
+            **update_data,
+            score_reading=score_reading,
+            status=status,
+            gpa_snapshot=student.gpa
+        )
+        db.add(evaluation)
+
+    evaluation.score_achievements = eval_data.score_achievements
+    evaluation.score_attendance = eval_data.score_attendance
+    evaluation.score_marifat = eval_data.score_marifat
+    evaluation.score_volunteering = eval_data.score_volunteering
+    evaluation.score_culture = eval_data.score_culture
+    evaluation.score_sports = eval_data.score_sports
+    evaluation.score_other = eval_data.score_other
+    evaluation.tutor_comment = eval_data.tutor_comment
+    evaluation.status = eval_data.status
+    evaluation.gpa_snapshot = student.gpa # Always sync GPA on save
+
+    await db.commit()
+    await db.refresh(evaluation)
+
+    return {"success": True, "evaluation": evaluation}
 

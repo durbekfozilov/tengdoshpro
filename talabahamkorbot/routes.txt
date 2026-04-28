@@ -1,107 +1,285 @@
-🚀 Listing All Registered Routes:
- - {'HEAD', 'GET'} /openapi.json
- - {'HEAD', 'GET'} /docs
- - {'HEAD', 'GET'} /docs/oauth2-redirect
- - {'HEAD', 'GET'} /redoc
- - {'GET'} /
- - {'POST'} /webhook/bot
- - {'GET'} /authlog
- - {'POST'} /api/v1/auth/hemis/
- - {'POST'} /api/v1/auth/hemis
- - {'GET'} /api/v1/auth/hemis/oauth/url
- - {'GET'} /api/v1/auth/hemis/oauth/redirect
- - {'GET'} /api/v1/auth/authlog
- - {'GET'} /api/v1/oauth/login
- - {'GET'} /api/v1/student/me/
- - {'GET'} /api/v1/student/me
- - {'POST'} /api/v1/student/image
- - {'POST'} /api/v1/student/username
- - {'GET'} /api/v1/student/check-username
- - {'GET'} /api/v1/student/search
- - {'PUT'} /api/v1/student/badge
- - {'GET'} /api/v1/student/dashboard/
- - {'GET'} /api/v1/student/activities
- - {'GET'} /api/v1/student/activities/
- - {'POST'} /api/v1/student/activities/upload/init
- - {'GET'} /api/v1/student/activities/upload/status/{session_id}
- - {'POST'} /api/v1/student/activities
- - {'POST'} /api/v1/student/activities/
- - {'GET'} /api/v1/student/clubs/my
- - {'GET'} /api/v1/student/clubs/all
- - {'POST'} /api/v1/student/clubs/join
- - {'GET'} /api/v1/student/feedback
- - {'GET'} /api/v1/student/feedback/{id}
- - {'POST'} /api/v1/student/feedback/init-upload
- - {'GET'} /api/v1/student/feedback/upload-status/{session_id}
- - {'POST'} /api/v1/student/feedback
- - {'POST'} /api/v1/student/feedback/{id}/reply
- - {'GET'} /api/v1/student/documents
- - {'POST'} /api/v1/student/documents/init-upload
- - {'GET'} /api/v1/student/documents/upload-status/{session_id}
- - {'POST'} /api/v1/student/documents/finalize
- - {'POST'} /api/v1/student/documents/{doc_id}/send-to-bot
- - {'DELETE'} /api/v1/student/documents/{doc_id}
- - {'POST'} /api/v1/student/documents/send
- - {'GET'} /api/v1/student/certificates
- - {'POST'} /api/v1/student/certificates/init-upload
- - {'GET'} /api/v1/student/certificates/upload-status/{session_id}
- - {'POST'} /api/v1/student/certificates/finalize
- - {'POST'} /api/v1/student/certificates/{cert_id}/send-to-bot
- - {'DELETE'} /api/v1/student/certificates/{cert_id}
- - {'GET'} /api/v1/education/grades
- - {'GET'} /api/v1/education/semesters
- - {'GET'} /api/v1/education/schedule
- - {'GET'} /api/v1/education/subjects
- - {'GET'} /api/v1/education/resources/{subject_id}
- - {'GET'} /api/v1/education/attendance
- - {'POST'} /api/v1/education/resources/send
- - {'GET'} /api/v1/education/subject/{subject_id}/details
- - {'GET'} /api/v1/files/{file_id}
- - {'GET'} /api/v1/ai/history
- - {'DELETE'} /api/v1/ai/history
- - {'POST'} /api/v1/ai/chat
- - {'POST'} /api/v1/ai/summarize
- - {'POST'} /api/v1/community/posts
- - {'GET'} /api/v1/community/posts
- - {'GET'} /api/v1/community/posts/reposted
- - {'GET'} /api/v1/community/posts/{post_id}
- - {'PUT'} /api/v1/community/posts/{post_id}
- - {'DELETE'} /api/v1/community/posts/{post_id}
- - {'POST'} /api/v1/community/posts/{post_id}/like
- - {'POST'} /api/v1/community/posts/{post_id}/repost
- - {'POST'} /api/v1/community/posts/{post_id}/comments
- - {'GET'} /api/v1/community/posts/{post_id}/comments
- - {'POST'} /api/v1/community/comments/{comment_id}/like
- - {'DELETE'} /api/v1/community/comments/{comment_id}
- - {'PUT'} /api/v1/community/comments/{comment_id}
- - {'GET'} /api/v1/market
- - {'POST'} /api/v1/market
- - {'DELETE'} /api/v1/market/{item_id}
- - {'POST'} /api/v1/market/{item_id}/view
- - {'GET'} /api/v1/student/notifications/list
- - {'GET'} /api/v1/student/notifications/unread-count
- - {'POST'} /api/v1/student/notifications/{notif_id}/read
- - {'POST'} /api/v1/student/notifications/read-all
- - {'POST'} /api/v1/student/notifications/register-token
- - {'POST'} /api/v1/student/notifications/broadcast
- - {'GET'} /api/v1/payment/payme-url
- - {'POST'} /api/v1/payment/payme
- - {'GET'} /api/v1/payment/click-url
- - {'POST'} /api/v1/payment/click
- - {'GET'} /api/v1/payment/uzum-url
- - {'POST'} /api/v1/payment/uzum
- - {'POST'} /api/v1/community/subscribe/{target_id}
- - {'GET'} /api/v1/community/subscribers/count
- - {'GET'} /api/v1/community/check-subscription/{target_id}
- - {'GET'} /api/v1/community/followers-list/{target_id}
- - {'GET'} /api/v1/community/following-list/{target_id}
- - {'POST'} /api/v1/chat/start/{target_user_id}
- - {'GET'} /api/v1/chat/unread-count
- - {'GET'} /api/v1/chat/list
- - {'GET'} /api/v1/chat/{chat_id}/messages
- - {'POST'} /api/v1/chat/{chat_id}/send
- - {'GET'} /api/v1/gpa/semester
- - {'GET'} /api/v1/gpa/cumulative
- - {'GET'} /api/v1/plans
- - {'POST'} /api/v1/plans/buy/{plan_id}
- - {'POST'} /api/v1/plans/trial
+/openapi.json
+/docs
+/docs/oauth2-redirect
+/redoc
+/wp-login.php
+/admin/backup
+/api/v1/yetakchi/dashboard/stats
+/api/v1/yetakchi/students
+/api/v1/yetakchi/activities
+/api/v1/yetakchi/activities/{activity_id}/review
+/api/v1/yetakchi/events
+/api/v1/yetakchi/events
+/api/v1/yetakchi/reports/export
+/api/v1/yetakchi/documents
+/api/v1/yetakchi/announcements
+/config.json
+/.env
+/webhook/bot
+/api/v1/
+/api/v1/auth/hemis/
+/api/v1/auth/hemis
+/api/v1/auth/hemis/oauth/url
+/api/v1/auth/hemis/oauth/redirect
+/api/v1/auth/authlog
+/api/v1/auth/delete-account
+/api/v1/oauth/login
+/api/v1/files/{file_id}
+/api/v1/files/api/v1/files/{file_id}
+/api/v1/security/tokens/request
+/api/v1/student/grades
+/api/v1/student/semesters
+/api/v1/student/subjects
+/api/v1/student/schedule
+/api/v1/student/attendance
+/api/v1/student/qr-attendance
+/api/v1/student/resources/{subject_id}
+/api/v1/student/subject/{subject_id}/details
+/api/v1/education/grades
+/api/v1/education/semesters
+/api/v1/education/subjects
+/api/v1/education/schedule
+/api/v1/education/attendance
+/api/v1/education/qr-attendance
+/api/v1/education/resources/{subject_id}
+/api/v1/education/subject/{subject_id}/details
+/api/v1/student/attendance/qr-scan
+/api/v1/student/dashboard/
+/api/v1/student/activities
+/api/v1/student/activities/
+/api/v1/student/activities/upload/init
+/api/v1/student/activities/upload/status/{session_id}
+/api/v1/student/activities
+/api/v1/student/activities/
+/api/v1/student/activities/{activity_id}
+/api/v1/student/activities/{activity_id}
+/api/v1/student/clubs/my
+/api/v1/student/clubs/
+/api/v1/student/clubs/all
+/api/v1/student/clubs/join
+/api/v1/student/clubs/{club_id}/members
+/api/v1/student/clubs/{club_id}/members/{student_id}
+/api/v1/student/clubs/{club_id}/members/{student_id}
+/api/v1/student/clubs/{club_id}/announcements
+/api/v1/student/clubs/{club_id}/announcements
+/api/v1/student/clubs/{club_id}/events
+/api/v1/student/clubs/{club_id}/events
+/api/v1/student/clubs/events/{event_id}/participate
+/api/v1/student/clubs/events/{event_id}/participants
+/api/v1/student/clubs/events/{event_id}/attendance
+/api/v1/student/clubs/events/{event_id}/complete_activity
+/api/v1/student/clubs/{club_id}
+/api/v1/student/clubs/{club_id}
+/api/v1/student/feedback/debug
+/api/v1/student/feedback
+/api/v1/student/feedback/stats
+/api/v1/student/feedback/{id}
+/api/v1/student/feedback/init-upload
+/api/v1/student/feedback/upload-status/{session_id}
+/api/v1/student/feedback
+/api/v1/student/feedback/{id}
+/api/v1/student/feedback/{id}/reply
+/api/v1/student/feedback/{id}/close
+/api/v1/student/survey
+/api/v1/student/survey-start
+/api/v1/student/survey-answer
+/api/v1/student/survey-finish
+/api/v1/student/notifications/list
+/api/v1/student/notifications/unread-count
+/api/v1/student/notifications/{notif_id}/read
+/api/v1/student/notifications/read-all
+/api/v1/student/notifications/register-token
+/api/v1/student/notifications/broadcast
+/api/v1/student/documents
+/api/v1/student/documents/{doc_id}/download
+/api/v1/student/documents/{doc_id}
+/api/v1/student/documents/init-upload
+/api/v1/student/documents/upload-status/{session_id}
+/api/v1/student/documents/finalize
+/api/v1/student/documents/{doc_id}/send-to-bot
+/api/v1/student/documents/{doc_id}
+/api/v1/student/documents/send
+/api/v1/student/certificates
+/api/v1/student/certificates/init-upload
+/api/v1/student/certificates/upload-status/{session_id}
+/api/v1/student/certificates/finalize
+/api/v1/student/certificates/{cert_id}/send-to-bot
+/api/v1/student/certificates/{cert_id}
+/api/v1/student/accommodation/listings
+/api/v1/student/accommodation/listings
+/api/v1/student/accommodation/dorm/roommates
+/api/v1/student/accommodation/dorm/rules
+/api/v1/student/accommodation/dorm/menu
+/api/v1/student/accommodation/dorm/roster
+/api/v1/student/accommodation/dorm/issue
+/api/v1/student/accommodation/dorm/my-issues
+/api/v1/documents
+/api/v1/documents/{doc_id}/download
+/api/v1/documents/{doc_id}
+/api/v1/documents/init-upload
+/api/v1/documents/upload-status/{session_id}
+/api/v1/documents/finalize
+/api/v1/documents/{doc_id}/send-to-bot
+/api/v1/documents/{doc_id}
+/api/v1/documents/send
+/api/v1/community/posts
+/api/v1/community/filters/meta
+/api/v1/community/posts
+/api/v1/community/posts/reposted
+/api/v1/community/posts/{post_id}
+/api/v1/community/posts/{post_id}
+/api/v1/community/posts/{post_id}/view
+/api/v1/community/posts/{post_id}
+/api/v1/community/posts/{post_id}/like
+/api/v1/community/posts/{post_id}/repost
+/api/v1/community/posts/{post_id}/comments
+/api/v1/community/posts/{post_id}/comments
+/api/v1/community/comments/{comment_id}/like
+/api/v1/community/comments/{comment_id}
+/api/v1/community/comments/{comment_id}
+/api/v1/community/subscribe/{target_id}
+/api/v1/community/subscribers/count
+/api/v1/community/check-subscription/{target_id}
+/api/v1/community/followers-list/{target_id}
+/api/v1/community/following-list/{target_id}
+/api/v1/chat/start/{target_user_id}
+/api/v1/chat/unread-count
+/api/v1/chat/list
+/api/v1/chat/{chat_id}/messages
+/api/v1/chat/{chat_id}/send
+/api/v1/chat/{chat_id}
+/api/v1/chat/message/{message_id}
+/api/v1/chat/message/{message_id}
+/api/v1/chat/start/{target_user_id}
+/api/v1/chat/unread-count
+/api/v1/chat/list
+/api/v1/chat/{chat_id}/messages
+/api/v1/chat/{chat_id}/send
+/api/v1/chat/{chat_id}
+/api/v1/chat/message/{message_id}
+/api/v1/chat/message/{message_id}
+/api/v1/banner/active
+/api/v1/banner/list
+/api/v1/banner/click/{banner_id}
+/api/v1/announcements/
+/api/v1/announcements/{announcement_id}/read
+/api/v1/announcements/create
+/api/v1/app-config/mobile
+/api/v1/app-config/management
+/api/v1/ai/history
+/api/v1/ai/history
+/api/v1/ai/chat
+/api/v1/ai/summarize
+/api/v1/ai/predict-grant
+/api/v1/ai/predict-sentiment
+/api/v1/ai/cluster-appeals
+/api/v1/market/market
+/api/v1/market/market
+/api/v1/market/market/{item_id}
+/api/v1/market/market/{item_id}/view
+/api/v1/payment/payme-url
+/api/v1/payment/subsidy
+/api/v1/payment/payme
+/api/v1/payment/click-url
+/api/v1/payment/uzum-url
+/api/v1/payment/uzum
+/api/v1/payment/click/
+/api/v1/payment/click
+/api/v1/payment/click/getinfo
+/api/v1/gpa/semester
+/api/v1/gpa/cumulative
+/api/v1/plans
+/api/v1/plans/buy/{plan_id}
+/api/v1/plans/trial
+/api/v1/election/{election_id}
+/api/v1/election/vote
+/api/v1/management/analytics/dashboard
+/api/v1/management/analytics/recent-submissions
+/api/v1/management/analytics/faculties
+/api/v1/management/dashboard
+/api/v1/management/faculties
+/api/v1/management/education-types
+/api/v1/management/levels
+/api/v1/management/education-forms
+/api/v1/management/groups
+/api/v1/management/specialties
+/api/v1/management/groups/{group_number}/students
+/api/v1/management/students/search
+/api/v1/management/staff/search
+/api/v1/management/groups
+/api/v1/management/students/{student_id}/full-details
+/api/v1/management/analytics
+/api/v1/management/ai-report
+/api/v1/management/certificates/{cert_id}/download
+/api/v1/management/documents/{doc_id}/download
+/api/v1/management/documents/{doc_id}/download
+/api/v1/management/archive
+/api/v1/management/documents/export-zip
+/api/v1/management/activities
+/api/v1/management/activities/{activity_id}/approve
+/api/v1/management/activities/{activity_id}/reject
+/api/v1/management/appeals/stats
+/api/v1/management/appeals/list
+/api/v1/management/appeals/{id}
+/api/v1/management/appeals/{id}/resolve
+/api/v1/management/appeals/{id}/reply
+/api/v1/management/appeals/{id}/forward
+/api/v1/tutor/documents/stats
+/api/v1/tutor/students/group/{group_number}
+/api/v1/tutor/documents/all
+/api/v1/tutor/documents/group/{group_number}
+/api/v1/tutor/documents/request
+/api/v1/tutor/groups
+/api/v1/tutor/dashboard
+/api/v1/tutor/students
+/api/v1/tutor/groups/{group_number}/appeals
+/api/v1/tutor/appeals
+/api/v1/tutor/appeals/stats
+/api/v1/tutor/appeals/{appeal_id}
+/api/v1/tutor/appeals/{appeal_id}/reply
+/api/v1/tutor/activities/stats
+/api/v1/tutor/activities/recent
+/api/v1/tutor/activities/group/{group_number}
+/api/v1/tutor/activities/student/{student_id}
+/api/v1/tutor/activity/{activity_id}/review
+/api/v1/tutor/certificates/stats
+/api/v1/tutor/certificates/group/{group_number}
+/api/v1/tutor/certificates/student/{student_id}
+/api/v1/tutor/certificates/{cert_id}/download
+/api/v1/tutor/activities/upload/init
+/api/v1/tutor/activities/upload/status/{session_id}
+/api/v1/tutor/activities/bulk
+/api/v1/rating/active
+/api/v1/rating/targets/{role_type}
+/api/v1/rating/submit
+/api/v1/management/rating/stats
+/api/v1/management/rating/status
+/api/v1/management/rating/activate
+/api/v1/management/rating/list
+/api/v1/management/rating/update/{activation_id}
+/api/v1/management/rating/update
+/api/v1/management/rating/stats/{activation_id}
+/api/v1/student/me/
+/api/v1/student/me
+/api/v1/student/sync
+/api/v1/student/image
+/api/v1/student/username
+/api/v1/student/check-username
+/api/v1/student/search
+/api/v1/student/badge
+/api/v1/student/contract-info
+/api/v1/student/performance
+/api/v1/student/{student_id}
+/api/v1/student/password
+/api/v1/student/profile
+/api/v1/student/unlink-telegram
+/oauth/login
+/authlog
+/
+/api/v1/announcements/
+/api/v1/announcements/{announcement_id}/read
+/api/v1/announcements/create
+/api/v1/diagnostics/config
+/api/v1/diagnostics/test/format
+/api/support/send
+/static

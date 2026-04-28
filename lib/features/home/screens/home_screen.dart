@@ -113,15 +113,18 @@ class _HomeScreenState extends State<HomeScreen> {
             _selectedSemesterId = first['code']?.toString() ?? first['id']?.toString();
           }
 
-          final dashResult = await _dataService.getDashboardStats(refresh: refresh);
-          final announcements = await _dataService.getAnnouncementModels();
-          final banners = await _dataService.getActiveBanners();
+          // Parallelize all student-specific dashboard requests
+          final dashboardResults = await Future.wait([
+            _dataService.getDashboardStats(refresh: refresh),
+            _dataService.getAnnouncementModels(),
+            _dataService.getActiveBanners(),
+          ]);
 
           if (mounted) {
             setState(() {
-               _dashboard = dashResult;
-               _announcements = announcements;
-               _banners = banners;
+               _dashboard = dashboardResults[0] as Map<String, dynamic>?;
+               _announcements = dashboardResults[1] as List<AnnouncementModel>? ?? [];
+               _banners = dashboardResults[2] as List<BannerModel>? ?? [];
             });
             _startBannerTimer(); // [NEW]
           }

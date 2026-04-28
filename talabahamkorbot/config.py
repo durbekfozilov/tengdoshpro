@@ -53,15 +53,27 @@ LOG_LEVEL = "INFO"
 # 🔐 --- HEMIS OAuth Settings --- 🔐
 HEMIS_CLIENT_ID = os.environ.get("HEMIS_CLIENT_ID", "6")
 HEMIS_CLIENT_SECRET = os.environ.get("HEMIS_CLIENT_SECRET")
-HEMIS_REDIRECT_URL = os.environ.get("HEMIS_REDIRECT_URL", "https://tengdosh.uzjoku.uz/api/v1/oauth/login")
+# Base URL for the current university instance (e.g. https://api.university.uz)
+APP_BASE_URL = os.environ.get("APP_BASE_URL", "https://tengdosh.uz")
+
+HEMIS_REDIRECT_URL = os.environ.get("HEMIS_REDIRECT_URL", f"{APP_BASE_URL}/api/v1/oauth/login")
 
 # Staff Credentials
 HEMIS_STAFF_CLIENT_ID = os.environ.get("HEMIS_STAFF_CLIENT_ID", "8")
 HEMIS_STAFF_CLIENT_SECRET = os.environ.get("HEMIS_STAFF_CLIENT_SECRET")
-HEMIS_STAFF_REDIRECT_URL = os.environ.get("HEMIS_STAFF_REDIRECT_URL", "https://tengdosh.uzjoku.uz/oauth/login")
-HEMIS_AUTH_URL = "https://hemis.jmcu.uz/oauth/authorize" # User facing
-HEMIS_TOKEN_URL = "https://student.jmcu.uz/oauth/access-token" # Internal
-HEMIS_PROFILE_URL = "https://student.jmcu.uz/oauth/api/user" # Internal
+HEMIS_STAFF_REDIRECT_URL = os.environ.get("HEMIS_STAFF_REDIRECT_URL", f"{APP_BASE_URL}/oauth/login")
+
+# --- Dynamic HEMIS Domain Configuration ---
+# Example: hemis.university.uz or student.university.uz
+HEMIS_DOMAIN = os.environ.get("HEMIS_DOMAIN", "jmcu.uz") 
+HEMIS_SUBDOMAIN_AUTH = os.environ.get("HEMIS_SUBDOMAIN_AUTH", "hemis")
+HEMIS_SUBDOMAIN_REST = os.environ.get("HEMIS_SUBDOMAIN_REST", "student")
+
+HEMIS_AUTH_URL = os.environ.get("HEMIS_AUTH_URL", f"https://{HEMIS_SUBDOMAIN_AUTH}.{HEMIS_DOMAIN}/oauth/authorize")
+HEMIS_TOKEN_URL = os.environ.get("HEMIS_TOKEN_URL", f"https://{HEMIS_SUBDOMAIN_REST}.{HEMIS_DOMAIN}/oauth/access-token")
+HEMIS_PROFILE_URL = os.environ.get("HEMIS_PROFILE_URL", f"https://{HEMIS_SUBDOMAIN_REST}.{HEMIS_DOMAIN}/oauth/api/user")
+HEMIS_REST_BASE_URL = os.environ.get("HEMIS_REST_BASE_URL", f"https://{HEMIS_SUBDOMAIN_REST}.{HEMIS_DOMAIN}/rest/v1")
+
 HEMIS_ADMIN_TOKEN = os.environ.get("HEMIS_ADMIN_TOKEN") # Token for backend data fetching
 
 # 💳 --- Payme Sozlamalari --- 💳

@@ -47,36 +47,44 @@ class SubscriptionMiddleware(BaseMiddleware):
                 except: pass
             return res
 
-        from config import DEVELOPERS
-        if user.id in DEVELOPERS:
-            return await handler(event, data)
-            
         # Is this an automated channel post or a forward from a channel?
         is_channel_post = getattr(event, "sender_chat", None) is not None and getattr(event.sender_chat, "type", "") == "channel"
         is_forwarded_channel = getattr(event, "forward_from_chat", None) is not None and getattr(event.forward_from_chat, "type", "") == "channel"
 
-        # Check Global Channel Requirement (@talabahamkor)
-        # Skip this check if it's a channel post, a broadcast forward, or the Owner
+        # 1. Clear Update Types
+        if (is_channel_post or is_forwarded_channel):
+            return await handler(event, data)
+
+        # 2. Global Requirement (@talabahamkor) - MUST CHECK FIRST for Media/Start/Check
         is_media = isinstance(event, Message) and (event.document or event.photo or event.video)
         is_start = isinstance(event, Message) and event.text and event.text.startswith('/start')
+        is_check_sub = isinstance(event, CallbackQuery) and event.data == "check_subscription"
         
-        if (is_media or is_start) and not is_channel_post and not is_forwarded_channel:
-            global_channel = "@talabahamkor"
-            is_global_member = await self._is_member_of(data.get("bot"), user.id, global_channel)
-            if not is_global_member:
-                return await self._block_with_subscription(event, global_channel)
-
-        # Check Cache
         now = datetime.utcnow()
+        if (is_media or is_start or is_check_sub):
+            global_channel = "@talabahamkor"
+            # Check Global Status in Cache
+            if user.id in self.cache and self.cache.get(user.id, {}).get("global_status") is True and self.cache[user.id].get("expiry", now) > now:
+                is_global_member = True
+            else:
+                is_global_member = await self._is_member_of(data.get("bot"), user.id, global_channel)
+                if is_global_member:
+                    # Update cache with global status
+                    if user.id not in self.cache: self.cache[user.id] = {"status": True, "expiry": now + timedelta(minutes=30)}
+                    self.cache[user.id]["global_status"] = True
+            
+            if not is_global_member:
+                return await self._block_with_subscription(event, global_channel, is_start=is_start, data=data)
+
+        # 3. Specific University Cache Check
+        from config import DEVELOPERS
+        if user.id in DEVELOPERS:
+            return await handler(event, data)
+            
         if user.id in self.cache:
             cache_entry = self.cache[user.id]
             if cache_entry["expiry"] > now and cache_entry["status"] is True:
                 return await handler(event, data)
-            
-            # If we have the channel in cache, we can skip the DB query
-            if "channel" in cache_entry and cache_entry["channel"]:
-                channel_id_str = cache_entry["channel"]
-                return await self._check_membership(handler, event, data, user, channel_id_str, now)
 
         session: AsyncSession = data.get("session")
         if not session:
@@ -168,7 +176,7 @@ class SubscriptionMiddleware(BaseMiddleware):
         except Exception:
             return False
 
-    async def _block_with_subscription(self, event, channel_id_str: str):
+    async def _block_with_subscription(self, event, channel_id_str: str, is_start: bool = False, data: dict = None):
         """Blocks interaction and shows subscribe keyboard."""
         bot = event.bot
         import asyncio
@@ -184,9 +192,17 @@ class SubscriptionMiddleware(BaseMiddleware):
         text = "🚫 <b>Diqqat!</b> Botga fayl yoki rasm yuklash uchun asosiy kanalimizga a'zo bo'lishingiz kerak."
 
         if isinstance(event, Message):
+            if is_start:
+                  data = data or {}
+                  state = data.get("state")
+                  if state:
+                      await state.update_data(pending_start_command=event.text)
             await event.answer(text, reply_markup=get_subscription_check_kb(invite_link))
         elif isinstance(event, CallbackQuery):
-            await event.answer("❌ Asosiy kanalga a'zo emassiz!", show_alert=True)
-            try: await event.message.answer(text, reply_markup=get_subscription_check_kb(invite_link))
-            except: pass
+            if event.data == "check_subscription":
+                await event.answer("❌ Asosiy kanalga a'zo emassiz!", show_alert=True)
+            else:
+                await event.answer("❌ Asosiy kanalga a'zo emassiz!", show_alert=True)
+                try: await event.message.answer(text, reply_markup=get_subscription_check_kb(invite_link))
+                except: pass
         return

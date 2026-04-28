@@ -19,12 +19,14 @@ async def cmd_start_deep_link(message: Message, command: CommandObject, session:
     1. Authorization Code (Legacy): auth_{uuid}
     2. OAuth/App Login: login__{token} (e.g., login__student_id_123 or login__staff_id_456)
     """
-    args = command.args
-    user_id = message.from_user.id
+    await process_deep_link(message, command.args, session, state)
+
+async def process_deep_link(message: Message, args: str, session: AsyncSession, state: FSMContext, user_id: int = None):
+    if user_id is None:
+        user_id = message.from_user.id
     
     if not args:
         return
-        
     token = args
 
     # --- 1. LEGACY AUTH FLOW ---
@@ -292,7 +294,11 @@ async def cmd_start_generic(message: Message, state: FSMContext, session: AsyncS
     Fallback for non-deep-link start.
     Check if user is Owner/Developer/Admin and show menu.
     """
-    user_id = message.from_user.id
+    await process_generic_start(message, state, session)
+
+async def process_generic_start(message: Message, state: FSMContext, session: AsyncSession, user_id: int = None):
+    if user_id is None:
+        user_id = message.from_user.id
     from config import DEVELOPERS
     from database.models import StaffRole
 

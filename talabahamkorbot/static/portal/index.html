@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tengdosh - Talabalar Portali</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="assets/logo.png">
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Main Styles -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Views will be injected here -->
+        <div id="loading-overlay" style="display: none; position: fixed; inset: 0; background: rgba(255,255,255,0.8); z-index: 9999; align-items: center; justify-content: center;">
+            <div class="loader" style="border-top-color: var(--primary-blue); width: 40px; height: 40px;"></div>
+        </div>
+    </div>
+
+    <!-- Templates -->
+    <template id="login-template">
+        <div class="auth-wrapper">
+            <div class="auth-card fade-in">
+                <div class="logo-container">
+                    <img src="assets/logo.png" alt="Tengdosh Logo">
+                </div>
+                <h1>Xush kelibsiz!</h1>
+                <p>HEMIS tizimi orqali kiring</p>
+                
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="login">Login / Talaba ID</label>
+                        <input type="text" id="login" placeholder="Masalan: 395..." required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Parol</label>
+                        <input type="password" id="password" placeholder="••••••••" required>
+                    </div>
+                    
+                    <div id="error-message" class="error-message"></div>
+                    
+                    <button type="submit" class="btn btn-primary" id="login-btn">
+                        <span>Kirish</span>
+                    </button>
+                </form>
+                
+                <div style="margin-top: 2rem; font-size: 0.8rem; color: #888;">
+                    Agarda login yoki parolni unutgan bo'lsangiz, talabalar bo'limiga murojaat qiling.
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <template id="dashboard-template">
+        <div class="dashboard-layout fade-in">
+            <aside class="sidebar">
+                <div class="sidebar-logo">
+                    <img src="assets/logo.png" alt="Logo">
+                    <span>Tengdosh</span>
+                </div>
+                <ul class="nav-links">
+                    <li class="nav-item active" data-view="home">
+                        <i>🏠</i> Bosh sahifa
+                    </li>
+                    <li class="nav-item" data-view="schedule">
+                        <i>📅</i> Dars jadvali
+                    </li>
+                    <li class="nav-item" data-view="grades">
+                        <i>📊</i> Baholar
+                    </li>
+                    <li class="nav-item" data-view="attendance">
+                        <i>📍</i> Davomat
+                    </li>
+                    <li class="nav-item" data-view="profile">
+                        <i>👤</i> Profil
+                    </li>
+                </ul>
+                <div class="nav-item" id="logout-btn" style="color: var(--error-red); margin-top: auto;">
+                    <i>🚪</i> Chiqish
+                </div>
+            </aside>
+            
+            <main class="main-content">
+                <header>
+                    <h1 id="page-title">Bosh sahifa</h1>
+                    <div class="user-profile-header">
+                        <div id="user-name" style="font-weight: 600;">Talaba</div>
+                        <div class="avatar" id="user-avatar">?</div>
+                    </div>
+                </header>
+                
+                <!-- Dynamic Content Sections -->
+                <section id="view-home" class="view-section">
+                    <div class="stats-grid">
+                        <div class="card">
+                            <div class="stat-label">O'rtacha ball (GPA)</div>
+                            <div class="stat-value" id="stat-gpa">0.0</div>
+                        </div>
+                        <div class="card">
+                            <div class="stat-label">Umumiy davomat</div>
+                            <div class="stat-value" id="stat-attendance">0%</div>
+                        </div>
+                        <div class="card">
+                            <div class="stat-label">Xabarlar</div>
+                            <div class="stat-value" id="stat-messages">0</div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 2.5rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                            <h2>Bugungi darslar</h2>
+                            <button class="btn-text" onclick="app.navigateTo('schedule')">Hammasini ko'rish</button>
+                        </div>
+                        <div class="card" id="today-classes">
+                            <p style="color: #666;">Hozircha darslar yuklanmoqda...</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="view-schedule" class="view-section" style="display: none;">
+                    <div class="card" style="margin-bottom: 1.5rem;">
+                        <div class="schedule-controls">
+                            <div class="tabs">
+                                <button class="tab-btn active" data-mode="daily">Kunlik</button>
+                                <button class="tab-btn" data-mode="weekly">Haftalik</button>
+                            </div>
+                            <div id="day-selector" class="day-chips">
+                                <!-- Days will be injected here -->
+                            </div>
+                        </div>
+                    </div>
+                    <div id="schedule-list">
+                        <!-- Lessons list -->
+                    </div>
+                </section>
+
+                <section id="view-grades" class="view-section" style="display: none;">
+                    <div class="card">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Fan nomi</th>
+                                    <th>Tur</th>
+                                    <th>Ball</th>
+                                    <th>Baho</th>
+                                </tr>
+                            </thead>
+                            <tbody id="grades-table-body">
+                                <!-- Grades will be injected here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section id="view-attendance" class="view-section" style="display: none;">
+                    <div class="card">
+                        <div id="attendance-stats" style="display: flex; gap: 2rem; margin-bottom: 2rem;">
+                            <!-- Stats here -->
+                        </div>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Sana</th>
+                                    <th>Fan</th>
+                                    <th>Holat</th>
+                                    <th>Sabab</th>
+                                </tr>
+                            </thead>
+                            <tbody id="attendance-table-body">
+                                <!-- Attendance here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section id="view-profile" class="view-section" style="display: none;">
+                    <div class="card" style="max-width: 600px;">
+                        <h2 id="profile-full-name">Talaba ismi</h2>
+                        <p id="profile-id" style="color: #888; border-bottom: 1px solid #eee; padding-bottom: 1rem; margin-bottom: 1rem;">ID: -</p>
+                        <div id="profile-details-list">
+                            <!-- Details dynamic injection -->
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+    </template>
+
+    <!-- App Logic -->
+    <script src="app.js"></script>
+</body>
+</html>

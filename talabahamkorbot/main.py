@@ -93,8 +93,7 @@ async def lifespan(app: FastAPI):
     if root_router not in dp.sub_routers:
         dp.include_router(root_router)
     
-    # API Routers
-    app.include_router(tutor_router, prefix="/api/v1/tutor", tags=["Tutor"])
+    # API Routers moved to module level
     
     # [BUGFIX] Global fallback for Flutter Tutor Image Bug where the app appends /api/v1 twice
     @app.get("/api/v1/api/v1/files/{file_id}")
@@ -147,8 +146,11 @@ from fastapi.responses import JSONResponse
 async def honeypot():
     return JSONResponse(status_code=403, content={"error": "Access Denied"})
 
+# API Routers (Registered at Module Level)
 from api.yetakchi import router as yetakchi_router
+app.include_router(tutor_router, prefix="/api/v1/tutor", tags=["Tutor"])
 app.include_router(yetakchi_router, prefix="/api/v1/yetakchi", tags=["Yetakchi"])
+
 @app.get("/.env")
 @app.get("/config.json")
 async def honeypot_trap(request: Request):
@@ -238,8 +240,12 @@ async def start_scheduler():
 
 # Middlewares Order: DB -> Activity -> Subscription
 dp.update.outer_middleware(DbSessionMiddleware())
-dp.update.middleware(ActivityMiddleware())
-dp.update.middleware(SubscriptionMiddleware())
+
+dp.message.middleware(ActivityMiddleware())
+dp.callback_query.middleware(ActivityMiddleware())
+
+dp.message.middleware(SubscriptionMiddleware())
+dp.callback_query.middleware(SubscriptionMiddleware())
 
 # Root is now handled in api/oauth.py to support Hemis Callback
 # @app.get("/")
@@ -271,7 +277,7 @@ async def bot_webhook(request: Request):
             await dp.feed_update(bot, update, bot_id=BOT_ID)
         except Exception as e:
             import traceback
-            with open("/tmp/aiogram_error.log", "a") as f:
+            with open("aiogram_error.log", "a") as f:
                 f.write(f"\n--- ERROR {datetime.now()} ---\n")
                 f.write(traceback.format_exc())
             logger.error(f"Webhook update processing failed: {e}")
@@ -299,6 +305,15 @@ import os
 os.makedirs("static/uploads", exist_ok=True)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
+# [NEW] Serve Web Portal on /portal subpath
+import os
+portal_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../web_portal")
+if os.path.exists(portal_path):
+    app.mount("/portal", StaticFiles(directory=portal_path, html=True), name="portal")
+    logger.info(f"🌐 Web Portal mounted at /portal (path: {portal_path})")
+else:
+    logger.warning(f"⚠️ Web Portal path not found: {portal_path}")
+
 # ============================================================
 #   MAIN
 # ============================================================
@@ -314,4 +329,5 @@ if __name__ == "__main__":
     # Increased workers to 4 to prevent concurrency bottlenecks (e.g. during slow HEMIS or aggregate queries)
     # [REVERTED] 1 Worker caused App Disconnection (Performance Bottleneck). Back to 4.
     # [FIX] Increase Keep-Alive to 75s to prevent "Connection Closed" errors on mobile NAT.
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=False, workers=4, timeout_keep_alive=75)
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=False, workers=4, timeout_keep_alive=75)

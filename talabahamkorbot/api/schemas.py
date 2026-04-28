@@ -437,3 +437,19 @@ class RatingActivationToggleSchema(BaseModel):
     expires_at: Optional[datetime] = None
     questions: Optional[list] = None # [NEW] Custom questions list
 
+
+class StudentEvaluationSchema(BaseModel):
+    academic_year: str
+    score_reading: int
+    score_initiatives: int
+    score_academic_social: int
+    score_ethics: int
+    score_achievements: int
+    score_attendance: int
+    score_marifat: int
+    score_volunteering: int
+    score_culture: int
+    score_sports: int
+    score_other: int
+    tutor_comment: Optional[str] = None
+    status: str = "draft"

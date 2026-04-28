@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from sqlalchemy import select
 from database.db_connect import AsyncSessionLocal
 from database.models import StudentCache
-from config import HEMIS_ADMIN_TOKEN
+from config import HEMIS_ADMIN_TOKEN, HEMIS_REST_BASE_URL
 
 
 
@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 class HemisService:
     # Point to IPv4 IP directly due to local IPv6 issues
     # BASE_URL = "https://195.158.26.100/rest/v1"
-    BASE_URL = "https://student.jmcu.uz/rest/v1"
+    BASE_URL = HEMIS_REST_BASE_URL
     HEADERS = {
         "Accept": "application/json"
     }
@@ -350,11 +350,12 @@ class HemisService:
 
     @staticmethod
     async def get_me(token: str, base_url: Optional[str] = None, use_oauth_endpoint: bool = False):
-        from config import HEMIS_PROFILE_URL
+        from config import HEMIS_PROFILE_URL, HEMIS_REST_BASE_URL
         
         # Determine URLs
-        domain = base_url or "https://student.jmcu.uz"
-        if domain.endswith("/rest/v1"): domain = domain.replace("/rest/v1", "")
+        # Extract base domain from REST_BASE_URL if not provided
+        rest_base = base_url or HemisService.BASE_URL
+        domain = rest_base.replace("/rest/v1", "") if "/rest/v1" in rest_base else rest_base
         
         # Ensure rest_url uses the correct base
         rest_base = base_url or HemisService.BASE_URL
@@ -421,7 +422,7 @@ class HemisService:
             return HemisService._cached_employee_list
             
         client = await HemisService.get_client()
-        url = "https://student.jmcu.uz/rest/v1/data/employee-list"
+        url = f"{HemisService.BASE_URL}/data/employee-list"
         headers = HemisService.get_headers(HEMIS_ADMIN_TOKEN)
         
         all_items = []
@@ -510,7 +511,7 @@ class HemisService:
                 logger.info(f"Identifier {identifier} not found in cache. Forcing a targeted fallback request on Admin API...")
                 client = await HemisService.get_client()
                 from config import HEMIS_ADMIN_TOKEN
-                url = f"https://student.jmcu.uz/rest/v1/data/employee-list"
+                url = f"{HemisService.BASE_URL}/data/employee-list"
                 headers = HemisService.get_headers(HEMIS_ADMIN_TOKEN)
                 params = {"type": "all", "limit": 10, "search": str(identifier)}
                 
