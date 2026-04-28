@@ -32,7 +32,8 @@ class DataService {
     try {
       return await _apiClient.dio.get(
         url,
-        options: dio.Options(receiveTimeout: timeout);
+        options: dio.Options(receiveTimeout: timeout),
+      );
     } on dio.DioException catch (e) {
       _handleDioError(e);
       rethrow;
@@ -45,7 +46,8 @@ class DataService {
       return await _apiClient.dio.post(
         url,
         data: body,
-        options: dio.Options(sendTimeout: timeout);
+        options: dio.Options(sendTimeout: timeout),
+      );
     } on dio.DioException catch (e) {
       _handleDioError(e);
       rethrow;
@@ -1236,7 +1238,7 @@ class DataService {
       final Map<String, dynamic> body = {
         'phone': phone,
         'email': email,
-      });
+      };
       if (newPassword != null && newPassword.isNotEmpty) {
         body['password'] = newPassword;
       }
@@ -1898,11 +1900,7 @@ class DataService {
         return response.data;
       }
       return {"success": false, "message": "Xatolik: ${response.statusCode}"};
-    } catch (e) {
-      debugPrint("createFeedback error: $e");
-      return {"success": false, "message": e.toString()};
     }
-  }
   }
 
   Future<bool> deleteDocument(int docId) async {
@@ -1915,7 +1913,7 @@ class DataService {
     }
   }
 
-  Future<String?> sendDocumentToBot(int docId) async {
+  Future<String?> sendDocumentToBot(int docId, String type) async {
     try {
       final response = await _post("${ApiConstants.backendUrl}/student/documents/$docId/send-to-bot", body: json.encode({'type': type}));
 
@@ -1959,7 +1957,7 @@ class DataService {
       return response.data;
     } catch (e) {
       print("DataService: Error initiating certificate upload: $e");
-      return {"success": false, "message": "Tarmoq xatosi"});
+      return {"success": false, "message": "Tarmoq xatosi"};
     }
   }
 
@@ -1998,14 +1996,18 @@ class DataService {
     }
   }
 
-  Future<String?> sendCertificateToBot(int certId) async {
+  Future<String?> sendCertificateToBot(int certId, String emoji) async {
     try {
       final response = await _post("${ApiConstants.backendUrl}/student/certificates/$certId/send-to-bot", body: json.encode({"emoji": emoji}));
       
-      return response.statusCode == 200;
+      if (response.statusCode == 200) {
+        final body = response.data;
+        return body['message'] ?? "Yuborildi";
+      }
+      return null;
     } catch (e) {
       print("DataService: Error updating badge: $e");
-      return false;
+      return null;
     }
   }
 
@@ -2484,7 +2486,7 @@ class DataService {
   // --- DORMITORY ---
   Future<List<dynamic>> getDormRoommates() async {
     try {
-       final resp = await _get(ApiConstants.dormRoommates);
+       final response = await _get(ApiConstants.dormRoommates);
        if (response.statusCode == 200) return response.data;
     } catch (_) {}
     return [];
@@ -2492,7 +2494,7 @@ class DataService {
 
   Future<List<dynamic>> getDormRules() async {
     try {
-      final resp = await _get(ApiConstants.dormRules);
+      final response = await _get(ApiConstants.dormRules);
       if (response.statusCode == 200) return response.data;
     } catch (_) {}
     return [];
@@ -2500,7 +2502,7 @@ class DataService {
 
   Future<List<dynamic>> getDormMenu() async {
     try {
-      final resp = await _get(ApiConstants.dormMenu);
+      final response = await _get(ApiConstants.dormMenu);
       if (response.statusCode == 200) return response.data;
     } catch (_) {}
     return [];
@@ -2508,7 +2510,7 @@ class DataService {
 
   Future<List<dynamic>> getDormRoster() async {
     try {
-      final resp = await _get(ApiConstants.dormRoster);
+      final response = await _get(ApiConstants.dormRoster);
       if (response.statusCode == 200) return response.data;
     } catch (_) {}
     return [];
@@ -2516,7 +2518,7 @@ class DataService {
 
   Future<List<dynamic>> getMyDormIssues() async {
     try {
-      final resp = await _get(ApiConstants.dormMyIssues);
+      final response = await _get(ApiConstants.dormMyIssues);
       if (response.statusCode == 200) return response.data;
     } catch (_) {}
     return [];
@@ -2524,7 +2526,7 @@ class DataService {
 
   Future<Map<String, dynamic>> createDormIssue(String category, String description) async {
     try {
-      final resp = await _post(ApiConstants.dormIssues, body: {
+      final response = await _post(ApiConstants.dormIssues, body: {
         'category': category,
         'description': description,
       });
