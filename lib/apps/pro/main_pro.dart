@@ -1,27 +1,13 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:dio/dio.dart';
+import 'pro_app.dart';
 import '../../core/network/api_client.dart';
 import '../../core/network/data_service.dart';
 import '../../features/shared/auth/auth_provider.dart';
+import '../../core/auth/one_id_auth_repo.dart';
 import '../../features/pro/dashboard/providers/pro_dashboard_provider.dart';
 import '../../features/pro/scoring/providers/scoring_provider.dart';
-import '../../core/auth/base_auth_repo.dart';
-import 'pro_app.dart';
-
-// Placeholder for the actual OneID implementation
-class OneIdAuthRepository implements IAuthRepository {
-  @override
-  Future<bool> checkUsernameAvailability(String username) async => true;
-  @override
-  Future<dynamic> getSavedUser() async => null;
-  @override
-  Future<dynamic> login(String login, String password) async => null;
-  @override
-  Future<dynamic> loginWithToken(String token) async => null;
-  @override
-  Future<void> logout() async {}
-  @override
-  Future<Map<String, dynamic>> setUsername(String username) async => {'success': true};
-}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -29,8 +15,10 @@ void main() async {
   final dio = Dio();
   final apiClient = ApiClient(dio);
   final dataService = DataService(apiClient);
-  final proRepo = OneIdAuthRepository();
   
+  // Strategy: OneID for Pro App
+  final proRepo = OneIdAuthRepository(dataService);
+
   runApp(
     MultiProvider(
       providers: [

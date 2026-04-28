@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 import 'package:dio/dio.dart';
 import 'api_client.dart';
 import 'auth_service.dart';
@@ -10,6 +11,10 @@ import '../constants/api_constants.dart';
 import '../models/accommodation_listing.dart';
 import '../models/attendance.dart';
 import '../models/lesson.dart';
+import '../models/student.dart';
+import '../../features/social/models/social_activity.dart';
+import '../../features/home/models/announcement_model.dart';
+import '../../features/home/models/banner_model.dart';
 import '../../features/academic/models/survey_models.dart';
 
 class DataService {
@@ -54,8 +59,17 @@ class DataService {
   void _handleDioError(DioException e) {
     if (e.response?.statusCode == 401) {
       debugPrint("DataService: 401 Unauthorized detected.");
-      // Logic for HEMIS_AUTH_ERROR can be added here
+      onAuthError?.call("Session expired");
     }
+  }
+
+  Future<Map<String, String>> _getHeaders() async {
+    final token = await _authService.getToken();
+    return {
+      'Content-Type': 'application/json',
+      'X-Api-Key': ApiConstants.apiToken,
+      if (token != null) 'Authorization': 'Bearer $token',
+    };
   }
   
   // Public Accessors for Management Services

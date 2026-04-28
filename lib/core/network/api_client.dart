@@ -29,18 +29,17 @@ class ApiClient {
       onError: (DioException e, handler) {
         if (e.response?.statusCode == 401) {
           debugPrint("GLOBAL AUTH ERROR: Session expired or invalid token.");
-          // Global Logout trigger - AuthProvider's listener will catch this indirectly
-          // or we can use a dedicated StreamController here for app-wide events.
         }
         return handler.next(e);
       },
     ));
   }
 
-  static void setBaseUrl(String url) {
-    _baseUrl = url;
-    debugPrint("ApiClient: BaseURL updated to $_baseUrl");
+  void updateBaseUrl(String newBaseUrl) {
+    _baseUrl = newBaseUrl;
+    dio.options.baseUrl = _baseUrl;
+    debugPrint("ApiClient: BaseURL updated to $newBaseUrl");
   }
 
-  String get currentBaseUrl => _baseUrl;
+  String get baseUrl => _baseUrl;
 }
