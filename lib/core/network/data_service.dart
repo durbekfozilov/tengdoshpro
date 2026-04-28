@@ -30,11 +30,10 @@ class DataService {
   // Refactored GET using Dio
   Future<dio.Response> _get(String url, {Duration? timeout}) async {
     try {
-      final response = await _apiClient.dio.get(
+      return await _apiClient.dio.get(
         url,
         options: dio.Options(receiveTimeout: timeout),
       );
-      return response;
     } on dio.DioException catch (e) {
       _handleDioError(e);
       rethrow;
@@ -42,7 +41,18 @@ class DataService {
   }
 
   // Refactored POST using Dio
-  Future<dio.Response> _post(String url, {Object? body, Duration? timeout}
+  Future<dio.Response> _post(String url, {Object? body, Duration? timeout}) async {
+    try {
+      return await _apiClient.dio.post(
+        url,
+        data: body,
+        options: dio.Options(sendTimeout: timeout),
+      );
+    } on dio.DioException catch (e) {
+      _handleDioError(e);
+      rethrow;
+    }
+  }
 
   // Refactored PUT using Dio
   Future<dio.Response> _put(String url, {Object? body}) async {
@@ -68,19 +78,6 @@ class DataService {
   Future<dio.Response> _patch(String url, {Object? body}) async {
     try {
       return await _apiClient.dio.patch(url, data: body);
-    } on dio.DioException catch (e) {
-      _handleDioError(e);
-      rethrow;
-    }
-  }
-) async {
-    try {
-      final response = await _apiClient.dio.post(
-        url,
-        data: body,
-        options: dio.Options(sendTimeout: timeout),
-      );
-      return response;
     } on dio.DioException catch (e) {
       _handleDioError(e);
       rethrow;
@@ -125,36 +122,31 @@ class DataService {
   }
 
   // 26. Upload Avatar
-  Future<String?> uploadAvatar(File imageFile) async {
+    Future<String?> uploadAvatar(File imageFile) async {
     try {
-      final uri = Uri.parse('${ApiConstants.backendUrl}/student/image');
-      
-      
-      // Auth Header
-      final token = await _authService.getToken();
-      
-      
-
-      // File
-      request.files.add(
-        await dio.MultipartFile.fromPath(
-          'file', 
+      final formData = dio.FormData.fromMap({
+        'file': await dio.MultipartFile.fromFile(
           imageFile.path,
-          contentType: MediaType('image', 'jpeg')
-        )
-      );
+          contentType: MediaType('image', 'jpeg'),
+        ),
+      });
 
-      final streamedResponse = await request.send();
-      final response = response;
+      final response = await _post('${ApiConstants.backendUrl}/student/image', body: formData);
 
       if (response.statusCode == 200) {
         final body = response.data;
         if (body['success'] == true) {
           return body['data']['image_url'];
         } else {
-             throw Exception(body['message'] ?? "Server xatosi");
+          throw Exception(body['message'] ?? "Server xatosi");
         }
       }
+      throw Exception("Server xatosi: ${response.statusCode}");
+    } catch (e) {
+      debugPrint("DataService: Error uploading avatar: $e");
+      rethrow;
+    }
+  }
       throw Exception("Server xatosi: ${response.statusCode}");
     } catch (e) {
       debugPrint("DataService: Error uploading avatar: $e"); // [FIXED] print -> debugPrint
@@ -2513,7 +2505,7 @@ class DataService {
   Future<List<dynamic>> getDormRoommates() async {
     try {
        final resp = await _get(ApiConstants.dormRoommates);
-       if (resp.statusCode == 200) return resp.data;
+       if (response.statusCode == 200) return response.data;
     } catch (_) {}
     return [];
   }
@@ -2521,7 +2513,7 @@ class DataService {
   Future<List<dynamic>> getDormRules() async {
     try {
       final resp = await _get(ApiConstants.dormRules);
-      if (resp.statusCode == 200) return resp.data;
+      if (response.statusCode == 200) return response.data;
     } catch (_) {}
     return [];
   }
@@ -2529,7 +2521,7 @@ class DataService {
   Future<List<dynamic>> getDormMenu() async {
     try {
       final resp = await _get(ApiConstants.dormMenu);
-      if (resp.statusCode == 200) return resp.data;
+      if (response.statusCode == 200) return response.data;
     } catch (_) {}
     return [];
   }
@@ -2537,7 +2529,7 @@ class DataService {
   Future<List<dynamic>> getDormRoster() async {
     try {
       final resp = await _get(ApiConstants.dormRoster);
-      if (resp.statusCode == 200) return resp.data;
+      if (response.statusCode == 200) return response.data;
     } catch (_) {}
     return [];
   }
@@ -2545,7 +2537,7 @@ class DataService {
   Future<List<dynamic>> getMyDormIssues() async {
     try {
       final resp = await _get(ApiConstants.dormMyIssues);
-      if (resp.statusCode == 200) return resp.data;
+      if (response.statusCode == 200) return response.data;
     } catch (_) {}
     return [];
   }
@@ -2556,7 +2548,7 @@ class DataService {
         'category': category,
         'description': description,
       });
-      return resp.data;
+      return response.data;
     } catch (e) {
       return {'success': false, 'message': e.toString()};
     }
