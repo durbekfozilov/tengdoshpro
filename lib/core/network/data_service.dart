@@ -279,7 +279,7 @@ class DataService {
       );
       
       if (response.statusCode == 200) {
-        return response.data;
+        return resp.data;
       } else {
         try {
           final body = response.data;
@@ -304,7 +304,7 @@ class DataService {
         body: surveyData,
       );
       if (response.statusCode == 200 || response.statusCode == 201) {
-        return response.data;
+        return resp.data;
       } else {
         try {
           final body = response.data;
@@ -329,7 +329,7 @@ class DataService {
     try {
       final response = await _get(ApiConstants.managementRatingActiveSurvey);
       if (response.statusCode == 200) {
-        return response.data;
+        return resp.data;
       }
     } catch (e) {
       debugPrint("DataService: Error fetching active survey: $e");
@@ -345,7 +345,7 @@ class DataService {
         body: surveyData,
       );
       if (response.statusCode == 200) {
-        return response.data;
+        return resp.data;
       } else {
         try {
           final body = response.data;
@@ -370,7 +370,7 @@ class DataService {
     try {
       final response = await _get(ApiConstants.managementRatingList);
       if (response.statusCode == 200) {
-        return response.data;
+        return resp.data;
       }
     } catch (e) {
       debugPrint("DataService: Error fetching management surveys: $e");
@@ -382,7 +382,7 @@ class DataService {
     try {
       final response = await _get('${ApiConstants.managementRatingStatsDetail}/$surveyId');
       if (response.statusCode == 200) {
-        return response.data;
+        return resp.data;
       }
     } catch (e) {
       debugPrint("DataService: Error fetching survey analytics detail: $e");
@@ -394,7 +394,7 @@ class DataService {
     try {
       final response = await _get(ApiConstants.managementRatingStats);
       if (response.statusCode == 200) {
-        return response.data;
+        return resp.data;
       }
     } catch (e) {
       debugPrint("DataService: Error fetching management rating stats: $e");
@@ -410,7 +410,7 @@ class DataService {
         body: {'qr_code': qrCode},
       );
       if (response.statusCode == 200) {
-        return response.data;
+        return resp.data;
       }
       return {'success': false, 'message': 'HTTP xatolik: ${response.statusCode}'};
     } catch (e) {
@@ -641,7 +641,7 @@ class DataService {
 
       final response = await _post(url);
       if (response.statusCode == 200) {
-        return response.data;
+        return resp.data;
       }
     } catch (e) {
       debugPrint("DataService: Error exporting documents zip: $e");
@@ -670,7 +670,7 @@ class DataService {
       
       debugPrint("DataService: Activities response: ${response.statusCode}");
       if (response.statusCode == 200) {
-        return response.data as List<dynamic>;
+        return resp.data as List<dynamic>;
       }
     } catch (e) {
       debugPrint("DataService API error: $e");
@@ -696,7 +696,7 @@ class DataService {
     );
 
     if (response.statusCode == 200) {
-      return response.data;
+      return resp.data;
     } else {
       throw Exception('Failed to init session: ${response.data}');
     }
@@ -714,7 +714,7 @@ class DataService {
     );
 
     if (response.statusCode == 200) {
-      return response.data;
+      return resp.data;
     }
     return {"status": "pending"};
   }
@@ -736,7 +736,7 @@ class DataService {
     );
 
     if (response.statusCode == 200) {
-      return response.data;
+      return resp.data;
     } else {
       throw Exception('Failed to init tutor upload: ${response.data}');
     }
@@ -746,7 +746,7 @@ class DataService {
     final response = await _get('${ApiConstants.tutorActivitiesUploadStatus}/$sessionId');
 
     if (response.statusCode == 200) {
-      return response.data;
+      return resp.data;
     }
     return {"status": "pending"};
   }
@@ -774,7 +774,7 @@ class DataService {
     );
 
     if (response.statusCode == 200) {
-      return response.data;
+      return resp.data;
     } else {
       throw Exception('Failed to create tutor bulk activities: ${response.data}');
     }
@@ -786,7 +786,7 @@ class DataService {
   Future<Map<String, dynamic>> unlinkTelegram() async {
     final response = await authPost('${ApiConstants.backendUrl}/student/unlink-telegram');
     if (response.statusCode == 200) {
-      return response.data;
+      return resp.data;
     } else {
       throw Exception('Failed to unlink Telegram: ${response.data}');
     }
@@ -910,7 +910,7 @@ class DataService {
       ).timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
-        return response.data;
+        return resp.data;
       }
     } catch (e) {
       debugPrint("DataService: Error fetching clubs: $e");
@@ -944,7 +944,7 @@ class DataService {
       ).timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
-        return response.data;
+        return resp.data;
       }
     } catch (_) {}
     return [];
@@ -959,7 +959,7 @@ class DataService {
       ).timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
-        return response.data;
+        return resp.data;
       }
     } catch (e) {
       debugPrint("DataService: Error joining club: $e");
@@ -974,7 +974,7 @@ class DataService {
         Uri.parse('${ApiConstants.backendUrl}/student/clubs/$clubId/members'),
         headers: await _getHeaders(),
       ).timeout(const Duration(seconds: 15));
-      if (response.statusCode == 200) return response.data;
+      if (response.statusCode == 200) return resp.data;
     } catch (_) {}
     return [];
   }
@@ -996,7 +996,7 @@ class DataService {
         Uri.parse('${ApiConstants.backendUrl}/student/clubs/$clubId/announcements'),
         headers: await _getHeaders(),
       ).timeout(const Duration(seconds: 15));
-      if (response.statusCode == 200) return response.data;
+      if (response.statusCode == 200) return resp.data;
     } catch (_) {}
     return [];
   }
@@ -1024,7 +1024,7 @@ class DataService {
         Uri.parse('${ApiConstants.backendUrl}/student/clubs/$clubId/events'),
         headers: await _getHeaders(),
       ).timeout(const Duration(seconds: 15));
-      if (response.statusCode == 200) return response.data;
+      if (response.statusCode == 200) return resp.data;
     } catch (_) {}
     return [];
   }
@@ -1069,7 +1069,7 @@ class DataService {
         Uri.parse('${ApiConstants.backendUrl}/student/clubs/events/$eventId/participants'),
         headers: await _getHeaders(),
       ).timeout(const Duration(seconds: 15));
-      if (response.statusCode == 200) return response.data;
+      if (response.statusCode == 200) return resp.data;
     } catch (_) {}
     return [];
   }
@@ -1080,7 +1080,7 @@ class DataService {
         Uri.parse('${ApiConstants.backendUrl}/student/clubs/$clubId/members/$studentId'),
         headers: await _getHeaders(),
       ).timeout(const Duration(seconds: 15));
-      if (response.statusCode == 200) return response.data;
+      if (response.statusCode == 200) return resp.data;
     } catch (_) {}
     return null;
   }
@@ -1175,7 +1175,7 @@ class DataService {
         Uri.parse(ApiConstants.feedback),
         headers: await _getHeaders(),
       ).timeout(const Duration(seconds: 10));
-      if (response.statusCode == 200) return response.data;
+      if (response.statusCode == 200) return resp.data;
     } catch (e) {
       debugPrint("Feedback Load Error: $e");
     }
@@ -1218,7 +1218,7 @@ class DataService {
       ).timeout(const Duration(seconds: 10));
       
       if (response.statusCode == 200) {
-        return response.data;
+        return resp.data;
       }
     } catch (e) {
       debugPrint("Feedback Detail Error: $e");
@@ -1251,7 +1251,7 @@ class DataService {
       Uri.parse(ApiConstants.documents),
       headers: await _getHeaders(),
     ).timeout(const Duration(seconds: 10));
-    if (response.statusCode == 200) return response.data;
+    if (response.statusCode == 200) return resp.data;
     throw Exception('Failed to load documents');
   }
 
@@ -1653,11 +1653,11 @@ class DataService {
       );
 
       if (response.statusCode == 200) {
-        return response.data;
+        return resp.data;
       } else if (response.statusCode == 403) {
         throw Exception("PREMIUM_REQUIRED");
       } else {
-        return response.data;
+        return resp.data;
       }
     } catch (e) {
       if (e.toString().contains("PREMIUM_REQUIRED")) rethrow;
@@ -1748,7 +1748,7 @@ class DataService {
           'title': title,
         },
       );
-      return response.data;
+      return resp.data;
     } catch (e) {
       print("DataService: Error initiating upload: $e");
       return {"success": false, "message": "Tarmoq xatosi"};
@@ -1759,7 +1759,7 @@ class DataService {
     try {
       final response = await _get("${ApiConstants.backendUrl}/student/documents/upload-status/$sessionId");
       if (response.statusCode == 200) {
-        return response.data;
+        return resp.data;
       }
     } catch (e) {
       print("DataService: Error checking status: $e");
@@ -1773,7 +1773,7 @@ class DataService {
         "${ApiConstants.backendUrl}/student/documents/finalize",
         body: {'session_id': sessionId},
       );
-      return response.data;
+      return resp.data;
     } catch (e) {
       print("DataService: Error finalizing upload: $e");
       return {"success": false, "message": "Tarmoq xatosi"};
@@ -1796,7 +1796,7 @@ class DataService {
           'is_anonymous': isAnonymous,
         },
       );
-      return response.data;
+      return resp.data;
     } catch (e) {
       print("DataService: Error initiating feedback upload: $e");
       return {"success": false, "message": "Tarmoq xatosi"};
@@ -1946,7 +1946,7 @@ class DataService {
     try {
       final response = await _get(ApiConstants.tutorRatingStats);
       if (response.statusCode == 200) {
-        return response.data;
+        return resp.data;
       }
     } catch (e) {
       debugPrint("DataService: Error fetching tutor rating stats: $e");
@@ -2057,7 +2057,7 @@ class DataService {
     try {
       final response = await _get("${ApiConstants.backendUrl}/student/feedback/upload-status/$sessionId");
       if (response.statusCode == 200) {
-        return response.data;
+        return resp.data;
       }
     } catch (e) {
       print("DataService: Error checking feedback status: $e");
@@ -2090,7 +2090,7 @@ class DataService {
       final streamedResponse = await request.send();
       final response = await http.Response.fromStream(streamedResponse);
       
-      return response.data;
+      return resp.data;
     } catch (e) {
       print("DataService: Error creating feedback: $e");
       return {"status": "error", "message": "Tarmoq xatosi"};
@@ -2172,7 +2172,7 @@ class DataService {
           'title': title,
         },
       );
-      return response.data;
+      return resp.data;
     } catch (e) {
       print("DataService: Error initiating certificate upload: $e");
       return {"success": false, "message": "Tarmoq xatosi"};
@@ -2183,7 +2183,7 @@ class DataService {
     try {
       final response = await _get("${ApiConstants.backendUrl}/student/certificates/upload-status/$sessionId");
       if (response.statusCode == 200) {
-        return response.data;
+        return resp.data;
       }
     } catch (e) {
       print("DataService: Error checking certificate status: $e");
@@ -2197,7 +2197,7 @@ class DataService {
         "${ApiConstants.backendUrl}/student/certificates/finalize",
         body: {'session_id': sessionId},
       );
-      return response.data;
+      return resp.data;
     } catch (e) {
       print("DataService: Error finalizing certificate upload: $e");
       return {"success": false, "message": "Tarmoq xatosi"};
@@ -2798,7 +2798,7 @@ class DataService {
 
       final response = await _get(url);
       if (response.statusCode == 200) {
-        return response.data;
+        return resp.data;
       }
     } catch (e) {
       debugPrint("DataService: Error fetching management activities: $e");
@@ -2915,7 +2915,7 @@ class DataService {
         body: data,
       );
       if (response.statusCode == 200) {
-        return response.data;
+        return resp.data;
       }
     } catch (e) {
       debugPrint("DataService: Error creating accommodation listing: $e");
@@ -2927,7 +2927,7 @@ class DataService {
   Future<List<dynamic>> getDormRoommates() async {
     try {
        final resp = await _get(ApiConstants.dormRoommates);
-       if (resp.statusCode == 200) return response.data;
+       if (resp.statusCode == 200) return resp.data;
     } catch (_) {}
     return [];
   }
@@ -2935,7 +2935,7 @@ class DataService {
   Future<List<dynamic>> getDormRules() async {
     try {
       final resp = await _get(ApiConstants.dormRules);
-      if (resp.statusCode == 200) return response.data;
+      if (resp.statusCode == 200) return resp.data;
     } catch (_) {}
     return [];
   }
@@ -2943,7 +2943,7 @@ class DataService {
   Future<List<dynamic>> getDormMenu() async {
     try {
       final resp = await _get(ApiConstants.dormMenu);
-      if (resp.statusCode == 200) return response.data;
+      if (resp.statusCode == 200) return resp.data;
     } catch (_) {}
     return [];
   }
@@ -2951,7 +2951,7 @@ class DataService {
   Future<List<dynamic>> getDormRoster() async {
     try {
       final resp = await _get(ApiConstants.dormRoster);
-      if (resp.statusCode == 200) return response.data;
+      if (resp.statusCode == 200) return resp.data;
     } catch (_) {}
     return [];
   }
@@ -2959,7 +2959,7 @@ class DataService {
   Future<List<dynamic>> getMyDormIssues() async {
     try {
       final resp = await _get(ApiConstants.dormMyIssues);
-      if (resp.statusCode == 200) return response.data;
+      if (resp.statusCode == 200) return resp.data;
     } catch (_) {}
     return [];
   }
@@ -2970,7 +2970,7 @@ class DataService {
         'category': category,
         'description': description,
       });
-      return response.data;
+      return resp.data;
     } catch (e) {
       return {'success': false, 'message': e.toString()};
     }
@@ -2980,7 +2980,7 @@ class DataService {
     try {
       final response = await _get('${ApiConstants.ratingTargets}/$roleType');
       if (response.statusCode == 200) {
-        return response.data;
+        return resp.data;
       }
     } catch (e) {
       debugPrint("DataService: Error fetching rating targets: $e");
