@@ -169,6 +169,8 @@ class LocalDatabaseService {
     await db.delete('schedule');
   }
 
+  Future<void> clearAll() async => clearCache();
+
   Future close() async {
     final db = await database;
     db.close();

@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
-import 'package:dio/dio.dart';
+import 'package:dio/dio.dart' as dio;
 import 'api_client.dart';
 import '../services/auth_service.dart';
 import '../services/local_database_service.dart';
@@ -28,35 +28,35 @@ class DataService {
   static Function(String)? onAuthError;
 
   // Refactored GET using Dio
-  Future<Response> _get(String url, {Duration? timeout}) async {
+  Future<dio.Response> _get(String url, {Duration? timeout}) async {
     try {
       final response = await _apiClient.dio.get(
         url,
-        options: Options(receiveTimeout: timeout),
+        options: dio.Options(receiveTimeout: timeout),
       );
       return response;
-    } on DioException catch (e) {
+    } on dio.DioException catch (e) {
       _handleDioError(e);
       rethrow;
     }
   }
 
   // Refactored POST using Dio
-  Future<Response> _post(String url, {Object? body, Duration? timeout}) async {
+  Future<dio.Response> _post(String url, {Object? body, Duration? timeout}) async {
     try {
       final response = await _apiClient.dio.post(
         url,
         data: body,
-        options: Options(sendTimeout: timeout),
+        options: dio.Options(sendTimeout: timeout),
       );
       return response;
-    } on DioException catch (e) {
+    } on dio.DioException catch (e) {
       _handleDioError(e);
       rethrow;
     }
   }
 
-  void _handleDioError(DioException e) {
+  void _handleDioError(dio.DioException e) {
     if (e.response?.statusCode == 401) {
       debugPrint("DataService: 401 Unauthorized detected.");
       onAuthError?.call("Session expired");
@@ -73,8 +73,8 @@ class DataService {
   }
   
   // Public Accessors for Management Services
-  Future<Response> authGet(String url) => _get(url);
-  Future<Response> authPost(String url, {Object? body}) => _post(url, body: body);
+  Future<dio.Response> authGet(String url) => _get(url);
+  Future<dio.Response> authPost(String url, {Object? body}) => _post(url, body: body);
 
 
 
@@ -1577,7 +1577,7 @@ class DataService {
 
       if (response.statusCode == 200) {
         final body = response.data;
-        print("Bot Send Response: $body");
+        print("Bot Send dio.Response: $body");
         return body['success'] == true;
       }
       return false;
@@ -2811,7 +2811,7 @@ class DataService {
       final response = await _post("${ApiConstants.managementActivities}/$activityId/approve");
       if (response.statusCode == 200) {
         final body = response.data;
-        debugPrint("DataService: Approve Response: $body");
+        debugPrint("DataService: Approve dio.Response: $body");
         return body['success'] == true;
       }
     } catch (e, stacktrace) {

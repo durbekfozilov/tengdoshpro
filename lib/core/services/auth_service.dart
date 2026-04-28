@@ -265,6 +265,8 @@ class AuthService {
     await clearBiometricCredentials();
   }
 
+  Future<void> clearToken() async => logout();
+
   Future<Student?> loginWithOAuthToken(String token) async {
     try {
       // 1. Save token first
