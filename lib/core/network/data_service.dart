@@ -32,8 +32,7 @@ class DataService {
     try {
       return await _apiClient.dio.get(
         url,
-        options: dio.Options(receiveTimeout: timeout),
-      );
+        options: dio.Options(receiveTimeout: timeout);
     } on dio.DioException catch (e) {
       _handleDioError(e);
       rethrow;
@@ -46,8 +45,7 @@ class DataService {
       return await _apiClient.dio.post(
         url,
         data: body,
-        options: dio.Options(sendTimeout: timeout),
-      );
+        options: dio.Options(sendTimeout: timeout);
     } on dio.DioException catch (e) {
       _handleDioError(e);
       rethrow;
@@ -145,12 +143,6 @@ class DataService {
     } catch (e) {
       debugPrint("DataService: Error uploading avatar: $e");
       rethrow;
-    }
-  }
-      throw Exception("Server xatosi: ${response.statusCode}");
-    } catch (e) {
-      debugPrint("DataService: Error uploading avatar: $e"); // [FIXED] print -> debugPrint
-      rethrow; // Pass error to UI
     }
   }
 
@@ -771,8 +763,7 @@ class DataService {
 
     final response = await _post(
       ApiConstants.tutorActivitiesBulk,
-      body: json.encode(payload),
-    );
+      body: json.encode(payload);
 
     if (response.statusCode == 200) {
       return response.data;
@@ -828,8 +819,7 @@ class DataService {
   }
   Future<bool> deleteActivity(String id) async {
     try {
-      final response = await _delete('${ApiConstants.activities}/$id'),
-      );
+      final response = await _delete('${ApiConstants.activities}/$id');
       
       if (response.statusCode == 200) {
         return true;
@@ -902,7 +892,7 @@ class DataService {
 
   Future<Map<String, dynamic>> joinClub(int clubId) async {
     try {
-      final response = await _post('${ApiConstants.backendUrl}/student/clubs/join', body: json.encode({'club_id': clubId}).timeout(const Duration(seconds: 15));
+      final response = await _post('${ApiConstants.backendUrl}/student/clubs/join', body: json.encode({'club_id': clubId})).timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
         return response.data;
@@ -945,7 +935,7 @@ class DataService {
         'send_to_telegram': sendToTelegram,
         if (mediaUrl != null) 'media_url': mediaUrl,
       };
-      final response = await _post('${ApiConstants.backendUrl}/student/clubs/$clubId/announcements', body: json.encode(body).timeout(const Duration(seconds: 15));
+      final response = await _post('${ApiConstants.backendUrl}/student/clubs/$clubId/announcements', body: json.encode(body)).timeout(const Duration(seconds: 15));
       return response.statusCode == 200;
     } catch (_) {}
     return false;
@@ -1246,7 +1236,7 @@ class DataService {
       final Map<String, dynamic> body = {
         'phone': phone,
         'email': email,
-      };
+      });
       if (newPassword != null && newPassword.isNotEmpty) {
         body['password'] = newPassword;
       }
@@ -1444,8 +1434,7 @@ class DataService {
         url += "?semester=$semesterId";
       }
       
-      final response = await _get(url),
-      );
+      final response = await _get(url);
 
       if (response.statusCode == 200) {
         final body = response.data;
@@ -1464,8 +1453,7 @@ class DataService {
   // 17. Send AI Message (Old version - for backward compatibility)
   Future<String?> sendAiMessage(String message) async {
     try {
-      final response = await _post(ApiConstants.aiChat, body: json.encode({'message': message}),
-      );
+      final response = await _post(ApiConstants.aiChat, body: json.encode({'message': message}));
 
       if (response.statusCode == 200) {
         final body = response.data;
@@ -1490,8 +1478,7 @@ class DataService {
           if (keyword != null) 'keyword': keyword,
           if (text != null) 'text': text,
           if (question != null) 'question': question,
-        }),
-      );
+        }));
 
       if (response.statusCode == 200) {
         return response.data;
@@ -1530,8 +1517,7 @@ class DataService {
   // 18. Get AI History
   Future<List<dynamic>?> getAiHistory() async {
     try {
-      final response = await _get('${ApiConstants.backendUrl}/ai/history'),
-      );
+      final response = await _get('${ApiConstants.backendUrl}/ai/history');
 
       if (response.statusCode == 200) {
         final body = response.data;
@@ -1549,8 +1535,7 @@ class DataService {
   // 19. Clear AI History
   Future<bool> clearAiHistory() async {
     try {
-      final response = await _delete('${ApiConstants.backendUrl}/ai/history'),
-      );
+      final response = await _delete('${ApiConstants.backendUrl}/ai/history');
 
       return response.statusCode == 200;
     } catch (e) {
@@ -1561,8 +1546,7 @@ class DataService {
   // 20. Document Management
   Future<List<dynamic>> getDocuments() async {
     try {
-      final response = await _get("${ApiConstants.backendUrl}/student/documents"),
-      );
+      final response = await _get("${ApiConstants.backendUrl}/student/documents");
       if (response.statusCode == 200) {
         final data = response.data;
         return data['data'] ?? [];
@@ -1933,8 +1917,7 @@ class DataService {
 
   Future<String?> sendDocumentToBot(int docId) async {
     try {
-      final response = await _post("${ApiConstants.backendUrl}/student/documents/$docId/send-to-bot", body: json.encode({'type': type}),
-      );
+      final response = await _post("${ApiConstants.backendUrl}/student/documents/$docId/send-to-bot", body: json.encode({'type': type}));
 
       if (response.statusCode == 200) {
         final body = response.data;
@@ -1953,8 +1936,7 @@ class DataService {
   // 21. Certificate Management
   Future<List<dynamic>> getCertificates() async {
     try {
-      final response = await _get("${ApiConstants.backendUrl}/student/certificates"),
-      );
+      final response = await _get("${ApiConstants.backendUrl}/student/certificates");
       if (response.statusCode == 200) {
         final data = response.data;
         return data['data'] ?? [];
@@ -1977,7 +1959,7 @@ class DataService {
       return response.data;
     } catch (e) {
       print("DataService: Error initiating certificate upload: $e");
-      return {"success": false, "message": "Tarmoq xatosi"};
+      return {"success": false, "message": "Tarmoq xatosi"});
     }
   }
 
@@ -2008,8 +1990,7 @@ class DataService {
 
   Future<bool> deleteCertificate(int certId) async {
     try {
-      final response = await _delete("${ApiConstants.backendUrl}/student/certificates/$certId"),
-      );
+      final response = await _delete("${ApiConstants.backendUrl}/student/certificates/$certId");
       return response.statusCode == 200;
     } catch (e) {
       print("DataService: Error deleting certificate: $e");
@@ -2019,8 +2000,7 @@ class DataService {
 
   Future<String?> sendCertificateToBot(int certId) async {
     try {
-      final response = await _post("${ApiConstants.backendUrl}/student/certificates/$certId/send-to-bot", body: json.encode({"emoji": emoji}),
-      );
+      final response = await _post("${ApiConstants.backendUrl}/student/certificates/$certId/send-to-bot", body: json.encode({"emoji": emoji}));
       
       return response.statusCode == 200;
     } catch (e) {
@@ -2136,7 +2116,7 @@ class DataService {
       final token = await _authService.getToken();
       String url = "${ApiConstants.backendUrl}/tutor/documents/request";
       
-      final response = await _post(url, body: json.encode({"student_id": studentId, "category": category ?? "all"}).timeout(const Duration(seconds: 15));
+      final response = await _post(url, body: json.encode({"student_id": studentId, "category": category ?? "all"})).timeout(const Duration(seconds: 15));
 
       if (response.statusCode == 200) {
         return true;
@@ -2381,7 +2361,7 @@ class DataService {
     } catch (e) {
       debugPrint("DataService: Error fetching management activities: $e");
     }
-    return {"success": false, "data": [], "total": 0};
+    return {"success": false, "data": [], "total": 0});
   }
 
   Future<bool> approveActivity(int activityId) async {
