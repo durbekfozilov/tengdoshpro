@@ -765,7 +765,8 @@ class DataService {
 
     final response = await _post(
       ApiConstants.tutorActivitiesBulk,
-      body: json.encode(payload);
+      body: json.encode(payload),
+    );
 
     if (response.statusCode == 200) {
       return response.data;
@@ -1900,6 +1901,9 @@ class DataService {
         return response.data;
       }
       return {"success": false, "message": "Xatolik: ${response.statusCode}"};
+    } catch (e) {
+      debugPrint("createFeedback error: $e");
+      return {"success": false, "message": e.toString()};
     }
   }
 
@@ -2363,7 +2367,7 @@ class DataService {
     } catch (e) {
       debugPrint("DataService: Error fetching management activities: $e");
     }
-    return {"success": false, "data": [], "total": 0});
+    return {"success": false, "data": [], "total": 0};
   }
 
   Future<bool> approveActivity(int activityId) async {
