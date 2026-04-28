@@ -155,11 +155,17 @@ class _PendingReviewsScreenState extends State<PendingReviewsScreen> {
           TextButton(onPressed: () => Navigator.pop(context), child: const Text('Bekor qilish')),
           ElevatedButton(
             onPressed: () async {
-              final success = await context.read<ScoringProvider>().updateActivityStatus(
-                id, 
-                status, 
-                comment: commentController.text
-              );
+              bool success = false;
+              if (status == 'approved') {
+                success = await context.read<ScoringProvider>().approveWithScore(
+                  id, 
+                  context.read<ScoringProvider>().getNewScoringTemplate(),
+                  commentController.text
+                );
+              } else {
+                success = await context.read<ScoringProvider>().rejectActivity(id, commentController.text);
+              }
+              
               if (mounted && success) {
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(

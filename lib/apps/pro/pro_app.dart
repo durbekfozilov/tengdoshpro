@@ -82,7 +82,7 @@ class ProDashboard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Xush kelibsiz, ${user?.name?.split(' ').first ?? 'Xodim'}!',
+                'Xush kelibsiz, ${user?.fullName?.split(' ').first ?? 'Xodim'}!',
                 style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 24),

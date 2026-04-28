@@ -1,8 +1,16 @@
+import 'dart:convert';
+import 'dart:io';
+import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
 import 'package:dio/dio.dart';
 import 'api_client.dart';
 import 'auth_service.dart';
 import 'local_database_service.dart';
-// ... other imports remain the same
+import '../constants/api_constants.dart';
+import '../models/accommodation_listing.dart';
+import '../models/attendance.dart';
+import '../models/lesson.dart';
+import '../../features/academic/models/survey_models.dart';
 
 class DataService {
   final ApiClient _apiClient;
