@@ -112,9 +112,6 @@ class DataService {
     };
   }
   
-  // Public Accessors for Management Services
-  Future<dio.Response> authGet(String url) => _get(url);
-  Future<dio.Response> authPost(String url, {Object? body}) => _post(url, body: body);
 
 
 
@@ -270,38 +267,7 @@ class DataService {
     };
   }
 
-  // Management Dashboard
-  Future<Map<String, dynamic>> getManagementDashboard({bool refresh = false}) async {
-    try {
-      String url = ApiConstants.managementDashboard;
-      if (refresh) {
-        url += (url.contains('?') ? '&' : '?') + 'refresh=true';
-      }
-      final response = await _get(url);
-      if (response.statusCode == 200) {
-        final body = response.data;
-        if (body['success'] == true) {
-          return body['data'];
-        }
-      }
-    } catch (e) {
-      debugPrint("DataService: Error fetching management dashboard: $e");
-    }
-    return {};
-  }
 
-  Future<bool> getManagementRatingStatus() async {
-    try {
-      final response = await _get(ApiConstants.managementRatingStatus);
-      if (response.statusCode == 200) {
-        final body = response.data;
-        return body['is_active'] ?? false;
-      }
-    } catch (e) {
-      debugPrint("DataService: Error fetching rating status: $e");
-    }
-    return false;
-  }
 
   Future<Map<String, dynamic>> toggleRatingActivation(String roleType, bool isActive) async {
     try {
@@ -435,21 +401,6 @@ class DataService {
   }
 
   // QR Attendance
-  Future<Map<String, dynamic>> markQrAttendance(String qrCode) async {
-    try {
-      final response = await _post(
-        '${ApiConstants.backendUrl}/student/attendance/qr-scan',
-        body: {'qr_code': qrCode},
-      );
-      if (response.statusCode == 200) {
-        return response.data;
-      }
-      return {'success': false, 'message': 'HTTP xatolik: ${response.statusCode}'};
-    } catch (e) {
-      debugPrint("DataService: Error marking QR attendance: $e");
-      return {'success': false, 'message': 'Ulanishda xatolik: $e'};
-    }
-  }
 
   Future<List<dynamic>> getManagementFaculties() async {
     try {
@@ -1738,157 +1689,20 @@ class DataService {
   }
   
   // ==========================================================
-  // TYUTOR MODULE
-  // ==========================================================
-  
-  // 30. Get Tutor Groups
-  Future<List<dynamic>> getTutorGroups() async {
-    try {
-      final response = await _get("${ApiConstants.backendUrl}/tutor/groups");
-      if (response.statusCode == 200) {
-        final body = response.data;
-        if (body['success'] == true) {
-          return body['data'];
-        }
-      }
-    } catch (e) {
-      debugPrint("DataService: Error fetching tutor groups: $e");
-    }
-    return [];
-  }
   
 
   // 30.1 Get Group Appeals
-  Future<List<dynamic>> getGroupAppeals(String groupNumber) async {
-    debugPrint("DataService: Fetching appeals for group '$groupNumber'...");
-    try {
-      final url = "${ApiConstants.backendUrl}/tutor/groups/${groupNumber.trim()}/appeals";
-      debugPrint("DataService: URL: $url");
-      final response = await _get(url);
-      
-      debugPrint("DataService: Status: ${response.statusCode}");
-      if (response.statusCode == 200) {
-        final body = response.data;
-        if (body['success'] == true) {
-          final list = body['data'] as List;
-          debugPrint("DataService: Found ${list.length} appeals");
-          return list;
-        } else {
-             debugPrint("DataService: Success false. Message: ${body['message']}");
-        }
-      } else {
-         debugPrint("DataService: Error Error Body: ${response.data}");
-      }
-    } catch (e) {
-      debugPrint("DataService: Error fetching group appeals: $e");
-    }
-    return [];
-  }
 
   // 30.2 Reply to Appeal (Tutor)
-  Future<void> replyToTutorAppeal(int appealId, String text) async {
-    final token = await _authService.getToken();
-    final uri = Uri.parse('${ApiConstants.backendUrl}/tutor/appeals/$appealId/reply?text=${Uri.encodeComponent(text)}');
-    
-    final response = await _post(uri.toString());
-
-    if (response.statusCode != 200) {
-      throw Exception("Failed to reply: ${response.data}");
-    }
-  }
 
   // 30.3 Get All Tutor Appeals
-  Future<List<dynamic>> getTutorAllAppeals({String? status}) async {
-    try {
-      String url = "${ApiConstants.backendUrl}/tutor/appeals";
-      if (status != null && status.isNotEmpty) {
-        url += "?status=$status";
-      }
-      final response = await _get(url);
-      if (response.statusCode == 200) {
-        final body = response.data;
-        if (body['success'] == true) return body['data'] as List;
-      }
-    } catch (e) {
-      debugPrint("Error fetching tutor appeals: $e");
-    }
-    return [];
-  }
 
   // 30.4 Get Tutor Appeals Stats
-  Future<Map<String, dynamic>> getTutorAppealsStats() async {
-    try {
-      final response = await _get("${ApiConstants.backendUrl}/tutor/appeals/stats");
-      if (response.statusCode == 200) {
-        final body = response.data;
-        if (body['success'] == true) return body['stats'];
-      }
-    } catch (e) {
-      debugPrint("Error fetching tutor appeals stats: $e");
-    }
-    return {"pending": 0, "answered": 0, "resolved": 0};
-  }
 
   // 30.5 Get Tutor Appeal Detail
-  Future<Map<String, dynamic>?> getTutorAppealDetail(int id) async {
-    try {
-      final response = await _get("${ApiConstants.backendUrl}/tutor/appeals/$id");
-      if (response.statusCode == 200) {
-        final body = response.data;
-        if (body['success'] == true) return body['detail'];
-      }
-    } catch (e) {
-      debugPrint("Error fetching tutor appeal detail: $e");
-    }
-    return null;
-  }
 
-  // 31. Get Tutor Dashboard
-  Future<Map<String, dynamic>> getTutorDashboard() async {
-    try {
-      final response = await _get("${ApiConstants.backendUrl}/tutor/dashboard");
-      if (response.statusCode == 200) {
-        final body = response.data;
-        if (body['success'] == true) return body['data'];
-      }
-    } catch (e) {
-      debugPrint("DataService: Error fetching tutor dashboard: $e");
-    }
-    return {};
-  }
 
-  Future<Map<String, dynamic>> getTutorRatingStats() async {
-    try {
-      final response = await _get(ApiConstants.tutorRatingStats);
-      if (response.statusCode == 200) {
-        return response.data;
-      }
-    } catch (e) {
-      debugPrint("DataService: Error fetching tutor rating stats: $e");
-    }
-    return {};
-  }
   
-  // 32. Get Tutor Students
-  Future<List<dynamic>> getTutorStudents({String? group}) async {
-    try {
-      String url = "${ApiConstants.backendUrl}/tutor/students";
-      if (group != null) {
-        url += "?group=$group";
-      }
-      
-      final response = await _get(url);
-      if (response.statusCode == 200) {
-        final body = response.data;
-        if (body['success'] == true) {
-          return body['data'];
-        }
-      }
-    } catch (e) {
-      debugPrint("DataService: Error fetching tutor students: $e");
-    }
-    return [];
-  }
 
   Future<bool> voteInElection(int electionId, int candidateId) async {
     final response = await _post(
