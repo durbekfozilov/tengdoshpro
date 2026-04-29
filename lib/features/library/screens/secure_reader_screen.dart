@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/book_model.dart';
-import '../../../../core/theme/app_theme.dart';
+import 'package:talabahamkor_mobile/core/theme/app_theme.dart';
 
 class SecureReaderScreen extends StatefulWidget {
   final Book book;

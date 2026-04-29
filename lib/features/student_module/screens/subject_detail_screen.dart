@@ -1,7 +1,7 @@
 
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_theme.dart';
-import '../../../../core/services/data_service.dart';
+import 'package:talabahamkor_mobile/core/theme/app_theme.dart';
+import 'package:talabahamkor_mobile/core/network/data_service.dart';
 import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 import 'package:talabahamkor_mobile/core/constants/feature_flags.dart';
 import 'resources_screen.dart';

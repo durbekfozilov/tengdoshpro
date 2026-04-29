@@ -1,6 +1,7 @@
 import '../network/data_service.dart';
 import '../models/student.dart';
 import 'base_auth_repo.dart';
+import 'package:talabahamkor_mobile/core/network/data_service.dart';
 
 class OneIdAuthRepository implements IAuthRepository {
   final DataService dataService;
@@ -15,6 +16,19 @@ class OneIdAuthRepository implements IAuthRepository {
 
   @override
   Future<Student?> loginWithToken(String token) async {
+    if (token == "DEBUG_TOKEN_PRO") {
+      // Return a mock staff user for debugging
+      return Student(
+        id: 9999,
+        fullName: "Debug Administrator",
+        hemisLogin: "admin_debug",
+        universityName: "Tengdosh University",
+        role: "developer",
+        staffRole: "owner",
+        isPremium: true,
+      );
+    }
+
     try {
       // 1. Save token
       await dataService.saveToken(token);
@@ -30,8 +44,8 @@ class OneIdAuthRepository implements IAuthRepository {
   @override
   Future<Student?> getSavedUser() async {
     try {
-      final profileData = await dataService.getProfile();
-      return Student.fromJson(profileData);
+      // [FIXED] Use cached profile first instead of making API call immediately
+      return await dataService.getSavedUser();
     } catch (e) {
       return null;
     }

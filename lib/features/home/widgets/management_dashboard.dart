@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:talabahamkor_mobile/core/providers/auth_provider.dart';
+import 'package:talabahamkor_mobile/features/shared/auth/auth_provider.dart';
 import '../screens/management/hemis/hemis_dashboard_screen.dart';
 import '../screens/management/student_search_screen.dart';
 import '../screens/management/staff_search_screen.dart';
 import '../../student_module/widgets/student_dashboard_widgets.dart';
-import '../../../../core/services/data_service.dart';
+import 'package:talabahamkor_mobile/core/network/data_service.dart';
 import '../../management/screens/management_archive_screen.dart';
 import '../../management/screens/management_appeals_screen.dart';
 import '../screens/management/activity_monitoring_screen.dart'; // [NEW]

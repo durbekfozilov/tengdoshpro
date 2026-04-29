@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../../../../core/theme/app_theme.dart';
+import 'package:talabahamkor_mobile/core/theme/app_theme.dart';
 import '../models/market_item.dart';
 import '../services/market_service.dart';
 import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';

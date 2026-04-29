@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:talabahamkor_mobile/core/constants/api_constants.dart';
 
-import 'package:talabahamkor_mobile/core/services/data_service.dart';
+import 'package:talabahamkor_mobile/core/network/data_service.dart';
 
 class StudentItemsListScreen extends StatelessWidget {
   final List<dynamic> items;

@@ -1,13 +1,13 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_theme.dart';
+import 'package:talabahamkor_mobile/core/theme/app_theme.dart';
 import '../services/appeal_service.dart';
 import '../models/appeal_model.dart';
 import 'package:intl/intl.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/constants/api_constants.dart';
-import '../../../../core/services/data_service.dart';
+import 'package:talabahamkor_mobile/core/network/data_service.dart';
 import 'package:provider/provider.dart';
 import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 

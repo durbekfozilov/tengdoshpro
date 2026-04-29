@@ -5,7 +5,7 @@ import '../constants/api_constants.dart';
 
 class ApiClient {
   final Dio dio;
-  static String _baseUrl = "https://central.tengdosh.uz";
+  static String _baseUrl = "https://tengdosh.uzjoku.uz";
 
   ApiClient(this.dio) {
     final authService = AuthService();

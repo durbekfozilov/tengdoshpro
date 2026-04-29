@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../core/network/data_service.dart';
+import 'package:talabahamkor_mobile/core/network/data_service.dart';
 
 /// Policy-based scoring criteria according to "Nizom"
 class ScoringCriteria {

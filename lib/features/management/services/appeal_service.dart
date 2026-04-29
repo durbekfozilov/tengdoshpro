@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:talabahamkor_mobile/core/constants/api_constants.dart';
-import 'package:talabahamkor_mobile/core/services/data_service.dart';
+import 'package:talabahamkor_mobile/core/network/data_service.dart';
 import '../models/appeal_model.dart';
 import '../../appeals/models/appeal_model.dart' as student_models; // Reuse detail models
 import 'package:http/http.dart' as http;

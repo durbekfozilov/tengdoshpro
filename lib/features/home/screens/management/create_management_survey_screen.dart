@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../../../../core/services/data_service.dart';
+import 'package:talabahamkor_mobile/core/network/data_service.dart';
 
 class CreateManagementSurveyScreen extends StatefulWidget {
   final Map<String, dynamic>? initialData;

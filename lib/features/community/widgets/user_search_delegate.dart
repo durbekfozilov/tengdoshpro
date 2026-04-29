@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:talabahamkor_mobile/core/utils/uzbek_name_formatter.dart';
 import '../services/community_service.dart';
 import '../../../../core/models/student.dart';
-import '../../../../core/theme/app_theme.dart';
+import 'package:talabahamkor_mobile/core/theme/app_theme.dart';
 import '../screens/user_profile_screen.dart';
 import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 

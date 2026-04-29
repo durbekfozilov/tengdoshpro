@@ -3,10 +3,10 @@ import '../models/notification.dart';
 import '../services/notification_service.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import '../../../../core/providers/auth_provider.dart';
+import 'package:talabahamkor_mobile/features/shared/auth/auth_provider.dart';
 import '../../../../core/providers/notification_provider.dart';
-import '../../../../core/services/data_service.dart';
-import '../../../../core/theme/app_theme.dart';
+import 'package:talabahamkor_mobile/core/network/data_service.dart';
+import 'package:talabahamkor_mobile/core/theme/app_theme.dart';
 import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class NotificationsScreen extends StatefulWidget {

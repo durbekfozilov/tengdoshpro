@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_theme.dart';
+import 'package:talabahamkor_mobile/core/theme/app_theme.dart';
 import '../../../../core/services/auth_service.dart';
 import '../models/community_models.dart';
 import '../services/community_service.dart';

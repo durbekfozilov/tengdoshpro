@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../../core/theme/app_theme.dart';
-import '../../../core/services/data_service.dart';
+import 'package:talabahamkor_mobile/core/theme/app_theme.dart';
+import 'package:talabahamkor_mobile/core/network/data_service.dart';
 import '../widgets/document_upload_dialog.dart';
 import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 

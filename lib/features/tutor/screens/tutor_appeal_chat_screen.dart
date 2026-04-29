@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:talabahamkor_mobile/core/services/data_service.dart';
+import 'package:talabahamkor_mobile/core/network/data_service.dart';
 import 'package:talabahamkor_mobile/core/theme/app_theme.dart';
 import 'package:talabahamkor_mobile/core/constants/api_constants.dart';
 import 'package:cached_network_image/cached_network_image.dart';

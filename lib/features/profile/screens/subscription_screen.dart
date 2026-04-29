@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart'; // Force reload
-import '../../../../core/theme/app_theme.dart';
-import '../../../../core/services/data_service.dart';
+import 'package:talabahamkor_mobile/core/theme/app_theme.dart';
+import 'package:talabahamkor_mobile/core/network/data_service.dart';
 import '../../../../core/models/student.dart';
 import '../models/subscription_plan.dart';
 import 'package:url_launcher/url_launcher.dart';

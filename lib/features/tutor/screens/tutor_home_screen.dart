@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:talabahamkor_mobile/core/providers/auth_provider.dart';
-import 'package:talabahamkor_mobile/core/services/data_service.dart';
+import 'package:talabahamkor_mobile/features/shared/auth/auth_provider.dart';
+import 'package:talabahamkor_mobile/core/network/data_service.dart';
 import 'package:talabahamkor_mobile/core/theme/app_theme.dart';
 import 'package:talabahamkor_mobile/features/tutor/screens/tutor_groups_screen.dart';
 import 'package:talabahamkor_mobile/features/tutor/screens/tutor_students_screen.dart';

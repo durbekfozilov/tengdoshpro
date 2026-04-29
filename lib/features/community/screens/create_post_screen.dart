@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../../../core/theme/app_theme.dart';
-import '../../../../core/providers/auth_provider.dart';
+import 'package:talabahamkor_mobile/core/theme/app_theme.dart';
+import 'package:talabahamkor_mobile/features/shared/auth/auth_provider.dart';
 import '../models/community_models.dart';
 import '../services/community_service.dart';
 import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';

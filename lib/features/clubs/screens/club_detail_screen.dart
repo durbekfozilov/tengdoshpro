@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:provider/provider.dart';
 import 'package:talabahamkor_mobile/core/theme/app_theme.dart';
-import 'package:talabahamkor_mobile/core/services/data_service.dart';
+import 'package:talabahamkor_mobile/core/network/data_service.dart';
 import 'package:talabahamkor_mobile/core/constants/api_constants.dart';
 import 'club_member_profile_screen.dart';
 import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';

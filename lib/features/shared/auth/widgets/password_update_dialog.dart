@@ -1,7 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../../core/providers/auth_provider.dart';
+import 'package:talabahamkor_mobile/features/shared/auth/auth_provider.dart';
 import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class PasswordUpdateDialog extends StatefulWidget {

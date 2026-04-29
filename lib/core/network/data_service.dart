@@ -113,7 +113,10 @@ class DataService {
 
     if (response.statusCode == 200) {
       final data = response.data;
-      return data['data'] ?? data;
+      final profileData = data['data'] ?? data;
+      // [NEW] Save to cache so loadUser works offline
+      await _authService.saveProfileManually(profileData);
+      return profileData;
     } else if (response.statusCode == 403) {
       // Premium revoked/expired
       throw Exception("PREMIUM_REQUIRED");
@@ -2596,5 +2599,7 @@ class DataService {
   void updateUniversityServer(String prefix) {
     _apiClient.updateBaseUrl(prefix);
   }
+  // [NEW] Exposed for Offline Support
+  Future<Student?> getSavedUser() => _authService.getSavedUser();
 
 }

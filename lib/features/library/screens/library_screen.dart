@@ -4,7 +4,7 @@ import '../services/library_service.dart';
 import '../widgets/book_card.dart';
 import 'book_details_screen.dart';
 import 'library_search_screen.dart';
-import '../../../../core/theme/app_theme.dart';
+import 'package:talabahamkor_mobile/core/theme/app_theme.dart';
 import 'my_books/my_books_screen.dart';
 
 class LibraryScreen extends StatefulWidget {

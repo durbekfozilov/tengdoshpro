@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../features/shared/auth/auth_provider.dart';
+import 'package:talabahamkor_mobile/features/shared/auth/auth_provider.dart';
 import '../../features/shared/auth/screens/one_id_webview_screen.dart';
 import '../../features/pro/dashboard/providers/pro_dashboard_provider.dart';
 import '../../features/pro/scoring/screens/pending_reviews_screen.dart';
 import '../../features/pro/attendance/screens/qr_scanner_screen.dart';
-import '../../features/pro/notifications/screens/send_notification_screen.dart';
 
 class ProApp extends StatelessWidget {
   const ProApp({super.key});
@@ -82,7 +81,7 @@ class ProDashboard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Xush kelibsiz, ${user?.fullName?.split(' ').first ?? 'Xodim'}!',
+                'Xush kelibsiz, ${user?.fullName.split(' ').first ?? 'Xodim'}!',
                 style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 24),
@@ -209,60 +208,129 @@ class ProLoginScreen extends StatelessWidget {
     
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(32.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                width: 100,
-                height: 100,
-                decoration: const BoxDecoration(
-                  color: brandRed,
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(Icons.admin_panel_settings, color: Colors.white, size: 50),
-              ),
-              const SizedBox(height: 32),
-              const Text(
-                "Tengdosh Pro",
-                style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: brandRed),
-              ),
-              const Text(
-                "Staff & Management Portal",
-                style: TextStyle(color: Colors.grey, fontSize: 16),
-              ),
-              const Spacer(),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const OneIdWebViewScreen()),
-                    );
-                  },
-                  icon: const Icon(Icons.security),
-                  label: const Text('Login with OneID', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: brandRed,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 18),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                    elevation: 5,
-                    shadowColor: brandRed.withOpacity(0.5),
+      body: Stack(
+        children: [
+          // Background subtle gradient or pattern could go here
+          SafeArea(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 40.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const SizedBox(height: 60),
+                  // App Logo (Matching Tengdosh style)
+                  Center(
+                    child: Hero(
+                      tag: 'pro_logo',
+                      child: Container(
+                        width: 120,
+                        height: 120,
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          color: brandRed.withOpacity(0.05),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.admin_panel_settings_rounded, color: brandRed, size: 60),
+                      ),
+                    ),
                   ),
-                ),
+                  const SizedBox(height: 32),
+                  const Text(
+                    "tengdosh",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 42, 
+                      fontWeight: FontWeight.w900, 
+                      color: brandRed,
+                      letterSpacing: -1,
+                    ),
+                  ),
+                  const Text(
+                    "PRO MANAGEMENT",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 14, 
+                      fontWeight: FontWeight.bold, 
+                      color: Colors.grey,
+                      letterSpacing: 3,
+                    ),
+                  ),
+                  const SizedBox(height: 60),
+                  
+                  // Main Info Section
+                  Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF8F9FA),
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(color: Colors.grey.withOpacity(0.1)),
+                    ),
+                    child: Column(
+                      children: [
+                        const Text(
+                          "Xodimlar uchun kirish",
+                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 12),
+                        const Text(
+                          "Universitet boshqaruv tizimiga kirish uchun OneID identifikatsiya xizmatidan foydalaning",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.grey, fontSize: 14, height: 1.5),
+                        ),
+                        const SizedBox(height: 32),
+                        
+                        // Action Buttons
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton.icon(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => const OneIdWebViewScreen()),
+                              );
+                            },
+                            icon: const Icon(Icons.security_rounded),
+                            label: const Text('Login with OneID', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: brandRed,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 20),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                              elevation: 8,
+                              shadowColor: brandRed.withOpacity(0.4),
+                            ),
+                          ),
+                        ),
+                        
+                        const SizedBox(height: 16),
+                        // DEBUG BUTTON (Moved inside the styled container)
+                        TextButton(
+                          onPressed: () async {
+                            final auth = Provider.of<AuthProvider>(context, listen: false);
+                            await auth.loginWithToken("DEBUG_TOKEN_PRO");
+                          },
+                          child: const Text(
+                            "DEBUG MODE: KIRISH (BYPASS)", 
+                            style: TextStyle(color: brandRed, fontWeight: FontWeight.bold, fontSize: 12),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  
+                  const SizedBox(height: 40),
+                  const Text(
+                    "Faqat vakolatli xodimlar uchun.\nBarcha harakatlar tizimda qayd etiladi.",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.grey, fontSize: 12, height: 1.5),
+                  ),
+                  const SizedBox(height: 40),
+                ],
               ),
-              const SizedBox(height: 20),
-              const Text(
-                "Authorized access only",
-                style: TextStyle(color: Colors.grey, fontSize: 12),
-              ),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

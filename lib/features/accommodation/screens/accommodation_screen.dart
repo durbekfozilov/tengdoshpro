@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_theme.dart';
+import 'package:talabahamkor_mobile/core/theme/app_theme.dart';
 import '../../../../core/localization/app_dictionary.dart';
-import '../../../../core/services/data_service.dart';
+import 'package:talabahamkor_mobile/core/network/data_service.dart';
 import '../../../../core/models/student.dart';
 import '../models/accommodation_listing.dart';
 import '../widgets/listing_card.dart';

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:talabahamkor_mobile/core/services/data_service.dart';
+import 'package:talabahamkor_mobile/core/network/data_service.dart';
 import 'package:talabahamkor_mobile/core/theme/app_theme.dart';
 import 'tutor_certificates_students_screen.dart';
 import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';

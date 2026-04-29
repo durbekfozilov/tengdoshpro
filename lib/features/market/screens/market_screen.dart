@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_theme.dart';
+import 'package:talabahamkor_mobile/core/theme/app_theme.dart';
 import '../models/market_item.dart';
 import '../services/market_service.dart';
 import 'create_market_item_screen.dart';
 import 'market_item_detail_screen.dart';
 import 'package:provider/provider.dart';
-import '../../../../core/providers/auth_provider.dart';
+import 'package:talabahamkor_mobile/features/shared/auth/auth_provider.dart';
 import '../../profile/screens/subscription_screen.dart';
 import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 

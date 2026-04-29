@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../core/services/data_service.dart';
+import 'package:talabahamkor_mobile/core/network/data_service.dart';
 import '../../widgets/management_dashboard.dart';
 import 'student_search_screen.dart';
 import 'activity_review_screen.dart'; // [NEW]

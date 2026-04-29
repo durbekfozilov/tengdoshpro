@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../core/services/data_service.dart';
+import 'package:talabahamkor_mobile/core/network/data_service.dart';
 import 'survey_detail_analytics_screen.dart';
 import 'create_management_survey_screen.dart';
 

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/auth/base_auth_repo.dart';
 import '../../../core/models/student.dart';
-import '../../../core/network/data_service.dart';
+import 'package:talabahamkor_mobile/core/network/data_service.dart';
 
 class AuthProvider with ChangeNotifier {
   final IAuthRepository _repo;
@@ -31,10 +31,9 @@ class AuthProvider with ChangeNotifier {
 
   void _initDataServiceListener() {
     DataService.onAuthError = (errorType) {
-      if (errorType == 'HEMIS_AUTH_ERROR') {
-        _isAuthUpdateRequired = true;
-        notifyListeners();
-      }
+      // [FIXED] Handle all types of auth errors (including session expired)
+      _isAuthUpdateRequired = true;
+      notifyListeners();
     };
   }
   
@@ -47,8 +46,9 @@ class AuthProvider with ChangeNotifier {
     try {
       _currentUser = await _repo.getSavedUser();
     } catch (e) {
-      debugPrint("AuthProvider: Error loading user: $e");
-      await _repo.logout();
+      debugPrint("AuthProvider: Error loading user (possible offline): $e");
+      // [FIXED] Don't logout automatically here, as it might just be a network error
+      // The cached user from repository should be enough to keep the session alive
     } finally {
       _isLoading = false;
       notifyListeners();

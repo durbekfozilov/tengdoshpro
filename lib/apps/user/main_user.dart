@@ -1,21 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
-import '../../features/shared/auth/auth_provider.dart';
+import 'package:talabahamkor_mobile/features/shared/auth/auth_provider.dart';
 import '../../core/providers/notification_provider.dart';
 import '../../core/providers/locale_provider.dart';
-import '../../core/services/data_service.dart';
-import '../../features/auth/screens/login_screen.dart';
-import '../../features/home/screens/home_screen.dart';
-import '../../core/theme/app_theme.dart';
+import 'package:talabahamkor_mobile/core/network/data_service.dart';
+import 'package:talabahamkor_mobile/features/shared/auth/screens/login_screen.dart';
+import 'package:talabahamkor_mobile/features/home/screens/home_screen.dart';
+import 'package:talabahamkor_mobile/core/theme/app_theme.dart';
 import '../../core/services/push_notification_service.dart';
 import '../../core/auth/hemis_auth_repo.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:app_links/app_links.dart';
-import '../../core/network/api_client.dart';
-import '../../core/network/data_service.dart';
+import 'package:talabahamkor_mobile/core/network/api_client.dart';
 import '../../core/network/direct_http_overrides.dart';
 import 'package:dio/dio.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'dart:async';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
