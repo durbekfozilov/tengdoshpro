@@ -97,10 +97,47 @@ class ProDashboard extends StatelessWidget {
                 crossAxisSpacing: 12,
                 childAspectRatio: 1.4,
                 children: [
-                  _buildStatCard('Talabalar', dashboard.studentCount.toString(), Icons.group_outlined, brandRed),
-                  _buildStatCard('Kutilmoqda', dashboard.pendingAppeals.toString(), Icons.hourglass_empty, Colors.orange),
-                  _buildStatCard('Haftalik', '124', Icons.assessment_outlined, Colors.blue),
-                  _buildStatCard('Grantlar', '84%', Icons.verified_user_outlined, Colors.green),
+                children: [
+                  _buildStatCard(
+                    context, 
+                    'Talabalar', 
+                    dashboard.studentCount.toString(), 
+                    Icons.group_outlined, 
+                    brandRed,
+                    onTap: () {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Talabalar ro'yxati yuklanmoqda...")));
+                    },
+                  ),
+                  _buildStatCard(
+                    context,
+                    'Kutilmoqda', 
+                    dashboard.pendingAppeals.toString(), 
+                    Icons.hourglass_empty, 
+                    Colors.orange,
+                    onTap: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const PendingReviewsScreen()));
+                    },
+                  ),
+                  _buildStatCard(
+                    context,
+                    'Haftalik', 
+                    '124', 
+                    Icons.assessment_outlined, 
+                    Colors.blue,
+                    onTap: () {
+                      // Weekly Analytics
+                    },
+                  ),
+                  _buildStatCard(
+                    context,
+                    'Grantlar', 
+                    '84%', 
+                    Icons.verified_user_outlined, 
+                    Colors.green,
+                    onTap: () {
+                      // Grants view
+                    },
+                  ),
                 ],
               ),
               
