@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:local_auth/local_auth.dart';
-import 'package:talabahamkor_mobile/features/core/providers/locale_provider.dart' as core_providers;
+import 'package:talabahamkor_mobile/core/providers/locale_provider.dart' as core_providers;
 import 'package:talabahamkor_mobile/features/shared/auth/auth_provider.dart';
 import 'package:talabahamkor_mobile/core/theme/app_theme.dart';
 import 'package:talabahamkor_mobile/core/constants/api_constants.dart';
