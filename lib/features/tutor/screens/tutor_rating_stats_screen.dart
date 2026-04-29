@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:talabahamkor_mobile/core/network/data_service.dart';
-import 'package:talabahamkor_mobile/core/theme/app_theme.dart';
-import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class TutorRatingStatsScreen extends StatefulWidget {
   const TutorRatingStatsScreen({super.key});

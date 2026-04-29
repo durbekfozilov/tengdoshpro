@@ -203,10 +203,7 @@ class _AttendanceScreenState extends State<AttendanceScreen> {
         int totalSubjectHours = items.isNotEmpty ? items.first.totalSubjectHours : 0;
         int missedHours = items.fold(0, (sum, item) => sum + item.hours);
         Map<String, int> trainingHours = items.isNotEmpty ? items.first.trainingHours : {};
-        
-        double percent = 0.0;
         if (totalSubjectHours > 0) {
-           percent = (missedHours / totalSubjectHours) * 100;
         }
 
         List<Widget> breakdownChips = [];

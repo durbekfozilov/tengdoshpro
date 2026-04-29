@@ -6,7 +6,6 @@ import '../models/community_models.dart';
 import '../services/community_service.dart';
 import 'comment_item.dart';
 import 'comment_input.dart';
-import 'reply_thread_sheet.dart';
 import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class CommentSheet extends StatefulWidget {

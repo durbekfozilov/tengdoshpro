@@ -7,7 +7,6 @@ import 'grades_screen.dart';
 import 'subjects_screen.dart';
 import '../../academic/screens/survey_list_screen.dart';
 import 'finance/subsidy_screen.dart';
-import 'contract_screen.dart';
 import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 import 'package:talabahamkor_mobile/core/constants/feature_flags.dart';
 

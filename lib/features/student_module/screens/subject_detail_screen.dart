@@ -26,7 +26,6 @@ class _SubjectDetailScreenState extends State<SubjectDetailScreen> {
   final DataService _dataService = DataService();
   bool _isLoading = true;
   Map<String, dynamic>? _details;
-  List<dynamic> _dailyGrades = [];
 
   @override
   void initState() {
@@ -367,57 +366,6 @@ class _SubjectDetailScreenState extends State<SubjectDetailScreen> {
             "$hours soat",
             style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDailyGradeItem(dynamic item) {
-    if (item == null) return const SizedBox();
-    
-    final tStamp = item['date'] ?? 0;
-    final dateStr = tStamp > 0 ? DateTime.fromMillisecondsSinceEpoch(tStamp * 1000).toString().split(' ')[0] : "Sana noma'lum";
-    final type = item['type'] ?? "Baho";
-    final val = item['value']?.toString() ?? "-";
-    
-    // Choose Color based on score
-    Color scoreColor = Colors.grey;
-    if (val == "5" || val == "4") scoreColor = Colors.green;
-    else if (val == "3") scoreColor = Colors.orange;
-    else if (val == "2" || val == "1" || val == "0") scoreColor = Colors.red;
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 8, offset: const Offset(0, 2))
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-           Column(
-             crossAxisAlignment: CrossAxisAlignment.start,
-             children: [
-                Text(dateStr, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppTheme.primaryBlue)),
-                const SizedBox(height: 4),
-                Text(type, style: TextStyle(color: Colors.grey[600], fontSize: 13)),
-             ],
-           ),
-           Container(
-             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-             decoration: BoxDecoration(
-               color: scoreColor.withOpacity(0.1),
-               borderRadius: BorderRadius.circular(12),
-             ),
-             child: Text(
-               val,
-               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: scoreColor),
-             ),
-           )
         ],
       ),
     );

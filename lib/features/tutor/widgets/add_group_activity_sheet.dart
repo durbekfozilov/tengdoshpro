@@ -256,7 +256,6 @@ class _AddGroupActivitySheetState extends State<AddGroupActivitySheet> {
       itemCount: _categories.length,
       itemBuilder: (context, index) {
         final category = _categories[index];
-        final isSelected = _selectedCategory == category;
         return Padding(
           padding: const EdgeInsets.only(bottom: 12),
           child: InkWell(
@@ -498,8 +497,6 @@ class _AddGroupActivitySheetState extends State<AddGroupActivitySheet> {
             itemBuilder: (context, index) {
               final s = students[index];
               final id = s['id'] as int;
-              final isSelected = _selectedStudentIds.contains(id);
-              
               return ListTile(
                 onTap: () {
                   setState(() {

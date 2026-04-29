@@ -622,7 +622,7 @@ class _PostCardState extends State<PostCard> {
       }
     }
     
-    const maxLines = 4;
+    const
     final shouldFold = body.length > 150 || body.split('\n').length > 5;
 
     if (!shouldFold || widget.isDetail || _isExpanded) {

@@ -27,7 +27,6 @@ import 'package:talabahamkor_mobile/features/student_module/screens/qr_scanner_s
 import 'package:talabahamkor_mobile/core/constants/feature_flags.dart';
 import '../../clubs/screens/clubs_screen.dart';
 import '../../appeals/screens/appeals_screen.dart';
-import '../../library/screens/library_screen.dart';
 import 'package:talabahamkor_mobile/features/notifications/screens/notifications_screen.dart';
 import 'package:talabahamkor_mobile/features/accommodation/screens/accommodation_screen.dart';
 import 'package:talabahamkor_mobile/core/providers/notification_provider.dart';
@@ -197,7 +196,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   backgroundColor: Colors.white,
                   elevation: 0,
                   onTap: (index) {
-                    final isPremium = auth.currentUser?.hasActivePremium ?? false;
                     
                     // Guard Market (1)
                     if (index == 1) {

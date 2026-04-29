@@ -8,7 +8,6 @@ import '../models/appeal_model.dart';
 import '../services/appeal_service.dart';
 import 'management_appeal_detail_screen.dart';
 import 'faculty_appeals_screen.dart';
-import 'package:intl/intl.dart';
 import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class ManagementAppealsScreen extends StatefulWidget {
@@ -252,7 +251,6 @@ class _ManagementAppealsScreenState extends State<ManagementAppealsScreen> with 
   Widget _buildListTab({required bool isAddressedToMe}) {
     // 1. Determine user scope to filter "Bizga kelgan"
     final currentUserRole = Provider.of<AuthProvider>(context, listen: false).currentUser?.role?.toLowerCase() ?? "";
-    final isManagement = Provider.of<AuthProvider>(context, listen: false).isManagement;
     
     // Default roles to filter by if isAddressedToMe == true
     List<String> myRoles = [];
@@ -265,7 +263,7 @@ class _ManagementAppealsScreenState extends State<ManagementAppealsScreen> with 
     // 2. Filter appeals
     final filteredAppeals = _appeals.where((a) {
         if (isAddressedToMe) {
-            final aRole = a.assignedRole?.toLowerCase() ?? "";
+            final aRole = (a.assignedRole ?? "").toLowerCase();
             // If we have specific roles mapped to this user, check if appeal role is in it
             if (myRoles.isNotEmpty) {
                 if (!myRoles.contains(aRole)) return false;

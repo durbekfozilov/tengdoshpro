@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:talabahamkor_mobile/core/utils/uzbek_name_formatter.dart';
 import '../services/community_service.dart';
 import 'package:talabahamkor_mobile/core/models/student.dart';

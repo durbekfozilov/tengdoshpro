@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:talabahamkor_mobile/core/network/data_service.dart';
@@ -164,7 +163,6 @@ class _CreateManagementSurveyScreenState extends State<CreateManagementSurveyScr
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final dateFormat = DateFormat('dd.MM.yyyy HH:mm');
 
     return Scaffold(

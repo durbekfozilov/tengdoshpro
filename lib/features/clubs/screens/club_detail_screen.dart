@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:provider/provider.dart';
 import 'package:talabahamkor_mobile/core/theme/app_theme.dart';
 import 'package:talabahamkor_mobile/core/network/data_service.dart';
 import 'package:talabahamkor_mobile/core/constants/api_constants.dart';
@@ -25,26 +24,6 @@ class _ClubDetailScreenState extends State<ClubDetailScreen> {
     super.initState();
     isLeader = widget.club['is_leader'] == true;
     isJoined = widget.club['is_joined'] == true;
-  }
-
-  Color _getColor(String? colorHex, String clubName) {
-    if (colorHex == null || colorHex.isEmpty || colorHex.toUpperCase() == '#4A90E2') {
-      final colors = [
-        Colors.blue, Colors.red, Colors.green, Colors.orange,
-        Colors.purple, Colors.teal, Colors.pink, Colors.indigo,
-        Colors.amber, Colors.cyan, Colors.deepOrange, Colors.brown
-      ];
-      int hash = 0;
-      for (int i = 0; i < clubName.length; i++) {
-         hash = clubName.codeUnitAt(i) + ((hash << 5) - hash);
-      }
-      return colors[hash.abs() % colors.length];
-    }
-    try {
-      return Color(int.parse(colorHex.replaceFirst('#', '0xFF')));
-    } catch (_) {
-      return AppTheme.primaryBlue;
-    }
   }
 
   @override
@@ -400,9 +379,7 @@ class _MembersTabState extends State<_MembersTab> {
       itemCount: members.length,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       itemBuilder: (context, index) {
-        final m = members[index];
-        final isActive = m['status'] == 'active';
-        final int studentId = m['student_id'] ?? 0;
+        final m = members[index];        final int studentId = m['student_id'] ?? 0;
         
         return Container(
           height: 80,
@@ -835,10 +812,7 @@ class _EventsTabState extends State<_EventsTab> {
                  itemCount: items.length,
                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                  itemBuilder: (context, index) {
-                   final a = items[index];
-                   final isPart = a['is_participating'] == true;
-
-                   String dateDay = "00";
+                   final a = items[index];                   String dateDay = "00";
                    String dateMonth = "Noma'lum";
                    if (a['event_date'] != null) {
                        try {
