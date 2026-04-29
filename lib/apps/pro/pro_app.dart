@@ -5,6 +5,7 @@ import '../../features/shared/auth/screens/one_id_webview_screen.dart';
 import '../../features/pro/dashboard/providers/pro_dashboard_provider.dart';
 import '../../features/pro/scoring/screens/pending_reviews_screen.dart';
 import '../../features/pro/attendance/screens/qr_scanner_screen.dart';
+import '../../features/management/screens/management_appeals_screen.dart';
 
 class ProApp extends StatelessWidget {
   const ProApp({super.key});
@@ -192,7 +193,7 @@ class ProDashboard extends StatelessWidget {
             Expanded(
               child: FloatingActionButton.extended(
                 heroTag: 'review',
-                onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const PendingReviewsScreen())),
+                onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const ManagementAppealsScreen())),
                 backgroundColor: Colors.black87,
                 foregroundColor: Colors.white,
                 icon: const Icon(Icons.rate_review),
