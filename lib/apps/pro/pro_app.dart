@@ -97,7 +97,6 @@ class ProDashboard extends StatelessWidget {
                 crossAxisSpacing: 12,
                 childAspectRatio: 1.4,
                 children: [
-                children: [
                   _buildStatCard(
                     context, 
                     'Talabalar', 
