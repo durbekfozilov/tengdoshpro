@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:talabahamkor_mobile/core/theme/app_theme.dart';
-import '../services/market_service.dart';
+import 'package:talabahamkor_mobile/features/market/services/market_service.dart';
 import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class CreateMarketItemScreen extends StatefulWidget {

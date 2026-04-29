@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:talabahamkor_mobile/core/utils/uzbek_name_formatter.dart';
 import 'package:talabahamkor_mobile/core/models/student.dart';
 import 'package:talabahamkor_mobile/core/theme/app_theme.dart';
-import '../services/community_service.dart';
+import 'package:talabahamkor_mobile/features/community/services/community_service.dart';
 import 'user_profile_screen.dart';
 
 enum UserListType { followers, following }

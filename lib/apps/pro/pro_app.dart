@@ -3,10 +3,10 @@ import 'package:provider/provider.dart';
 import 'package:talabahamkor_mobile/features/shared/auth/auth_provider.dart';
 import 'package:talabahamkor_mobile/core/theme/app_theme.dart';
 import 'package:talabahamkor_mobile/features/shared/auth/screens/one_id_webview_screen.dart';
-import '../../features/pro/dashboard/providers/pro_dashboard_provider.dart';
-import '../../features/pro/scoring/screens/pending_reviews_screen.dart';
-import '../../features/pro/attendance/screens/qr_scanner_screen.dart';
-import '../../features/management/screens/management_appeals_screen.dart';
+import 'package:talabahamkor_mobile/features/pro/dashboard/providers/pro_dashboard_provider.dart';
+import 'package:talabahamkor_mobile/features/pro/scoring/screens/pending_reviews_screen.dart';
+import 'package:talabahamkor_mobile/features/pro/attendance/screens/qr_scanner_screen.dart';
+import 'package:talabahamkor_mobile/features/management/screens/management_appeals_screen.dart';
 
 class ProApp extends StatelessWidget {
   const ProApp({super.key});

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:talabahamkor_mobile/core/utils/uzbek_name_formatter.dart';
-import '../services/community_service.dart';
+import 'package:talabahamkor_mobile/features/community/services/community_service.dart';
 import 'package:talabahamkor_mobile/core/models/student.dart';
 import 'package:talabahamkor_mobile/core/theme/app_theme.dart';
-import '../screens/user_profile_screen.dart';
+import 'package:talabahamkor_mobile/features/community/screens/user_profile_screen.dart';
 import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class UserSearchDelegate extends SearchDelegate {

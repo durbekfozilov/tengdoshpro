@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
-import '../../features/notifications/services/notification_service.dart';
+import 'package:talabahamkor_mobile/features/notifications/services/notification_service.dart';
 
 class NotificationProvider with ChangeNotifier {
   final NotificationService _service = NotificationService();

@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:talabahamkor_mobile/features/shared/auth/auth_provider.dart';
-import '../screens/management/hemis/hemis_dashboard_screen.dart';
-import '../screens/management/student_search_screen.dart';
-import '../screens/management/staff_search_screen.dart';
-import '../../student_module/widgets/student_dashboard_widgets.dart';
+import 'package:talabahamkor_mobile/features/home/screens/management/hemis/hemis_dashboard_screen.dart';
+import 'package:talabahamkor_mobile/features/home/screens/management/student_search_screen.dart';
+import 'package:talabahamkor_mobile/features/home/screens/management/staff_search_screen.dart';
+import 'package:talabahamkor_mobile/features/student_module/widgets/student_dashboard_widgets.dart';
 import 'package:talabahamkor_mobile/core/network/data_service.dart';
-import '../../management/screens/management_archive_screen.dart';
-import '../../management/screens/management_appeals_screen.dart';
-import '../screens/management/activity_monitoring_screen.dart'; // [NEW]
-import '../screens/management/management_rating_hub_screen.dart';
-import '../../library/screens/library_screen.dart';
+import 'package:talabahamkor_mobile/features/management/screens/management_archive_screen.dart';
+import 'package:talabahamkor_mobile/features/management/screens/management_appeals_screen.dart';
+import 'package:talabahamkor_mobile/features/home/screens/management/activity_monitoring_screen.dart'; // [NEW]
+import 'package:talabahamkor_mobile/features/home/screens/management/management_rating_hub_screen.dart';
+import 'package:talabahamkor_mobile/features/library/screens/library_screen.dart';
 import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class ManagementDashboard extends StatelessWidget {

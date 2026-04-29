@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:talabahamkor_mobile/core/theme/app_theme.dart';
-import '../services/appeal_service.dart';
-import '../models/appeal_model.dart';
+import 'package:talabahamkor_mobile/features/appeals/services/appeal_service.dart';
+import 'package:talabahamkor_mobile/features/appeals/models/appeal_model.dart';
 import 'package:intl/intl.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:url_launcher/url_launcher.dart';

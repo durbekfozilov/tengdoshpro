@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
-import '../models/book_model.dart';
-import '../models/reservation_model.dart';
+import 'package:talabahamkor_mobile/features/library/models/book_model.dart';
+import 'package:talabahamkor_mobile/features/library/models/reservation_model.dart';
 
 class LibraryService {
   // Mock Data

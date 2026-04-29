@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:talabahamkor_mobile/core/theme/app_theme.dart';
-import '../models/community_models.dart';
-import '../screens/user_profile_screen.dart';
+import 'package:talabahamkor_mobile/features/community/models/community_models.dart';
+import 'package:talabahamkor_mobile/features/community/screens/user_profile_screen.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:provider/provider.dart';
 import 'package:talabahamkor_mobile/features/shared/auth/auth_provider.dart';

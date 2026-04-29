@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../models/notification.dart';
-import '../services/notification_service.dart';
+import 'package:talabahamkor_mobile/features/notifications/models/notification.dart';
+import 'package:talabahamkor_mobile/features/notifications/services/notification_service.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:talabahamkor_mobile/features/shared/auth/auth_provider.dart';

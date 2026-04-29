@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:talabahamkor_mobile/core/theme/app_theme.dart';
-import '../services/community_service.dart';
+import 'package:talabahamkor_mobile/features/community/services/community_service.dart';
 import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class EditPostSheet extends StatefulWidget {

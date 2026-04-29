@@ -1,4 +1,4 @@
-import '../models/student.dart';
+import 'package:talabahamkor_mobile/core/models/student.dart';
 
 abstract class IAuthRepository {
   Future<Student?> login(String login, String password);

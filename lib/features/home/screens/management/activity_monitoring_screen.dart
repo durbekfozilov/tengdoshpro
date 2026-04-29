@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:talabahamkor_mobile/core/network/data_service.dart';
-import '../../widgets/management_dashboard.dart';
+import 'package:talabahamkor_mobile/features/home/widgets/management_dashboard.dart';
 import 'student_search_screen.dart';
 import 'activity_review_screen.dart'; // [NEW]
 import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';

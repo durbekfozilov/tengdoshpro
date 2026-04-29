@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'auth_service.dart';
-import '../constants/api_constants.dart';
+import 'package:talabahamkor_mobile/core/constants/api_constants.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 

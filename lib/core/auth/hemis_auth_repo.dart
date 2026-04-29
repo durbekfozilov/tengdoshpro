@@ -1,6 +1,6 @@
 import 'base_auth_repo.dart';
-import '../models/student.dart';
-import '../services/auth_service.dart';
+import 'package:talabahamkor_mobile/core/models/student.dart';
+import 'package:talabahamkor_mobile/core/services/auth_service.dart';
 
 class HemisAuthRepository implements IAuthRepository {
   final AuthService _authService = AuthService();

@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import '../models/student.dart';
-import '../constants/api_constants.dart';
+import 'package:talabahamkor_mobile/core/models/student.dart';
+import 'package:talabahamkor_mobile/core/constants/api_constants.dart';
 
 class AuthService {
   

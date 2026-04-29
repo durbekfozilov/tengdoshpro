@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import '../models/book_model.dart';
+import 'package:talabahamkor_mobile/features/library/models/book_model.dart';
 import 'package:talabahamkor_mobile/core/theme/app_theme.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'secure_reader_screen.dart';
-import '../services/library_service.dart';
+import 'package:talabahamkor_mobile/features/library/services/library_service.dart';
 import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class BookDetailsScreen extends StatelessWidget {

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:talabahamkor_mobile/core/theme/app_theme.dart';
-import '../models/market_item.dart';
-import '../services/market_service.dart';
+import 'package:talabahamkor_mobile/features/market/models/market_item.dart';
+import 'package:talabahamkor_mobile/features/market/services/market_service.dart';
 import 'create_market_item_screen.dart';
 import 'market_item_detail_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:talabahamkor_mobile/features/shared/auth/auth_provider.dart';
-import '../../profile/screens/subscription_screen.dart';
+import 'package:talabahamkor_mobile/features/profile/screens/subscription_screen.dart';
 import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class MarketScreen extends StatefulWidget {

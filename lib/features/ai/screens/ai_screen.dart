@@ -4,9 +4,9 @@ import 'ai_chat_screen.dart';
 import 'konspekt_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:talabahamkor_mobile/features/shared/auth/auth_provider.dart';
-import '../../profile/screens/subscription_screen.dart';
+import 'package:talabahamkor_mobile/features/profile/screens/subscription_screen.dart';
 import 'package:talabahamkor_mobile/core/constants/feature_flags.dart';
-// import '../student_module/screens/schedule_screen.dart';
+// import 'package:talabahamkor_mobile/features/ai/student_module/screens/schedule_screen.dart';
 
 class AiScreen extends StatelessWidget {
   const AiScreen({super.key});

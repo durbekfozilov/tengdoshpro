@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:talabahamkor_mobile/features/shared/auth/auth_provider.dart';
 import 'package:talabahamkor_mobile/core/theme/app_theme.dart';
-import '../models/community_models.dart';
-import '../services/community_service.dart';
-import '../widgets/post_card.dart';
-import '../widgets/shimmer_post.dart';
-import '../screens/create_post_screen.dart';
+import 'package:talabahamkor_mobile/features/community/models/community_models.dart';
+import 'package:talabahamkor_mobile/features/community/services/community_service.dart';
+import 'package:talabahamkor_mobile/features/community/widgets/post_card.dart';
+import 'package:talabahamkor_mobile/features/community/widgets/shimmer_post.dart';
+import 'package:talabahamkor_mobile/features/community/screens/create_post_screen.dart';
 import 'chat_list_screen.dart';
 import 'package:talabahamkor_mobile/features/community/services/chat_service.dart'; // NEW
-import '../widgets/user_search_delegate.dart';
+import 'package:talabahamkor_mobile/features/community/widgets/user_search_delegate.dart';
 import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class CommunityScreen extends StatefulWidget {

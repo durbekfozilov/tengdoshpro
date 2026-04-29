@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:talabahamkor_mobile/core/constants/api_constants.dart';
-import '../models/notification.dart';
+import 'package:talabahamkor_mobile/features/notifications/models/notification.dart';
 
 class NotificationService {
   Future<String?> _getToken() async {

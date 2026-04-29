@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:talabahamkor_mobile/core/network/data_service.dart';
-import '../models/survey_models.dart';
+import 'package:talabahamkor_mobile/features/academic/models/survey_models.dart';
 import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class SurveyTakingScreen extends StatefulWidget {

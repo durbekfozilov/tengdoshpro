@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:talabahamkor_mobile/core/theme/app_theme.dart';
-import '../../services/library_service.dart';
-import '../../models/reservation_model.dart';
+import 'package:talabahamkor_mobile/features/library/services/library_service.dart';
+import 'package:talabahamkor_mobile/features/library/models/reservation_model.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import '../book_details_screen.dart';
-import '../secure_reader_screen.dart';
+import 'package:talabahamkor_mobile/features/library/screens/book_details_screen.dart';
+import 'package:talabahamkor_mobile/features/library/screens/secure_reader_screen.dart';
 import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class MyBooksScreen extends StatefulWidget {

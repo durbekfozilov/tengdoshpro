@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import '../services/auth_service.dart';
-import '../constants/api_constants.dart';
+import 'package:talabahamkor_mobile/core/services/auth_service.dart';
+import 'package:talabahamkor_mobile/core/constants/api_constants.dart';
 
 class ApiClient {
   final Dio dio;

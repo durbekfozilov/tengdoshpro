@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import '../models/book_model.dart';
-import '../services/library_service.dart';
-import '../widgets/book_card.dart';
+import 'package:talabahamkor_mobile/features/library/models/book_model.dart';
+import 'package:talabahamkor_mobile/features/library/services/library_service.dart';
+import 'package:talabahamkor_mobile/features/library/widgets/book_card.dart';
 import 'book_details_screen.dart';
 import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 

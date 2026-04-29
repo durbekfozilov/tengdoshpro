@@ -1,4 +1,4 @@
-import '../models/student.dart';
+import 'package:talabahamkor_mobile/core/models/student.dart';
 import 'base_auth_repo.dart';
 import 'package:talabahamkor_mobile/core/network/data_service.dart';
 

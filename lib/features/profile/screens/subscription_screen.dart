@@ -2,7 +2,7 @@ import 'package:flutter/material.dart'; // Force reload
 import 'package:talabahamkor_mobile/core/theme/app_theme.dart';
 import 'package:talabahamkor_mobile/core/network/data_service.dart';
 import 'package:talabahamkor_mobile/core/models/student.dart';
-import '../models/subscription_plan.dart';
+import 'package:talabahamkor_mobile/features/profile/models/subscription_plan.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/services.dart';
 import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';

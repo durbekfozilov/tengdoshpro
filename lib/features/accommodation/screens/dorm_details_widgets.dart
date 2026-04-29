@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:talabahamkor_mobile/core/theme/app_theme.dart';
 import 'package:talabahamkor_mobile/core/network/data_service.dart';
-import '../models/dorm_models.dart';
+import 'package:talabahamkor_mobile/features/accommodation/models/dorm_models.dart';
 
 // --- RULES SCREEN ---
 class DormRuleScreen extends StatefulWidget {

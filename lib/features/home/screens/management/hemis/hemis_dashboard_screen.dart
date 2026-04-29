@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../dormitory/dormitory_dashboard_screen.dart';
+import 'package:talabahamkor_mobile/features/home/screens/management/dormitory/dormitory_dashboard_screen.dart';
 import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class HemisDashboardScreen extends StatelessWidget {

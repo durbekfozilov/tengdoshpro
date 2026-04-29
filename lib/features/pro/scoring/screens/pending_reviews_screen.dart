@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/scoring_provider.dart';
+import 'package:talabahamkor_mobile/features/pro/scoring/providers/scoring_provider.dart';
 
 class PendingReviewsScreen extends StatefulWidget {
   const PendingReviewsScreen({super.key});

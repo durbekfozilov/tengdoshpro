@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:talabahamkor_mobile/core/constants/api_constants.dart';
 import 'package:talabahamkor_mobile/core/services/auth_service.dart';
-import '../models/community_models.dart';
+import 'package:talabahamkor_mobile/features/community/models/community_models.dart';
 
 class ChatService {
   static final ChatService _instance = ChatService._internal();

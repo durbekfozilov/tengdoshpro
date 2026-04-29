@@ -2,8 +2,8 @@ import 'package:dio/dio.dart' as dio;
 import 'package:talabahamkor_mobile/core/constants/api_constants.dart';
 import 'package:talabahamkor_mobile/core/network/data_service.dart';
 import 'package:talabahamkor_mobile/core/network/api_client.dart';
-import '../models/appeal_model.dart';
-import '../../appeals/models/appeal_model.dart' as student_models;
+import 'package:talabahamkor_mobile/features/management/models/appeal_model.dart';
+import 'package:talabahamkor_mobile/features/appeals/models/appeal_model.dart' as student_models;
 
 class AppealService {
   final DataService _dataService;

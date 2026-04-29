@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:provider/provider.dart';
-import '../auth_provider.dart';
+import 'package:talabahamkor_mobile/features/shared/auth/auth_provider.dart';
 
 class OneIdWebViewScreen extends StatefulWidget {
   const OneIdWebViewScreen({super.key});

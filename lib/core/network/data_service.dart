@@ -7,17 +7,17 @@ import 'package:flutter/foundation.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:dio/dio.dart' as dio;
 import 'api_client.dart';
-import '../services/auth_service.dart';
-import '../services/local_database_service.dart';
-import '../constants/api_constants.dart';
-import '../../features/accommodation/models/accommodation_listing.dart';
-import '../models/attendance.dart';
-import '../models/lesson.dart';
-import '../models/student.dart';
-import '../../features/social/models/social_activity.dart';
-import '../../features/home/models/announcement_model.dart';
-import '../../features/home/models/banner_model.dart';
-import '../../features/academic/models/survey_models.dart';
+import 'package:talabahamkor_mobile/core/services/auth_service.dart';
+import 'package:talabahamkor_mobile/core/services/local_database_service.dart';
+import 'package:talabahamkor_mobile/core/constants/api_constants.dart';
+import 'package:talabahamkor_mobile/features/accommodation/models/accommodation_listing.dart';
+import 'package:talabahamkor_mobile/core/models/attendance.dart';
+import 'package:talabahamkor_mobile/core/models/lesson.dart';
+import 'package:talabahamkor_mobile/core/models/student.dart';
+import 'package:talabahamkor_mobile/features/social/models/social_activity.dart';
+import 'package:talabahamkor_mobile/features/home/models/announcement_model.dart';
+import 'package:talabahamkor_mobile/features/home/models/banner_model.dart';
+import 'package:talabahamkor_mobile/features/academic/models/survey_models.dart';
 
 class DataService {
   static DataService? _instance;

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:talabahamkor_mobile/core/theme/app_theme.dart';
 import 'package:talabahamkor_mobile/core/constants/api_constants.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import '../services/appeal_service.dart';
-import '../../appeals/models/appeal_model.dart' as student_models;
+import 'package:talabahamkor_mobile/features/management/services/appeal_service.dart';
+import 'package:talabahamkor_mobile/features/appeals/models/appeal_model.dart' as student_models;
 import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 
 class ManagementAppealDetailScreen extends StatefulWidget {

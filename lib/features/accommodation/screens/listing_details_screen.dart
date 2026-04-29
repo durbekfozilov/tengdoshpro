@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../models/accommodation_listing.dart';
+import 'package:talabahamkor_mobile/features/accommodation/models/accommodation_listing.dart';
 import 'package:talabahamkor_mobile/core/constants/api_constants.dart';
 import 'package:talabahamkor_mobile/core/theme/app_theme.dart';
 import 'package:intl/intl.dart';

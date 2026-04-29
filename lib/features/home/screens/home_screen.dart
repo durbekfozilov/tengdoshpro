@@ -19,14 +19,14 @@ import 'package:talabahamkor_mobile/features/student_module/screens/election_scr
 import 'package:talabahamkor_mobile/features/student_module/screens/student_rating_screen.dart';
 import 'package:talabahamkor_mobile/features/social/screens/social_activity_screen.dart';
 import 'package:talabahamkor_mobile/features/documents/screens/documents_screen.dart';
-import '../../certificates/screens/certificates_screen.dart';
+import 'package:talabahamkor_mobile/features/certificates/screens/certificates_screen.dart';
 import 'package:talabahamkor_mobile/features/home/widgets/management_dashboard.dart';
 import 'package:talabahamkor_mobile/features/tutor/screens/tutor_dashboard_screen.dart'; // [NEW]
 import 'package:talabahamkor_mobile/features/profile/screens/subscription_screen.dart';
 import 'package:talabahamkor_mobile/features/student_module/screens/qr_scanner_screen.dart';
 import 'package:talabahamkor_mobile/core/constants/feature_flags.dart';
-import '../../clubs/screens/clubs_screen.dart';
-import '../../appeals/screens/appeals_screen.dart';
+import 'package:talabahamkor_mobile/features/clubs/screens/clubs_screen.dart';
+import 'package:talabahamkor_mobile/features/appeals/screens/appeals_screen.dart';
 import 'package:talabahamkor_mobile/features/notifications/screens/notifications_screen.dart';
 import 'package:talabahamkor_mobile/features/accommodation/screens/accommodation_screen.dart';
 import 'package:talabahamkor_mobile/core/providers/notification_provider.dart';

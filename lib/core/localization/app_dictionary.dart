@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/locale_provider.dart';
+import 'package:talabahamkor_mobile/core/providers/locale_provider.dart';
 
 class AppDictionary {
   static const Map<String, Map<String, String>> strings = {
