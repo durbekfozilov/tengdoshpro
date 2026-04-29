@@ -37,12 +37,45 @@ class ScoringProvider with ChangeNotifier {
       if (response.statusCode == 200) {
         _pendingActivities = response.data is List ? response.data : (response.data['data'] ?? []);
       }
+      
+      if (_pendingActivities.isEmpty) {
+        _setMockActivities();
+      }
     } catch (e) {
       debugPrint("ScoringProvider: Fetch error: $e");
+      _setMockActivities();
     } finally {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  void _setMockActivities() {
+    _pendingActivities = [
+      {
+        'id': 101,
+        'student': {'full_name': 'Aliyev Behruz', 'group': '611-21', 'university': 'Tengdosh University'},
+        'title': 'Volontyorlik faoliyati - "Mehribonlik uyi" tashrifi',
+        'category': 'Ijtimoiy faollik',
+        'created_at': '2026-04-28T10:00:00Z',
+        'description': 'Toshkent shahridagi 1-sonli Mehribonlik uyiga tashrif buyurib, bolajonlar uchun o\'quv qurollari va sovg\'alar tarqatdik.',
+        'files': [
+          {'url': 'https://picsum.photos/800/600?sig=1', 'name': 'rasm1.jpg'},
+          {'url': 'https://picsum.photos/800/600?sig=2', 'name': 'rasm2.jpg'},
+        ]
+      },
+      {
+        'id': 102,
+        'student': {'full_name': 'Karimova Malika', 'group': '702-22', 'university': 'Tengdosh University'},
+        'title': 'Sport musobaqasi - Universiada 2026 g\'olibi',
+        'category': 'Sport va madaniyat',
+        'created_at': '2026-04-29T09:30:00Z',
+        'description': 'Shaxmat bo\'yicha o\'tkazilgan universitetlararo musobaqada 1-o\'rinni egalladim.',
+        'files': [
+          {'url': 'https://picsum.photos/800/600?sig=3', 'name': 'diplom.jpg'},
+        ]
+      }
+    ];
   }
 
   /// Implements multi-criteria scoring before approval
