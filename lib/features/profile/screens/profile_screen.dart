@@ -8,9 +8,9 @@ import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'package:talabahamkor_mobile/features/shared/auth/auth_provider.dart';
 import 'package:talabahamkor_mobile/core/theme/app_theme.dart';
-import '../../../../core/models/student.dart';
+import 'package:talabahamkor_mobile/core/models/student.dart';
 import 'package:talabahamkor_mobile/core/network/data_service.dart';
-import '../../../../core/utils/role_mapper.dart';
+import 'package:talabahamkor_mobile/core/utils/role_mapper.dart';
 import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 import 'subscription_screen.dart';
 

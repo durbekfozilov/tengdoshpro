@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:talabahamkor_mobile/core/theme/app_theme.dart';
-import '../../../../core/localization/app_dictionary.dart';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 import 'package:talabahamkor_mobile/core/network/data_service.dart';
 
 class AddAccommodationScreen extends StatefulWidget {

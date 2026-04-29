@@ -34,4 +34,18 @@ class HemisAuthRepository implements IAuthRepository {
   Future<Map<String, dynamic>> setUsername(String username) async {
     return await _authService.setUsername(username);
   }
+
+  @override
+  Future<Map<String, String>?> getSavedBiometricCredentials() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final login = prefs.getString('biometric_login');
+      final password = prefs.getString('biometric_password');
+      if (login != null && password != null) {
+        return {'login': login, 'password': password};
+      }
+    } catch (_) {}
+    return null;
+  }
+
 }

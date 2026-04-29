@@ -4,7 +4,7 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:talabahamkor_mobile/core/theme/app_theme.dart';
-import '../../../../core/utils/role_mapper.dart';
+import 'package:talabahamkor_mobile/core/utils/role_mapper.dart';
 import '../models/community_models.dart';
 import '../services/community_service.dart';
 import '../screens/user_profile_screen.dart'; 

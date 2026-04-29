@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:talabahamkor_mobile/core/theme/app_theme.dart';
-import '../../../../core/localization/app_dictionary.dart';
+import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 import 'package:talabahamkor_mobile/core/network/data_service.dart';
-import '../../../../core/models/student.dart';
+import 'package:talabahamkor_mobile/core/models/student.dart';
 import '../models/accommodation_listing.dart';
 import '../widgets/listing_card.dart';
 import 'add_accommodation_screen.dart';

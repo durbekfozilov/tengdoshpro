@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:talabahamkor_mobile/core/network/data_service.dart';
+
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 // import 'package:http/http.dart' as http; // Removed by cleanup
@@ -18,11 +20,21 @@ import '../../features/home/models/banner_model.dart';
 import '../../features/academic/models/survey_models.dart';
 
 class DataService {
+  static DataService? _instance;
   final ApiClient _apiClient;
   final AuthService _authService = AuthService();
   final LocalDatabaseService _dbService = LocalDatabaseService();
   
-  DataService(this._apiClient);
+  // Singleton pattern with support for explicit injection
+  factory DataService([ApiClient? apiClient]) {
+    if (apiClient != null) {
+      _instance = DataService._internal(apiClient);
+    }
+    _instance ??= DataService._internal(ApiClient(dio.Dio()));
+    return _instance!;
+  }
+
+  DataService._internal(this._apiClient);
 
   // Centralized Callback for auth errors
   static Function(String)? onAuthError;
@@ -963,18 +975,102 @@ class DataService {
     return false;
   }
 
-  Future<bool> completeEventActivity(int eventId, int studentId, String status) async {
+  Future<bool> completeEventActivity(int eventId, [int? studentId, String? status]) async {
     try {
       final response = await _post(
         '${ApiConstants.backendUrl}/student/clubs/events/$eventId/complete_activity',
-        body: json.encode({"student_id": studentId, "attendance_status": status}),
+        body: json.encode({"student_id": studentId ?? 0, "attendance_status": status ?? "attended"}),
       ).timeout(const Duration(seconds: 15));
       return response.statusCode == 200;
     } catch (_) {}
     return false;
   }
 
-  // Announcements
+
+  Future<List<dynamic>> getSubscriptionPlans() async {
+    try {
+      final response = await authGet('${ApiConstants.backendUrl}/subscription/plans');
+      if (response.statusCode == 200) {
+        final data = response.data;
+        return data is List ? data : (data['plans'] ?? []);
+      }
+    } catch (e) {
+      debugPrint('getSubscriptionPlans error: \$e');
+    }
+    return [];
+  }
+
+
+  Future<String?> getClickUrl({required int amount}) async {
+    try {
+      final response = await authPost(
+        '\${ApiConstants.backendUrl}/subscription/click-url',
+        body: {'amount': amount},
+      );
+      if (response.statusCode == 200) {
+        return response.data['url'] as String?;
+      }
+    } catch (e) {
+      debugPrint('getClickUrl error: \$e');
+    }
+    return null;
+  }
+
+
+  Future<Map<String, dynamic>> purchasePlan(int planId) async {
+    try {
+      final response = await authPost(
+        '\${ApiConstants.backendUrl}/subscription/purchase/\$planId',
+      );
+      if (response.statusCode == 200) return response.data;
+    } catch (e) {
+      debugPrint('purchasePlan error: \$e');
+    }
+    return {'success': false, 'message': 'Xatolik yuz berdi'};
+  }
+
+
+  Future<Map<String, dynamic>> activateTrial() async {
+    try {
+      final response = await authPost('\${ApiConstants.backendUrl}/subscription/trial');
+      if (response.statusCode == 200) return response.data;
+    } catch (e) {
+      debugPrint('activateTrial error: \$e');
+    }
+    return {'success': false, 'message': 'Xatolik yuz berdi'};
+  }
+
+
+  Future<List<dynamic>> getClubEventParticipants(int eventId) async {
+    try {
+      final response = await authGet(
+        '\${ApiConstants.backendUrl}/student/clubs/events/\$eventId/participants',
+      );
+      if (response.statusCode == 200) {
+        final data = response.data;
+        return data is List ? data : (data['participants'] ?? []);
+      }
+    } catch (e) {
+      debugPrint('getClubEventParticipants error: \$e');
+    }
+    return [];
+  }
+
+
+  Future<bool> updateClubEventAttendance(int eventId, dynamic studentId, String newStatus) async {
+    try {
+      final response = await authPost(
+        '\${ApiConstants.backendUrl}/student/clubs/events/\$eventId/attendance',
+        body: {'student_id': studentId, 'status': newStatus},
+      );
+      return response.statusCode == 200;
+    } catch (e) {
+      debugPrint('updateClubEventAttendance error: \$e');
+    }
+    return false;
+  }
+
+    // Announcements
   Future<List<AnnouncementModel>> getAnnouncementModels() async {
     try {
       final response = await _get(ApiConstants.announcements);

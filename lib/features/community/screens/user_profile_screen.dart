@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:talabahamkor_mobile/core/theme/app_theme.dart';
-import '../../../../core/services/auth_service.dart';
+import 'package:talabahamkor_mobile/core/services/auth_service.dart';
 import '../models/community_models.dart';
 import '../services/community_service.dart';
 import '../services/chat_service.dart'; // NEW
 import '../widgets/post_card.dart';
-import '../../../../core/utils/role_mapper.dart';
-import '../../../../core/models/student.dart'; 
+import 'package:talabahamkor_mobile/core/utils/role_mapper.dart';
+import 'package:talabahamkor_mobile/core/models/student.dart'; 
 import 'chat_detail_screen.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'dart:async'; // NEW

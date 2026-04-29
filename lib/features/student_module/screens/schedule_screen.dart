@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:talabahamkor_mobile/core/theme/app_theme.dart';
 import 'package:talabahamkor_mobile/core/network/data_service.dart';
-import '../../../core/models/lesson.dart';
-import '../../../core/models/attendance.dart';
+import 'package:talabahamkor_mobile/core/models/lesson.dart';
+import 'package:talabahamkor_mobile/core/models/attendance.dart';
 import 'package:intl/intl.dart';
 
 class ScheduleScreen extends StatefulWidget {

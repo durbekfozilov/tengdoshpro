@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:talabahamkor_mobile/core/theme/app_theme.dart';
 import 'package:talabahamkor_mobile/core/network/data_service.dart';
-import '../../../core/constants/api_constants.dart';
+import 'package:talabahamkor_mobile/core/constants/api_constants.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 

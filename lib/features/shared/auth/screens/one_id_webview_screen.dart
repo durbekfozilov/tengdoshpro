@@ -18,8 +18,9 @@ class _OneIdWebViewScreenState extends State<OneIdWebViewScreen> {
   void initState() {
     super.initState();
     // Use your central backend URL for OneID initiation
-    const loginUrl = "https://tengdosh.uzjoku.uz/api/auth/one-id/login";
-    const redirectUrl = "https://tengdosh.uzjoku.uz/api/auth/one-id/callback";
+    // Corrected to use the standard v1 API path
+    const loginUrl = "https://tengdosh.uzjoku.uz/api/v1/auth/one-id/login";
+    const redirectUrl = "https://tengdosh.uzjoku.uz/api/v1/auth/one-id/callback";
 
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)

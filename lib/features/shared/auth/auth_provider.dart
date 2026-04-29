@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../../core/auth/base_auth_repo.dart';
-import '../../../core/models/student.dart';
+import 'package:talabahamkor_mobile/core/auth/base_auth_repo.dart';
+import 'package:talabahamkor_mobile/core/models/student.dart';
 import 'package:talabahamkor_mobile/core/network/data_service.dart';
 
 class AuthProvider with ChangeNotifier {
@@ -109,6 +109,33 @@ class AuthProvider with ChangeNotifier {
     await _repo.logout();
     _currentUser = null;
     notifyListeners();
+  }
+
+
+  bool get isModerator {
+    final role = _currentUser?.role?.toLowerCase();
+    final staffRole = _currentUser?.staffRole?.toLowerCase();
+    return role == 'moderator' || staffRole == 'moderator';
+  }
+
+
+  Future<Map<String, String>?> getSavedBiometricCredentials() async {
+    try {
+      return await _repo.getSavedBiometricCredentials();
+    } catch (_) {
+      return null;
+    }
+  }
+
+
+  void updateUser(Map<String, dynamic>? profileData) {
+    if (profileData == null) return;
+    try {
+      _currentUser = Student.fromJson(profileData);
+      notifyListeners();
+    } catch (e) {
+      debugPrint('updateUser error: \$e');
+    }
   }
 
   String _mapErrorToMessage(String errorMsg) {

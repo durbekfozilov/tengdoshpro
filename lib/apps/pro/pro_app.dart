@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:talabahamkor_mobile/features/shared/auth/auth_provider.dart';
-import '../../features/shared/auth/screens/one_id_webview_screen.dart';
+import 'package:talabahamkor_mobile/core/theme/app_theme.dart';
+import 'package:talabahamkor_mobile/features/shared/auth/screens/one_id_webview_screen.dart';
 import '../../features/pro/dashboard/providers/pro_dashboard_provider.dart';
 import '../../features/pro/scoring/screens/pending_reviews_screen.dart';
 import '../../features/pro/attendance/screens/qr_scanner_screen.dart';
@@ -12,26 +13,10 @@ class ProApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const Color brandRed = Color(0xFFD40405);
-
     return MaterialApp(
       title: 'Tengdosh Pro',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: brandRed, 
-          primary: brandRed,
-          surface: Colors.white,
-        ),
-        useMaterial3: true,
-        scaffoldBackgroundColor: const Color(0xFFF2F2F2),
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.white,
-          foregroundColor: Colors.black,
-          elevation: 0,
-          surfaceTintColor: Colors.white,
-        ),
-      ),
+      theme: AppTheme.lightTheme,
       home: Consumer<AuthProvider>(
         builder: (context, auth, _) {
           if (auth.isLoading) {
@@ -55,7 +40,7 @@ class ProDashboard extends StatelessWidget {
     final dashboard = Provider.of<ProDashboardProvider>(context);
     final auth = Provider.of<AuthProvider>(context);
     final user = auth.currentUser;
-    const Color brandRed = Color(0xFFD40405);
+    final primaryColor = Theme.of(context).primaryColor;
 
     return Scaffold(
       appBar: AppBar(
@@ -94,8 +79,8 @@ class ProDashboard extends StatelessWidget {
                 crossAxisCount: 2,
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                mainAxisSpacing: 12,
-                crossAxisSpacing: 12,
+                mainAxisSpacing: 16,
+                crossAxisSpacing: 16,
                 childAspectRatio: 1.4,
                 children: [
                   _buildStatCard(
@@ -103,7 +88,7 @@ class ProDashboard extends StatelessWidget {
                     'Talabalar', 
                     dashboard.studentCount.toString(), 
                     Icons.group_outlined, 
-                    brandRed,
+                    primaryColor,
                     onTap: () {
                       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Talabalar ro'yxati yuklanmoqda...")));
                     },
@@ -133,7 +118,7 @@ class ProDashboard extends StatelessWidget {
                     'Grantlar', 
                     '84%', 
                     Icons.verified_user_outlined, 
-                    Colors.green,
+                    AppTheme.accentGreen,
                     onTap: () {
                       // Grants view
                     },
@@ -152,7 +137,10 @@ class ProDashboard extends StatelessWidget {
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(24),
+                  boxShadow: [
+                    BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 20, offset: const Offset(0, 10)),
+                  ],
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -161,8 +149,12 @@ class ProDashboard extends StatelessWidget {
                     width: 25,
                     height: 140 * h,
                     decoration: BoxDecoration(
-                      color: brandRed.withOpacity(0.8),
-                      borderRadius: BorderRadius.circular(6),
+                      gradient: LinearGradient(
+                        colors: [primaryColor, primaryColor.withOpacity(0.7)],
+                        begin: Alignment.bottomCenter,
+                        end: Alignment.topCenter,
+                      ),
+                      borderRadius: BorderRadius.circular(8),
                     ),
                   )).toList(),
                 ),
@@ -183,10 +175,11 @@ class ProDashboard extends StatelessWidget {
               child: FloatingActionButton.extended(
                 heroTag: 'qr',
                 onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const QrScannerScreen())),
-                backgroundColor: brandRed,
+                backgroundColor: primaryColor,
                 foregroundColor: Colors.white,
                 icon: const Icon(Icons.qr_code_scanner),
                 label: const Text('QR Davomat'),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               ),
             ),
             const SizedBox(width: 12),
@@ -194,10 +187,11 @@ class ProDashboard extends StatelessWidget {
               child: FloatingActionButton.extended(
                 heroTag: 'review',
                 onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const ManagementAppealsScreen())),
-                backgroundColor: Colors.black87,
+                backgroundColor: AppTheme.textBlack,
                 foregroundColor: Colors.white,
                 icon: const Icon(Icons.rate_review),
                 label: const Text('Arizalar'),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               ),
             ),
           ],
@@ -211,13 +205,16 @@ class ProDashboard extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(24),
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.grey.withOpacity(0.1)),
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: [
+              BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 15, offset: const Offset(0, 5)),
+            ],
+            border: Border.all(color: Colors.grey.withOpacity(0.05)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -227,15 +224,15 @@ class ProDashboard extends StatelessWidget {
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: color.withOpacity(0.1),
-                  shape: BoxShape.circle,
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(icon, color: color, size: 20),
               ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(value, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-                  Text(title, style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+                  Text(value, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, letterSpacing: -0.5)),
+                  Text(title, style: TextStyle(color: Colors.grey[600], fontSize: 12, fontWeight: FontWeight.w500)),
                 ],
               ),
             ],
@@ -251,128 +248,170 @@ class ProLoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const Color brandRed = Color(0xFFD40405);
-    
+    // Use const to avoid theme color override
+    const primaryColor = AppTheme.primaryBlue;
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: Stack(
         children: [
-          // Background subtle gradient or pattern could go here
+          // Soft background circles
+          Positioned(
+            top: -80,
+            right: -80,
+            child: Container(
+              width: 260,
+              height: 260,
+              decoration: BoxDecoration(
+                color: primaryColor.withOpacity(0.04),
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: -60,
+            left: -60,
+            child: Container(
+              width: 200,
+              height: 200,
+              decoration: BoxDecoration(
+                color: primaryColor.withOpacity(0.03),
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
           SafeArea(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 40.0),
+              padding: const EdgeInsets.symmetric(horizontal: 28.0),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const SizedBox(height: 60),
-                  // App Logo (Matching Tengdosh style)
+                  const SizedBox(height: 64),
+
+                  // Logo
                   Center(
-                    child: Hero(
-                      tag: 'pro_logo',
-                      child: Container(
-                        width: 120,
-                        height: 120,
-                        padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          color: brandRed.withOpacity(0.05),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(Icons.admin_panel_settings_rounded, color: brandRed, size: 60),
+                    child: Container(
+                      width: 120,
+                      height: 120,
+                      decoration: BoxDecoration(
+                        color: primaryColor.withOpacity(0.08),
+                        borderRadius: BorderRadius.circular(36),
+                      ),
+                      child: const Icon(
+                        Icons.admin_panel_settings_rounded,
+                        color: primaryColor,
+                        size: 60,
                       ),
                     ),
                   ),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 28),
+
+                  // Brand
                   const Text(
                     "tengdosh",
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: 42, 
-                      fontWeight: FontWeight.w900, 
-                      color: brandRed,
-                      letterSpacing: -1,
+                      fontSize: 44,
+                      fontWeight: FontWeight.w900,
+                      color: primaryColor,
+                      letterSpacing: -1.5,
                     ),
                   ),
                   const Text(
                     "PRO MANAGEMENT",
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: 14, 
-                      fontWeight: FontWeight.bold, 
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
                       color: Colors.grey,
-                      letterSpacing: 3,
+                      letterSpacing: 4,
                     ),
                   ),
-                  const SizedBox(height: 60),
-                  
-                  // Main Info Section
+                  const SizedBox(height: 56),
+
+                  // Login Card
                   Container(
-                    padding: const EdgeInsets.all(24),
+                    padding: const EdgeInsets.all(28),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF8F9FA),
-                      borderRadius: BorderRadius.circular(24),
-                      border: Border.all(color: Colors.grey.withOpacity(0.1)),
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(28),
+                      boxShadow: [
+                        BoxShadow(
+                          color: primaryColor.withOpacity(0.10),
+                          blurRadius: 36,
+                          offset: const Offset(0, 16),
+                        ),
+                      ],
+                      border: Border.all(color: Colors.grey.shade100),
                     ),
                     child: Column(
                       children: [
                         const Text(
                           "Xodimlar uchun kirish",
-                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                        const SizedBox(height: 12),
-                        const Text(
-                          "Universitet boshqaruv tizimiga kirish uchun OneID identifikatsiya xizmatidan foydalaning",
+                        const SizedBox(height: 10),
+                        Text(
+                          "Universitet boshqaruv tizimiga kirish uchun\nOneID xizmatidan foydalaning",
                           textAlign: TextAlign.center,
-                          style: TextStyle(color: Colors.grey, fontSize: 14, height: 1.5),
+                          style: TextStyle(
+                            color: Colors.grey.shade500,
+                            fontSize: 13,
+                            height: 1.55,
+                          ),
                         ),
-                        const SizedBox(height: 32),
-                        
-                        // Action Buttons
+                        const SizedBox(height: 28),
+
+                        // OneID Button
                         SizedBox(
                           width: double.infinity,
+                          height: 54,
                           child: ElevatedButton.icon(
                             onPressed: () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => const OneIdWebViewScreen()),
+                                MaterialPageRoute(
+                                  builder: (_) => const OneIdWebViewScreen(),
+                                ),
                               );
                             },
-                            icon: const Icon(Icons.security_rounded),
-                            label: const Text('Login with OneID', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: brandRed,
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(vertical: 20),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                              elevation: 8,
-                              shadowColor: brandRed.withOpacity(0.4),
+                            icon: const Icon(Icons.verified_user_rounded, color: Colors.white, size: 20),
+                            label: const Text(
+                              'Login with OneID',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
                             ),
-                          ),
-                        ),
-                        
-                        const SizedBox(height: 16),
-                        // DEBUG BUTTON (Moved inside the styled container)
-                        TextButton(
-                          onPressed: () async {
-                            final auth = Provider.of<AuthProvider>(context, listen: false);
-                            await auth.loginWithToken("DEBUG_TOKEN_PRO");
-                          },
-                          child: const Text(
-                            "DEBUG MODE: KIRISH (BYPASS)", 
-                            style: TextStyle(color: brandRed, fontWeight: FontWeight.bold, fontSize: 12),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: primaryColor,
+                              foregroundColor: Colors.white,
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                            ),
                           ),
                         ),
                       ],
                     ),
                   ),
-                  
-                  const SizedBox(height: 40),
-                  const Text(
-                    "Faqat vakolatli xodimlar uchun.\nBarcha harakatlar tizimda qayd etiladi.",
+
+                  const SizedBox(height: 44),
+                  Text(
+                    "Faqat vakolatli xodimlar uchun.\nBarcha harakatlar tizimda xavfsizlik maqsadida qayd etiladi.",
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.grey, fontSize: 12, height: 1.5),
+                    style: TextStyle(
+                      color: Colors.grey.shade400,
+                      fontSize: 12,
+                      height: 1.7,
+                    ),
                   ),
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 32),
                 ],
               ),
             ),
@@ -382,3 +421,5 @@ class ProLoginScreen extends StatelessWidget {
     );
   }
 }
+
+

@@ -4,7 +4,7 @@ import 'package:local_auth/local_auth.dart';
 import '../../../core/providers/locale_provider.dart' as core_providers;
 import 'package:talabahamkor_mobile/features/shared/auth/auth_provider.dart';
 import 'package:talabahamkor_mobile/core/theme/app_theme.dart';
-import '../../../core/constants/api_constants.dart';
+import 'package:talabahamkor_mobile/core/constants/api_constants.dart';
 import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 import 'package:url_launcher/url_launcher.dart';
 

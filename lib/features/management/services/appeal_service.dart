@@ -1,115 +1,134 @@
-import 'dart:convert';
+import 'package:dio/dio.dart' as dio;
 import 'package:talabahamkor_mobile/core/constants/api_constants.dart';
 import 'package:talabahamkor_mobile/core/network/data_service.dart';
+import 'package:talabahamkor_mobile/core/network/api_client.dart';
 import '../models/appeal_model.dart';
-import '../../appeals/models/appeal_model.dart' as student_models; // Reuse detail models
-import 'package:http/http.dart' as http;
+import '../../appeals/models/appeal_model.dart' as student_models;
 
 class AppealService {
-  final DataService _dataService = DataService();
+  final DataService _dataService;
+
+  // Constructor handles optional injection or default initialization
+  AppealService([DataService? dataService])
+      : _dataService = dataService ?? DataService(ApiClient(dio.Dio()));
 
   Future<AppealStats> getStats() async {
-    final response = await _dataService.authGet(ApiConstants.managementAppealsStats);
-    
-    if (response.statusCode == 200) {
-      final body = json.decode(response.body);
-      return AppealStats.fromJson(body);
-    } else {
-      throw Exception('Statistikani yuklab bo\'lmadi');
+    try {
+      final response = await _dataService.authGet(ApiConstants.managementAppealsStats);
+      
+      if (response.statusCode == 200) {
+        // Use response.data directly as Dio handles JSON decoding
+        return AppealStats.fromJson(response.data);
+      } else {
+        throw Exception('Statistikani yuklab bo\'lmadi: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Statistika yuklashda xatolik: $e');
     }
   }
 
   Future<List<Appeal>> getAppeals({
-    int page = 1, 
-    String? status, 
-    String? faculty, 
-    int? facultyId, // [NEW]
+    int page = 1,
+    String? status,
+    String? faculty,
+    int? facultyId,
     String? aiTopic,
     String? assignedRole
   }) async {
-    String url = '${ApiConstants.managementAppealsList}?page=$page&limit=20';
-    if (status != null) url += '&status=$status';
-    if (faculty != null) url += '&faculty=$faculty';
-    if (facultyId != null) url += '&faculty_id=$facultyId'; // [NEW]
-    if (aiTopic != null) url += '&ai_topic=$aiTopic';
-    if (assignedRole != null) url += '&assigned_role=$assignedRole';
-    
-    final response = await _dataService.authGet(url);
-    
-    if (response.statusCode == 200) {
-      final List body = json.decode(response.body);
-      return body.map((e) => Appeal.fromJson(e)).toList();
-    } else {
-      throw Exception('Murojaatlarni yuklab bo\'lmadi');
+    try {
+      String url = '${ApiConstants.managementAppealsList}?page=$page&limit=20';
+      if (status != null) url += '&status=$status';
+      if (faculty != null) url += '&faculty=$faculty';
+      if (facultyId != null) url += '&faculty_id=$facultyId';
+      if (aiTopic != null) url += '&ai_topic=$aiTopic';
+      if (assignedRole != null) url += '&assigned_role=$assignedRole';
+
+      final response = await _dataService.authGet(url);
+
+      if (response.statusCode == 200) {
+        // Dio already decodes JSON, handle both List and Map responses
+        final rawData = response.data;
+        final List data = rawData is List ? rawData : (rawData['data'] ?? []);
+        return data.map((e) => Appeal.fromJson(e)).toList();
+      } else {
+        throw Exception('Murojaatlarni yuklab bo\'lmadi: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Murojaatlarni yuklashda xatolik: $e');
     }
   }
 
   Future<void> resolveAppeal(int id) async {
-    final url = '${ApiConstants.managementAppealsResolve}/$id/resolve';
-    final response = await _dataService.authPost(url);
-    
-    if (response.statusCode != 200) {
-       throw Exception('Murojaatni yopib bo\'lmadi');
+    try {
+      final url = '${ApiConstants.managementAppealsResolve}/$id/resolve';
+      final response = await _dataService.authPost(url);
+
+      if (response.statusCode != 200) {
+        throw Exception('Murojaatni yopib bo\'lmadi: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Murojaatni yopishda xatolik: $e');
     }
   }
 
   Future<Map<String, dynamic>> clusterAppeals() async {
-    final response = await _dataService.authPost(ApiConstants.aiClusterAppeals);
-    
-    if (response.statusCode == 200) {
-      return json.decode(response.body);
-    } else {
-      throw Exception('AI Tahlil xatosi');
+    try {
+      final response = await _dataService.authPost(ApiConstants.aiClusterAppeals);
+
+      if (response.statusCode == 200) {
+        return response.data;
+      } else {
+        throw Exception('AI Tahlil xatosi: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('AI Tahlil jarayonida xatolik: $e');
     }
   }
 
   Future<void> forwardAppeal(int id, String targetRole) async {
-    final url = '${ApiConstants.managementAppealsResolve}/$id/forward';
-    final response = await _dataService.authPost(
-      url,
-      body: {'role': targetRole},
-    );
-    
-    if (response.statusCode != 200) {
-       throw Exception('Murojaatni yo\'naltirib bo\'lmadi');
+    try {
+      final url = '${ApiConstants.managementAppealsResolve}/$id/forward';
+      final response = await _dataService.authPost(
+        url,
+        body: {'role': targetRole},
+      );
+
+      if (response.statusCode != 200) {
+        throw Exception('Murojaatni yo\'naltirib bo\'lmadi: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Yo\'naltirishda xatolik: $e');
     }
   }
 
   Future<void> replyAppeal(int id, String text) async {
-    final url = '${ApiConstants.managementAppealsResolve}/$id/reply';
-    final response = await _dataService.authPost(
-      url,
-      body: {'text': text},
-    );
-    
-    if (response.statusCode != 200) {
-       throw Exception('Javob yuborishda xatolik yuz berdi');
+    try {
+      final url = '${ApiConstants.managementAppealsResolve}/$id/reply';
+      final response = await _dataService.authPost(
+        url,
+        body: {'text': text},
+      );
+
+      if (response.statusCode != 200) {
+        throw Exception('Javob yuborishda xatolik: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Javob yuborishda xatolik: $e');
     }
   }
 
   Future<student_models.AppealDetail> getAppealDetail(int id) async {
-    final url = '${ApiConstants.managementAppealsResolve}/$id';
-    final response = await _dataService.authGet(url);
-    
-    if (response.statusCode == 200) {
-      final body = json.decode(response.body);
-      return student_models.AppealDetail.fromJson(body);
-    } else {
-      throw Exception('Murojaat tafsilotlarini yuklab bo\'lmadi');
+    try {
+      final url = '${ApiConstants.managementAppealsResolve}/$id';
+      final response = await _dataService.authGet(url);
+
+      if (response.statusCode == 200) {
+        return student_models.AppealDetail.fromJson(response.data);
+      } else {
+        throw Exception('Murojaat tafsilotlarini yuklab bo\'lmadi: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Tafsilotlarni yuklashda xatolik: $e');
     }
   }
 }
-
-// Extension to access internal _get/_post of DataService if they are private
-// DataService methods are _get/_post which are private.
-// But it likely has public generic methods or I have to add them?
-// Let's check DataService again. It usually exposes authGet/authPost or similar.
-// Looking at DataService view earlier:
-// lines 45: Future<http.Response> _get(...) async
-// It seems methods are private `_get`.
-// I need to check if there are public wrappers.
-// If not, I should add `authGet` and `authPost` to DataService or make `_get` public.
-
-// Wait, I saw `getProfile` uses `_get`.
-// I should extend DataService or modify it to expose `authGet`.
-// Let's modify DataService to make `_get` public as `authGet` and `_post` as `authPost`.

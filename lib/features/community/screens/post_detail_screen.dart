@@ -4,7 +4,7 @@ import 'package:talabahamkor_mobile/core/theme/app_theme.dart';
 import '../models/community_models.dart';
 import '../services/community_service.dart';
 import '../widgets/post_card.dart';
-import '../../../../core/utils/role_mapper.dart'; // Import RoleMapper
+import 'package:talabahamkor_mobile/core/utils/role_mapper.dart'; // Import RoleMapper
 import 'dart:async';
 import 'package:talabahamkor_mobile/core/localization/app_dictionary.dart';
 

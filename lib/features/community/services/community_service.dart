@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../../../core/constants/api_constants.dart';
-import '../../../../core/services/auth_service.dart';
-import '../../../../core/models/student.dart';
+import 'package:talabahamkor_mobile/core/constants/api_constants.dart';
+import 'package:talabahamkor_mobile/core/services/auth_service.dart';
+import 'package:talabahamkor_mobile/core/models/student.dart';
 import '../models/community_models.dart';
 
 class CommunityService {

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:talabahamkor_mobile/core/network/data_service.dart';
+
 import 'package:provider/provider.dart';
 import 'package:talabahamkor_mobile/features/shared/auth/auth_provider.dart';
 import 'package:talabahamkor_mobile/core/theme/app_theme.dart';
@@ -17,7 +19,7 @@ class ManagementAppealsScreen extends StatefulWidget {
 }
 
 class _ManagementAppealsScreenState extends State<ManagementAppealsScreen> with SingleTickerProviderStateMixin {
-  final AppealService _service = AppealService();
+  late final AppealService _service;
   
   bool _isLoading = true;
   String? _error;
@@ -36,6 +38,7 @@ class _ManagementAppealsScreenState extends State<ManagementAppealsScreen> with 
   @override
   void initState() {
     super.initState();
+    _service = AppealService(Provider.of<DataService>(context, listen: false));
     _tabController = TabController(length: 2, vsync: this);
     _loadData();
   }

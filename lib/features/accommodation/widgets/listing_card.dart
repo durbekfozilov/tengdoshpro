@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/accommodation_listing.dart';
-import '../../../../core/constants/api_constants.dart';
+import 'package:talabahamkor_mobile/core/constants/api_constants.dart';
 import 'package:intl/intl.dart';
 
 class ListingCard extends StatefulWidget {

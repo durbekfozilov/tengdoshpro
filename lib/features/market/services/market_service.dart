@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
-import '../../../core/constants/api_constants.dart';
-import '../../../core/services/auth_service.dart';
+import 'package:talabahamkor_mobile/core/constants/api_constants.dart';
+import 'package:talabahamkor_mobile/core/services/auth_service.dart';
 import '../models/market_item.dart';
 
 class MarketService {
