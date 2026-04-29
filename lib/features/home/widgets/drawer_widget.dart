@@ -54,7 +54,7 @@ class AppDrawer extends StatelessWidget {
             leading: const Icon(Icons.exit_to_app, color: Colors.red),
             title: const Text("Chiqish", style: TextStyle(color: Colors.red)),
             onTap: () {
-              context.read<AuthProvider>().logout();
+              Provider.of<AuthProvider>(context, listen: false).logout();
             },
           ),
           const SizedBox(height: 20),

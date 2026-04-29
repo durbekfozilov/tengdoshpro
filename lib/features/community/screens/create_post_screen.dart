@@ -39,7 +39,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
     _selectedScope = widget.initialScope ?? 'university';
     
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (context.read<AuthProvider>().isManagement) {
+      if (Provider.of<AuthProvider>(context, listen: false).isManagement) {
         _loadFilters();
       }
     });

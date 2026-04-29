@@ -20,7 +20,7 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
       final String code = barcodes.first.rawValue ?? "";
       setState(() => _isScanning = false);
       
-      final dataService = context.read<DataService>();
+      final dataService = Provider.of<DataService>(context, listen: false);
       
       // Attempt to mark attendance via QR
       try {

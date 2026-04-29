@@ -25,7 +25,7 @@ class _SendNotificationScreenState extends State<SendNotificationScreen> {
 
     setState(() => _isSending = true);
     
-    final dataService = context.read<DataService>();
+    final dataService = Provider.of<DataService>(context, listen: false);
     try {
       // Mocking the push notification logic
       final response = await dataService.authPost(

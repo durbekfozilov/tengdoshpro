@@ -13,7 +13,7 @@ class _PendingReviewsScreenState extends State<PendingReviewsScreen> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() => context.read<ScoringProvider>().fetchPendingActivities());
+    Future.microtask(() => Provider.of<ScoringProvider>(context, listen: false).fetchPendingActivities());
   }
 
   @override
@@ -157,13 +157,14 @@ class _PendingReviewsScreenState extends State<PendingReviewsScreen> {
             onPressed: () async {
               bool success = false;
               if (status == 'approved') {
-                success = await context.read<ScoringProvider>().approveWithScore(
+                final provider = Provider.of<ScoringProvider>(context, listen: false);
+                success = await provider.approveWithScore(
                   id, 
-                  context.read<ScoringProvider>().getNewScoringTemplate(),
+                  provider.getNewScoringTemplate(),
                   commentController.text
                 );
               } else {
-                success = await context.read<ScoringProvider>().rejectActivity(id, commentController.text);
+                success = await Provider.of<ScoringProvider>(context, listen: false).rejectActivity(id, commentController.text);
               }
               
               if (mounted && success) {

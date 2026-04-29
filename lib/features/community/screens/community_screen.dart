@@ -71,7 +71,7 @@ class _CommunityScreenState extends State<CommunityScreen> with SingleTickerProv
     
     // Load Filters if Management
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (context.read<AuthProvider>().isManagement) {
+      if (Provider.of<AuthProvider>(context, listen: false).isManagement) {
         _loadFilters();
       }
     });
@@ -218,7 +218,7 @@ class _CommunityScreenState extends State<CommunityScreen> with SingleTickerProv
   }
 
   String _getCurrentScope() {
-    final isManagement = context.read<AuthProvider>().isManagement;
+    final isManagement = Provider.of<AuthProvider>(context, listen: false).isManagement;
     final index = _tabController.index;
     
     if (isManagement) {
@@ -410,7 +410,7 @@ class _CommunityScreenState extends State<CommunityScreen> with SingleTickerProv
   }
 
   void _showUniversityFilter() {
-     final user = context.read<AuthProvider>().currentUser;
+     final user = Provider.of<AuthProvider>(context, listen: false).currentUser;
      final allValue = -1;
      final myValue = user?.universityId ?? 0;
      
@@ -426,7 +426,7 @@ class _CommunityScreenState extends State<CommunityScreen> with SingleTickerProv
   }
 
   void _showFacultyFilter() {
-    final user = context.read<AuthProvider>().currentUser;
+    final user = Provider.of<AuthProvider>(context, listen: false).currentUser;
     final allValue = -1;
     final myValue = user?.facultyId ?? 0;
     
@@ -451,7 +451,7 @@ class _CommunityScreenState extends State<CommunityScreen> with SingleTickerProv
   }
 
   void _showSpecialtyFilter() {
-    final user = context.read<AuthProvider>().currentUser;
+    final user = Provider.of<AuthProvider>(context, listen: false).currentUser;
     final allValue = "ALL";
     final myValue = user?.specialtyName;
     

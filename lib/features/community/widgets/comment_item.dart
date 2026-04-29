@@ -29,7 +29,7 @@ class CommentItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isModerator = context.read<AuthProvider>().isModerator;
+    final isModerator = Provider.of<AuthProvider>(context, listen: false).isModerator;
     if (comment.isMine || isModerator) {
       return Dismissible(
         key: Key(comment.id),
@@ -89,7 +89,7 @@ class CommentItem extends StatelessWidget {
   }
 
   Widget _buildContent(BuildContext context) {
-    final isModerator = context.read<AuthProvider>().isModerator;
+    final isModerator = Provider.of<AuthProvider>(context, listen: false).isModerator;
     // "Indented to the right" for replies
     // User Requirement: "Replies must be visually indented to the right (one tab / padding-left)"
     // Increased indentation to 48.0 for better visibility.
