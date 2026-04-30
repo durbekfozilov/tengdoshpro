@@ -8,6 +8,7 @@ import 'package:talabahamkor_mobile/features/pro/scoring/screens/pending_reviews
 import 'package:talabahamkor_mobile/features/pro/attendance/screens/qr_scanner_screen.dart';
 import 'package:talabahamkor_mobile/features/management/screens/management_appeals_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:talabahamkor_mobile/core/constants/api_constants.dart';
 
 class ProApp extends StatelessWidget {
   const ProApp({super.key});
