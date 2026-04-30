@@ -257,9 +257,9 @@ class ProLoginScreen extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            const Spacer(),
+            const Spacer(flex: 2),
             
-            // Logo from Screenshot
+            // Logo
             Center(
               child: Container(
                 width: 140,
@@ -299,48 +299,82 @@ class ProLoginScreen extends StatelessWidget {
             
             const Spacer(flex: 2),
 
-            // Login Button
+            // Login Buttons Section
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 40),
-              child: SizedBox(
-                width: double.infinity,
-                height: 60,
-                child: ElevatedButton(
-                  onPressed: () async {
-                    final url = Uri.parse('${ApiConstants.oauthLogin}?source=mobile&role=staff');
-                    try {
-                      await launchUrl(url, mode: LaunchMode.externalApplication);
-                    } catch (e) {
-                      debugPrint("OneID launch error: $e");
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: brandRed,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    elevation: 8,
-                    shadowColor: brandRed.withOpacity(0.4),
-                  ),
-                  child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.security, size: 20),
-                      SizedBox(width: 12),
-                      Text(
-                        'Login with OneID',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+              child: Column(
+                children: [
+                  // Main OneID Button
+                  SizedBox(
+                    width: double.infinity,
+                    height: 60,
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        final url = Uri.parse('${ApiConstants.oauthLogin}?source=mobile&role=staff');
+                        try {
+                          await launchUrl(url, mode: LaunchMode.externalApplication);
+                        } catch (e) {
+                          debugPrint("OneID launch error: $e");
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: brandRed,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
                         ),
+                        elevation: 8,
+                        shadowColor: brandRed.withOpacity(0.4),
                       ),
-                    ],
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.security, size: 20),
+                          SizedBox(width: 12),
+                          Text(
+                            'Login with OneID',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                ),
+                  
+                  const SizedBox(height: 16),
+                  
+                  // Developer Bypass Button
+                  TextButton(
+                    onPressed: () => Provider.of<AuthProvider>(context, listen: false)
+                        .loginWithToken("DEBUG_TOKEN_PRO"),
+                    style: TextButton.styleFrom(
+                      foregroundColor: Colors.grey[400],
+                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.developer_mode, size: 16, color: Colors.grey[400]),
+                        const SizedBox(width: 8),
+                        const Text(
+                          "Developer Entry (Bypass)",
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 16),
+            
+            const Spacer(),
+            
             const Text(
               "Authorized access only",
               style: TextStyle(
@@ -348,7 +382,7 @@ class ProLoginScreen extends StatelessWidget {
                 fontSize: 14,
               ),
             ),
-            const SizedBox(height: 48),
+            const SizedBox(height: 32),
           ],
         ),
       ),
