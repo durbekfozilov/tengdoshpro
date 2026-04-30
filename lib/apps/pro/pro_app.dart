@@ -7,6 +7,10 @@ import 'package:talabahamkor_mobile/features/tutor/screens/tutor_dashboard_scree
 import 'package:talabahamkor_mobile/features/home/widgets/management_dashboard.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:talabahamkor_mobile/core/constants/api_constants.dart';
+import 'package:talabahamkor_mobile/features/market/screens/market_screen.dart';
+import 'package:talabahamkor_mobile/features/community/screens/community_screen.dart';
+import 'package:talabahamkor_mobile/features/ai/screens/management_ai_screen.dart';
+import 'package:talabahamkor_mobile/features/profile/screens/profile_screen.dart';
 
 class ProApp extends StatelessWidget {
   const ProApp({super.key});
@@ -32,8 +36,15 @@ class ProApp extends StatelessWidget {
   }
 }
 
-class ProDashboard extends StatelessWidget {
+class ProDashboard extends StatefulWidget {
   const ProDashboard({super.key});
+
+  @override
+  State<ProDashboard> createState() => _ProDashboardState();
+}
+
+class _ProDashboardState extends State<ProDashboard> {
+  int _selectedIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -47,23 +58,37 @@ class ProDashboard extends StatelessWidget {
       );
     }
 
-    // Role-based Dispatcher
-    Widget dashboardBody;
+    // Role-based Dispatcher for the Home screen
+    Widget homeBody;
     String roleTitle = "Boshqaruv";
-
     final String role = (user?.staffRole ?? user?.role ?? "").toLowerCase();
 
     if (role.contains("tutor") || role.contains("tyutor")) {
-      dashboardBody = TutorDashboardScreen(stats: dashboard.stats);
+      homeBody = TutorDashboardScreen(stats: dashboard.stats);
       roleTitle = "Tyutor Paneli";
     } else {
-      // Default to Management Dashboard for Dekan, Rektor, etc.
-      dashboardBody = SingleChildScrollView(
+      homeBody = SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: ManagementDashboard(stats: dashboard.stats),
       );
       roleTitle = "Rahbariyat Paneli";
     }
+
+    final List<Widget> screens = [
+      homeBody,
+      const MarketScreen(),
+      const CommunityScreen(),
+      const ManagementAiScreen(),
+      const ProfileScreen(),
+    ];
+
+    final List<String> titles = [
+      roleTitle,
+      "Bozor",
+      "Choyxona",
+      "AI Boshqaruv",
+      "Profil",
+    ];
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F7),
@@ -74,7 +99,7 @@ class ProDashboard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              roleTitle,
+              titles[_selectedIndex],
               style: const TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
             ),
             Text(
@@ -90,7 +115,37 @@ class ProDashboard extends StatelessWidget {
           ),
         ],
       ),
-      body: dashboardBody,
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: screens,
+      ),
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, -5),
+            ),
+          ],
+        ),
+        child: BottomNavigationBar(
+          currentIndex: _selectedIndex,
+          onTap: (index) => setState(() => _selectedIndex = index),
+          type: BottomNavigationBarType.fixed,
+          backgroundColor: Colors.white,
+          selectedItemColor: AppTheme.primaryBlue,
+          unselectedItemColor: Colors.grey,
+          showUnselectedLabels: true,
+          items: const [
+            BottomNavigationBarItem(icon: Icon(Icons.dashboard_rounded), label: 'Panel'),
+            BottomNavigationBarItem(icon: Icon(Icons.shopping_bag_rounded), label: 'Bozor'),
+            BottomNavigationBarItem(icon: Icon(Icons.forum_rounded), label: 'Choyxona'),
+            BottomNavigationBarItem(icon: Icon(Icons.psychology_rounded), label: 'AI'),
+            BottomNavigationBarItem(icon: Icon(Icons.person_rounded), label: 'Profil'),
+          ],
+        ),
+      ),
     );
   }
 }
