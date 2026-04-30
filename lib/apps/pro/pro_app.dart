@@ -197,8 +197,47 @@ class ProLoginScreen extends StatelessWidget {
                   
                   // Developer Bypass Button
                   TextButton(
-                    onPressed: () => Provider.of<AuthProvider>(context, listen: false)
-                        .loginWithToken("DEBUG_TOKEN_PRO"),
+                    onPressed: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text("Tanlang (Developer Mode)"),
+                          content: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              ListTile(
+                                title: const Text("Dekan"),
+                                onTap: () {
+                                  Navigator.pop(context);
+                                  Provider.of<AuthProvider>(context, listen: false).loginWithToken("DEBUG_TOKEN_PRO_DEKAN");
+                                },
+                              ),
+                              ListTile(
+                                title: const Text("Rektor"),
+                                onTap: () {
+                                  Navigator.pop(context);
+                                  Provider.of<AuthProvider>(context, listen: false).loginWithToken("DEBUG_TOKEN_PRO_REKTOR");
+                                },
+                              ),
+                              ListTile(
+                                title: const Text("Prorektor"),
+                                onTap: () {
+                                  Navigator.pop(context);
+                                  Provider.of<AuthProvider>(context, listen: false).loginWithToken("DEBUG_TOKEN_PRO_PROREKTOR");
+                                },
+                              ),
+                              ListTile(
+                                title: const Text("Tyutor"),
+                                onTap: () {
+                                  Navigator.pop(context);
+                                  Provider.of<AuthProvider>(context, listen: false).loginWithToken("DEBUG_TOKEN_PRO_TYUTOR");
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
                     style: TextButton.styleFrom(
                       foregroundColor: Colors.grey[400],
                       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),

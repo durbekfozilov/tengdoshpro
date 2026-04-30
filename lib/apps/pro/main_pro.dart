@@ -10,6 +10,7 @@ import 'package:talabahamkor_mobile/features/shared/auth/auth_provider.dart';
 import 'package:talabahamkor_mobile/core/auth/one_id_auth_repo.dart';
 import 'package:talabahamkor_mobile/features/pro/dashboard/providers/pro_dashboard_provider.dart';
 import 'package:talabahamkor_mobile/features/pro/scoring/providers/scoring_provider.dart';
+import 'package:talabahamkor_mobile/core/providers/locale_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,6 +28,7 @@ void main() async {
         Provider.value(value: apiClient),
         Provider.value(value: dataService),
         ChangeNotifierProvider.value(value: authProvider),
+        ChangeNotifierProvider(create: (_) => LocaleProvider()),
         ChangeNotifierProvider(create: (_) => ProDashboardProvider(dataService)),
         ChangeNotifierProvider(create: (_) => ScoringProvider(dataService)),
       ],

@@ -15,14 +15,31 @@ class OneIdAuthRepository implements IAuthRepository {
 
   @override
   Future<Student?> loginWithToken(String token) async {
-    if (token == "DEBUG_TOKEN_PRO") {
+    if (token.startsWith("DEBUG_TOKEN_PRO")) {
+      String staffRole = "owner";
+      String fullName = "Debug Administrator";
+      
+      if (token.contains("_DEKAN")) {
+        staffRole = "dekan";
+        fullName = "Debug Dekan";
+      } else if (token.contains("_REKTOR")) {
+        staffRole = "rektor";
+        fullName = "Debug Rektor";
+      } else if (token.contains("_PROREKTOR")) {
+        staffRole = "prorektor";
+        fullName = "Debug Prorektor";
+      } else if (token.contains("_TYUTOR")) {
+        staffRole = "tyutor";
+        fullName = "Debug Tyutor";
+      }
+
       return Student(
         id: 9999,
-        fullName: "Debug Administrator",
+        fullName: fullName,
         hemisLogin: "admin_debug",
         universityName: "Tengdosh University",
-        role: "developer",
-        staffRole: "owner",
+        role: "staff",
+        staffRole: staffRole,
         isPremium: true,
       );
     }
