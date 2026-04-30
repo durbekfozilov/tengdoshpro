@@ -7,6 +7,7 @@ import 'package:talabahamkor_mobile/features/pro/dashboard/providers/pro_dashboa
 import 'package:talabahamkor_mobile/features/pro/scoring/screens/pending_reviews_screen.dart';
 import 'package:talabahamkor_mobile/features/pro/attendance/screens/qr_scanner_screen.dart';
 import 'package:talabahamkor_mobile/features/management/screens/management_appeals_screen.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ProApp extends StatelessWidget {
   const ProApp({super.key});
@@ -304,13 +305,13 @@ class ProLoginScreen extends StatelessWidget {
                 width: double.infinity,
                 height: 60,
                 child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const OneIdWebViewScreen(),
-                      ),
-                    );
+                  onPressed: () async {
+                    final url = Uri.parse('${ApiConstants.oauthLogin}?source=mobile&role=staff');
+                    try {
+                      await launchUrl(url, mode: LaunchMode.externalApplication);
+                    } catch (e) {
+                      debugPrint("OneID launch error: $e");
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: brandRed,

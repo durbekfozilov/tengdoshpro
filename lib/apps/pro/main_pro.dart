@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:dio/dio.dart';
+import 'package:app_links/app_links.dart';
+import 'dart:async';
 import 'pro_app.dart';
 import 'package:talabahamkor_mobile/core/network/api_client.dart';
 import 'package:talabahamkor_mobile/core/network/data_service.dart';
@@ -14,13 +16,10 @@ void main() async {
 
   final dio = Dio();
   final apiClient = ApiClient(dio);
-  // Initialize the DataService singleton with the configured ApiClient
   final dataService = DataService(apiClient);
 
-  // Pro App uses OneID authentication
   final proRepo = OneIdAuthRepository(dataService);
   final authProvider = AuthProvider(proRepo);
-  // No debug bypass — app will show ProLoginScreen if not authenticated
 
   runApp(
     MultiProvider(
@@ -31,7 +30,53 @@ void main() async {
         ChangeNotifierProvider(create: (_) => ProDashboardProvider(dataService)),
         ChangeNotifierProvider(create: (_) => ScoringProvider(dataService)),
       ],
-      child: const ProApp(),
+      child: const ProAppWithDeepLinks(),
     ),
   );
+}
+
+class ProAppWithDeepLinks extends StatefulWidget {
+  const ProAppWithDeepLinks({super.key});
+
+  @override
+  State<ProAppWithDeepLinks> createState() => _ProAppWithDeepLinksState();
+}
+
+class _ProAppWithDeepLinksState extends State<ProAppWithDeepLinks> {
+  late AppLinks _appLinks;
+  StreamSubscription<Uri>? _linkSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    _initDeepLinks();
+  }
+
+  Future<void> _initDeepLinks() async {
+    _appLinks = AppLinks();
+    _linkSubscription = _appLinks.uriLinkStream.listen((uri) {
+      _handleDeepLink(uri);
+    });
+  }
+
+  void _handleDeepLink(Uri uri) {
+    if (uri.scheme == 'talabahamkor' && (uri.host == 'login' || uri.host == 'auth')) {
+      final token = uri.queryParameters['token'];
+      if (token != null) {
+        final auth = Provider.of<AuthProvider>(context, listen: false);
+        auth.loginWithToken(token);
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _linkSubscription?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return const ProApp();
+  }
 }
