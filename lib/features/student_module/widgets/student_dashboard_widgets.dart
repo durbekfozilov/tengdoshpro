@@ -20,7 +20,7 @@ class DashboardCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(24),
       child: Stack(
         children: [
           Container(
@@ -28,17 +28,17 @@ class DashboardCard extends StatelessWidget {
             height: double.infinity,
             decoration: BoxDecoration(
               color: isLocked ? Colors.grey[50] : Colors.white,
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(24),
               boxShadow: isLocked ? [] : [
                 BoxShadow(
-                  color: color.withValues(alpha: 0.08),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
+                  color: color.withValues(alpha: 0.12),
+                  blurRadius: 15,
+                  offset: const Offset(0, 8),
                 ),
               ],
               border: Border.all(
-                color: isLocked ? Colors.grey.withValues(alpha: 0.2) : color.withValues(alpha: 0.1), 
-                width: 1
+                color: isLocked ? Colors.grey.withValues(alpha: 0.2) : color.withValues(alpha: 0.08), 
+                width: 1.5
               ),
             ),
             child: Opacity(
