@@ -248,178 +248,108 @@ class ProLoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Use const to avoid theme color override
-    const primaryColor = AppTheme.primaryBlue;
+    const brandRed = Color(0xFFE31E24);
 
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Stack(
-        children: [
-          // Soft background circles
-          Positioned(
-            top: -80,
-            right: -80,
-            child: Container(
-              width: 260,
-              height: 260,
-              decoration: BoxDecoration(
-                color: primaryColor.withOpacity(0.04),
-                shape: BoxShape.circle,
+      body: SafeArea(
+        child: Column(
+          children: [
+            const Spacer(),
+            
+            // Logo from Screenshot
+            Center(
+              child: Container(
+                width: 140,
+                height: 140,
+                decoration: const BoxDecoration(
+                  color: brandRed,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.shield_outlined,
+                  color: Colors.white,
+                  size: 80,
+                ),
               ),
             ),
-          ),
-          Positioned(
-            bottom: -60,
-            left: -60,
-            child: Container(
-              width: 200,
-              height: 200,
-              decoration: BoxDecoration(
-                color: primaryColor.withOpacity(0.03),
-                shape: BoxShape.circle,
-              ),
-            ),
-          ),
-          SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 28.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const SizedBox(height: 64),
+            const SizedBox(height: 32),
 
-                  // Logo
-                  Center(
-                    child: Container(
-                      width: 120,
-                      height: 120,
-                      decoration: BoxDecoration(
-                        color: primaryColor.withOpacity(0.08),
-                        borderRadius: BorderRadius.circular(36),
+            // Title
+            const Text(
+              "Tengdosh Pro",
+              style: TextStyle(
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+                color: brandRed,
+                letterSpacing: -0.5,
+              ),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              "Staff & Management Portal",
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            
+            const Spacer(flex: 2),
+
+            // Login Button
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 40),
+              child: SizedBox(
+                width: double.infinity,
+                height: 60,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const OneIdWebViewScreen(),
                       ),
-                      child: const Icon(
-                        Icons.admin_panel_settings_rounded,
-                        color: primaryColor,
-                        size: 60,
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: brandRed,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    elevation: 8,
+                    shadowColor: brandRed.withOpacity(0.4),
+                  ),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.security, size: 20),
+                      SizedBox(width: 12),
+                      Text(
+                        'Login with OneID',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
+                    ],
                   ),
-                  const SizedBox(height: 28),
-
-                  // Brand
-                  const Text(
-                    "tengdosh",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 44,
-                      fontWeight: FontWeight.w900,
-                      color: primaryColor,
-                      letterSpacing: -1.5,
-                    ),
-                  ),
-                  const Text(
-                    "PRO MANAGEMENT",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.grey,
-                      letterSpacing: 4,
-                    ),
-                  ),
-                  const SizedBox(height: 56),
-
-                  // Login Card
-                  Container(
-                    padding: const EdgeInsets.all(28),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(28),
-                      boxShadow: [
-                        BoxShadow(
-                          color: primaryColor.withOpacity(0.10),
-                          blurRadius: 36,
-                          offset: const Offset(0, 16),
-                        ),
-                      ],
-                      border: Border.all(color: Colors.grey.shade100),
-                    ),
-                    child: Column(
-                      children: [
-                        const Text(
-                          "Xodimlar uchun kirish",
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-                        Text(
-                          "Universitet boshqaruv tizimiga kirish uchun\nOneID xizmatidan foydalaning",
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: Colors.grey.shade500,
-                            fontSize: 13,
-                            height: 1.55,
-                          ),
-                        ),
-                        const SizedBox(height: 28),
-
-                        // OneID Button
-                        SizedBox(
-                          width: double.infinity,
-                          height: 54,
-                          child: ElevatedButton.icon(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) => const OneIdWebViewScreen(),
-                                ),
-                              );
-                            },
-                            icon: const Icon(Icons.verified_user_rounded, color: Colors.white, size: 20),
-                            label: const Text(
-                              'Login with OneID',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: primaryColor,
-                              foregroundColor: Colors.white,
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(14),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 44),
-                  Text(
-                    "Faqat vakolatli xodimlar uchun.\nBarcha harakatlar tizimda xavfsizlik maqsadida qayd etiladi.",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.grey.shade400,
-                      fontSize: 12,
-                      height: 1.7,
-                    ),
-                  ),
-                  const SizedBox(height: 32),
-                ],
+                ),
               ),
             ),
-          ),
-        ],
+            const SizedBox(height: 16),
+            const Text(
+              "Authorized access only",
+              style: TextStyle(
+                color: Colors.grey,
+                fontSize: 14,
+              ),
+            ),
+            const SizedBox(height: 48),
+          ],
+        ),
       ),
     );
   }
 }
-
-
