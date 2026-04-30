@@ -497,6 +497,7 @@ class _AddGroupActivitySheetState extends State<AddGroupActivitySheet> {
             itemBuilder: (context, index) {
               final s = students[index];
               final id = s['id'] as int;
+              final isSelected = _selectedStudentIds.contains(id);
               return ListTile(
                 onTap: () {
                   setState(() {
