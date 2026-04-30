@@ -8,6 +8,7 @@ class AuthProvider with ChangeNotifier {
   Student? _currentUser;
   bool _isLoading = true;
   bool _isAuthUpdateRequired = false;
+  bool _isStaffOAuthLoading = false;
 
   AuthProvider(this._repo) {
     loadUser();
@@ -18,7 +19,7 @@ class AuthProvider with ChangeNotifier {
   bool get isLoading => _isLoading;
   bool get isAuthenticated => _currentUser != null;
   bool get isAuthUpdateRequired => _isAuthUpdateRequired;
-  bool get isAuthUpdateRequired => _isAuthUpdateRequired;
+  bool get isStaffOAuthLoading => _isStaffOAuthLoading;
   
   bool get isTutor => _currentUser?.role == 'tyutor' || _currentUser?.staffRole == 'tyutor';
   bool get isManagement {

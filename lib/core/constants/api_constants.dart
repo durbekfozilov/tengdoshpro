@@ -19,6 +19,26 @@ class ApiConstants {
   
   // Dashboard
   static const String dashboard = '$backendUrl/student/dashboard/';
+  static const String managementDashboard = '$backendUrl/management/dashboard';
+  static const String managementFaculties = '$backendUrl/management/faculties';
+  static const String managementStudents = '$backendUrl/management/students';
+  static const String managementGroups = '$backendUrl/management/groups';
+  static const String managementStaff = '$backendUrl/management/staff';
+  static const String managementAppealsStats = '$backendUrl/management/appeals/stats';
+  static const String managementAppealsList = '$backendUrl/management/appeals/list';
+  static const String managementAppealsResolve = '$backendUrl/management/appeals'; // Fixed path
+  static const String managementDocumentsArchive = '$backendUrl/management/archive';
+  static const String aiClusterAppeals = '$backendUrl/ai/cluster-appeals';
+  static String get managementAnalyticsDashboard => '$backendUrl/management/analytics/dashboard'; // [FIXED]
+  static String get managementActivities => '$backendUrl/management/activities'; // [NEW]
+  static String get managementRatingStats => '$backendUrl/management/rating/stats';
+  static String get managementRatingStatus => '$backendUrl/management/rating/status';
+  static String get managementRatingActivate => '$backendUrl/management/rating/activate';
+  static String get managementRatingUpdate => '$backendUrl/management/rating/update';
+  static String get managementRatingList => '$backendUrl/management/rating/list';
+  static String get managementRatingStatsDetail => '$backendUrl/management/rating/stats-detail';
+  static String get managementRatingActiveSurvey => '$backendUrl/management/rating/active-survey';
+  
   // Announcements
   static const String announcements = '$backendUrl/announcements';
   static const String banner = '$backendUrl/banner/active';
@@ -34,6 +54,12 @@ class ApiConstants {
   // Extended Features (Backend)
   static const String activities = '$backendUrl/student/activities'; 
   
+  // Tutor Features (Backend)
+  static const String tutorActivitiesUploadInit = '$backendUrl/tutor/activities/upload/init';
+  static const String tutorActivitiesUploadStatus = '$backendUrl/tutor/activities/upload/status';
+  static const String tutorActivitiesBulk = '$backendUrl/tutor/activities/bulk';
+  static const String tutorGroupStudents = '$backendUrl/tutor/students/group';
+  static const String tutorRatingStats = '$backendUrl/tutor/rating/stats';
 
   static const String clubsMy = '$backendUrl/student/clubs/my';
   static const String feedback = '$backendUrl/student/feedback';
@@ -71,4 +97,7 @@ class ApiConstants {
   // Rating
   static String get ratingTargets => '$backendUrl/rating/targets';
   static String get ratingSubmit => '$backendUrl/rating/submit';
+  static String get ratingStats => '$backendUrl/management/rating/stats';
+  static String get ratingActivate => '$backendUrl/management/rating/activate';
+  static String get ratingStatus => '$backendUrl/management/rating/status';
 }
